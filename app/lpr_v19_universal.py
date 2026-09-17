@@ -34,8 +34,8 @@ RUN_DIR = ROOT / "runs" / f"real_video_v18_{VIDEO_STEM}"
 OUT = RUN_DIR / "results_vehicle_switch_GPU.json"
 VIDEO_OUT = RUN_DIR / "result_vehicle_switch_GPU.mp4"
 
-YOLO_VENV = ROOT / ".venv_kz_gpu"
-OCR_VENV = ROOT / ".venv_paddlex_gpu"
+YOLO_VENV = ROOT.parent / ".venv_kz_gpu"
+OCR_VENV = ROOT.parent / ".venv_paddlex_gpu"
 YOLO_PYTHON = YOLO_VENV / "bin" / "python"
 OCR_PYTHON = OCR_VENV / "bin" / "python"
 
