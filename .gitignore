@@ -27,7 +27,6 @@ env/
 *.png
 
 # Runtime outputs
-runs/
 outputs/
 results/
 

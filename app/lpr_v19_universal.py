@@ -30,7 +30,7 @@ VIDEO_STEM = VIDEO.stem
 ONNX_MODEL = ROOT.parent / "model" / "best_512.onnx"
 # Results/video output are namespaced by the input video's filename, so
 # running against a second video never overwrites the first run's results.
-RUN_DIR = ROOT / "runs" / f"real_video_v18_{VIDEO_STEM}"
+RUN_DIR = ROOT.parent / "runs" / f"real_video_v18_{VIDEO_STEM}"
 OUT = RUN_DIR / "results_vehicle_switch_GPU.json"
 VIDEO_OUT = RUN_DIR / "result_vehicle_switch_GPU.mp4"
 
