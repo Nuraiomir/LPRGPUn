@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.venv_*/
+.ipynb_checkpoints/
+
+# Virtual environments
+venv/
+env/
+
+# Large models
+*.onnx
+*.pt
+*.pth
+*.pdmodel
+*.pdiparams
+*.safetensors
+
+# Videos / media
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.jpg
+*.jpeg
+*.png
+
+# Runtime outputs
+runs/
+outputs/
+results/
+
+# Logs
+*.log
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/
+
+# Secrets / local config
+.env
+.env.*
+config/gpu_env.py
+
+# Selected demo assets for integration review
+!model/
+!model/best_512.onnx
+!videos/
+!videos/*.mp4
+!results/
+!results/**/*.mp4
+!results/**/*.json
