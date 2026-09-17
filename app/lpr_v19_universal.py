@@ -27,7 +27,7 @@ VIDEO_ARG = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_VIDEO_NAME
 VIDEO = (ROOT / VIDEO_ARG) if not Path(VIDEO_ARG).is_absolute() else Path(VIDEO_ARG)
 VIDEO_STEM = VIDEO.stem
 
-ONNX_MODEL = ROOT / "best_512.onnx"
+ONNX_MODEL = ROOT.parent / "model" / "best_512.onnx"
 # Results/video output are namespaced by the input video's filename, so
 # running against a second video never overwrites the first run's results.
 RUN_DIR = ROOT / "runs" / f"real_video_v18_{VIDEO_STEM}"
