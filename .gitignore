@@ -78,3 +78,27 @@ test_*.py
 !runs/real_video_v18_20260908_150904/result_B_no_enhanced.mp4
 !runs/real_video_v18_20260909_171120/result_A_full.mp4
 !runs/real_video_v18_20260909_171120/result_B_no_enhanced.mp4
+
+# Project tests and benchmark history — keep in GitHub
+!test_ocr_gpu_worker.py
+!test_yolo_ocr_gpu.py
+!tests/
+!tests/*.py
+
+!runs/ab_A_full.json
+!runs/ab_B_no_enhanced.json
+!runs/http_benchmark_max.json
+!runs/http_profile.json
+!runs/http_profile_2.json
+!runs/http_profile_final.json
+!runs/http_profile_v2.json
+!runs/http_v1_60fps.json
+
+!runs/real_video_v15_speed_safe/
+!runs/real_video_v15_speed_safe/*.json
+!runs/real_video_v16_timing_profile/
+!runs/real_video_v16_timing_profile/*.json
+!runs/real_video_v17_ocr_early_exit/
+!runs/real_video_v17_ocr_early_exit/*.json
+!runs/real_video_v18_20260908_150630/
+!runs/real_video_v18_20260908_150630/*.json
