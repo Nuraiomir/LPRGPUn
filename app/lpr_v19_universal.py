@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parent
 # given, so old invocations still work unchanged.
 DEFAULT_VIDEO_NAME = "20260909_171120.mp4"
 VIDEO_ARG = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_VIDEO_NAME
-VIDEO = (ROOT / VIDEO_ARG) if not Path(VIDEO_ARG).is_absolute() else Path(VIDEO_ARG)
+VIDEO = (ROOT.parent / VIDEO_ARG) if not Path(VIDEO_ARG).is_absolute() else Path(VIDEO_ARG)
 VIDEO_STEM = VIDEO.stem
 
 ONNX_MODEL = ROOT.parent / "model" / "best_512.onnx"
@@ -34,25 +34,20 @@ RUN_DIR = ROOT.parent / "runs" / f"real_video_v18_{VIDEO_STEM}"
 OUT = RUN_DIR / "results_vehicle_switch_GPU.json"
 VIDEO_OUT = RUN_DIR / "result_vehicle_switch_GPU.mp4"
 
-YOLO_VENV = ROOT.parent / ".venv_kz_gpu"
-OCR_VENV = ROOT.parent / ".venv_paddlex_gpu"
-YOLO_PYTHON = YOLO_VENV / "bin" / "python"
-OCR_PYTHON = OCR_VENV / "bin" / "python"
+GPU_VENV = ROOT.parent / ".venv_gpu"
+YOLO_VENV = GPU_VENV
+OCR_VENV = GPU_VENV
+YOLO_PYTHON = GPU_VENV / "bin" / "python"
+OCR_PYTHON = GPU_VENV / "bin" / "python"
 
-CUDA12 = ":".join([
-    "/opt/conda/lib/python3.11/site-packages/nvidia/cuda_runtime/lib",
-    "/opt/conda/lib/python3.11/site-packages/nvidia/cuda_nvrtc/lib",
-    "/opt/conda/lib/python3.11/site-packages/nvidia/cublas/lib",
-    "/opt/conda/lib/python3.11/site-packages/nvidia/cudnn/lib",
-    "/opt/conda/lib/python3.11/site-packages/nvidia/curand/lib",
-    "/opt/conda/lib/python3.11/site-packages/nvidia/cufft/lib",
-])
-
-CUDA11 = ":".join([
-    str(YOLO_VENV / "lib/python3.11/site-packages/nvidia/cuda_runtime/lib"),
-    str(YOLO_VENV / "lib/python3.11/site-packages/nvidia/cuda_nvrtc/lib"),
-    str(YOLO_VENV / "lib/python3.11/site-packages/nvidia/cudnn/lib"),
-    str(YOLO_VENV / "lib/python3.11/site-packages/nvidia/cublas/lib"),
+CUDA_LIB = ":".join([
+    str(GPU_VENV / "lib/python3.12/site-packages/nvidia/cuda_runtime/lib"),
+    str(GPU_VENV / "lib/python3.12/site-packages/nvidia/cuda_nvrtc/lib"),
+    str(GPU_VENV / "lib/python3.12/site-packages/nvidia/cublas/lib"),
+    str(GPU_VENV / "lib/python3.12/site-packages/nvidia/cudnn/lib"),
+    str(GPU_VENV / "lib/python3.12/site-packages/nvidia/curand/lib"),
+    str(GPU_VENV / "lib/python3.12/site-packages/nvidia/cufft/lib"),
+    str(GPU_VENV / "lib/python3.12/site-packages/nvidia/nvjitlink/lib"),
 ])
 
 TMP = Path(tempfile.gettempdir()) / "lpr_gpu_v9_exact"
@@ -188,10 +183,8 @@ print()
 
 
 YOLO_WORKER = TMP / 'v9_gpu_yolo_worker.py'
-OCR_WORKER = TMP / 'v9_gpu_paddlex_worker.py'
+OCR_WORKER = ROOT.parent / "workers" / "ocr_gpu_worker.py"
 
-YOLO_WORKER.write_text('\nimport sys\nimport time\nfrom multiprocessing.connection import Client\nimport cv2\nimport numpy as np\nimport onnxruntime as ort\n\nhost, port, auth_hex, model = sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4]\nconn = Client((host, port), authkey=bytes.fromhex(auth_hex))\n\nsession = ort.InferenceSession(\n    model,\n    providers=["CUDAExecutionProvider", "CPUExecutionProvider"],\n)\nconn.send({"type": "ready", "providers": session.get_providers()})\ninp = session.get_inputs()[0].name\n\ndef letterbox(im, size=512):\n    h,w=im.shape[:2]\n    scale=min(size/w,size/h)\n    nw,nh=int(round(w*scale)),int(round(h*scale))\n    r=cv2.resize(im,(nw,nh),interpolation=cv2.INTER_LINEAR)\n    canvas=np.full((size,size,3),114,np.uint8)\n    dx=(size-nw)//2; dy=(size-nh)//2\n    canvas[dy:dy+nh,dx:dx+nw]=r\n    return canvas,scale,dx,dy\n\ndef detect(im):\n    x,scale,dx,dy=letterbox(im)\n    a=x[:,:,::-1].astype(np.float32)/255.0\n    a=np.transpose(a,(2,0,1))[None]\n    pred=session.run(None,{inp:a})[0]\n    if pred.ndim==3: pred=pred[0]\n    if pred.ndim==2 and pred.shape[0]<pred.shape[1] and pred.shape[0]<=10:\n        pred=pred.T\n    best=None\n    fh,fw=im.shape[:2]\n    for row in pred:\n        if len(row)<5: continue\n        cx,cy,bw,bh=map(float,row[:4])\n        conf=float(row[4]) if len(row)==5 else float(np.max(row[4:]))\n        if conf<0.40: continue\n        if max(abs(cx),abs(cy),abs(bw),abs(bh))<=2:\n            cx*=512; cy*=512; bw*=512; bh*=512\n        x1=max(0,min(fw-1,int((cx-bw/2-dx)/scale)))\n        y1=max(0,min(fh-1,int((cy-bh/2-dy)/scale)))\n        x2=max(1,min(fw,int((cx+bw/2-dx)/scale)))\n        y2=max(1,min(fh,int((cy+bh/2-dy)/scale)))\n        if x2<=x1 or y2<=y1: continue\n        if best is None or conf>best[4]:\n            best=(x1,y1,x2,y2,conf)\n    return best\n\nwhile True:\n    msg=conn.recv()\n    if msg["type"]=="frame":\n        fid=msg["fid"]\n        arr=np.frombuffer(msg["jpeg"],np.uint8)\n        im=cv2.imdecode(arr,cv2.IMREAD_COLOR)\n        t=time.perf_counter()\n        try:\n            det=detect(im)\n            conn.send({"type":"result","fid":fid,"det":det,\n                       "ms":(time.perf_counter()-t)*1000.0})\n        except Exception as e:\n            conn.send({"type":"error","fid":fid,"error":repr(e)})\n    elif msg["type"]=="stop":\n        break\nconn.close()\n', encoding='utf-8')
-OCR_WORKER.write_text('import sys\nimport time\nimport traceback\nfrom multiprocessing.connection import Client\n\nhost, port, auth_hex = sys.argv[1], int(sys.argv[2]), sys.argv[3]\n\n# Connect before importing Paddle/PaddleX so startup failures are visible.\nconn = Client((host, port), authkey=bytes.fromhex(auth_hex))\nconn.send({"type": "booting", "stage": "connected"})\n\ntry:\n    import cv2\n    import numpy as np\n    import paddle\n    from paddlex.inference import create_predictor\n\n    conn.send({\n        "type": "booting",\n        "stage": "paddle_imported",\n        "paddle": paddle.__version__,\n    })\n\n    ocr = create_predictor("en_PP-OCRv5_mobile_rec", device="gpu:0")\n\n    conn.send({\n        "type": "ready",\n        "device": "GPU",\n        "backend": "PaddleX en_PP-OCRv5_mobile_rec",\n        "paddle": paddle.__version__,\n    })\nexcept Exception as e:\n    conn.send({\n        "type": "startup_error",\n        "error": repr(e),\n        "traceback": traceback.format_exc(),\n    })\n    conn.close()\n    raise\n\ndef _ocr_once(image):\n    if image is None or image.size == 0:\n        return "", 0.0\n    if len(image.shape) == 2:\n        image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)\n    h, w = image.shape[:2]\n    if h < 32:\n        scale = max(2.0, 64.0 / max(1, h))\n        image = cv2.resize(image, None, fx=scale, fy=scale,\n                           interpolation=cv2.INTER_CUBIC)\n    try:\n        results = list(ocr(image))\n    except Exception:\n        return "", 0.0\n    best_text, best_conf = "", 0.0\n    for item in results:\n        text = getattr(item, "rec_text", None)\n        conf = getattr(item, "rec_score", None)\n        if text is None and isinstance(item, dict):\n            text = item.get("rec_text") or item.get("text")\n            conf = item.get("rec_score") or item.get("score")\n        if text is None:\n            continue\n        try:\n            conf = float(conf or 0.0)\n        except Exception:\n            conf = 0.0\n        text = str(text).strip()\n        if text and conf > best_conf:\n            best_text, best_conf = text, conf\n    return best_text, best_conf\n\n# v17: early-exit once a variant is confident enough. This never changes\n# WHICH variant wins when several are tried (still strict best-by-conf,\n# same tie-break order original->upscaled->gray->enhanced) -- it only\n# skips trying MORE variants once one is already good enough, which is\n# the exact case where trying more could not plausibly help. detailEnhance\n# (the most expensive, CPU-bound variant) still runs as a last resort for\n# genuinely hard crops, same as before -- it just stops being run\n# unconditionally on every single call.\nOCR_EARLY_EXIT_CONF = 0.92\n\ndef run_ocr(crop):\n    best_text, best_conf = "", 0.0\n\n    def _try(image):\n        nonlocal best_text, best_conf\n        text, conf = _ocr_once(image)\n        if text and conf > best_conf:\n            best_text, best_conf = text, conf\n        return best_conf >= OCR_EARLY_EXIT_CONF\n\n    if _try(crop):\n        return best_text, best_conf\n\n    up = cv2.resize(crop, None, fx=2.0, fy=2.0,\n                    interpolation=cv2.INTER_CUBIC)\n    if _try(up):\n        return best_text, best_conf\n\n    gray = cv2.cvtColor(up, cv2.COLOR_BGR2GRAY)\n    if _try(cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)):\n        return best_text, best_conf\n\n    try:\n        enhanced = cv2.detailEnhance(up, sigma_s=10, sigma_r=0.15)\n        _try(enhanced)\n    except Exception:\n        pass\n\n    return best_text, best_conf\n\ndef square_ocr(crop):\n    h, w = crop.shape[:2]\n    py, px = max(2, int(h*.05)), max(2, int(w*.03))\n    s = crop[py:h-py, px:w-px]\n    sh = s.shape[0]\n    split, gap = int(sh*.48), max(1, int(sh*.04))\n    top = s[:split]\n    bottom = s[min(sh, split+gap):]\n    tt, tc = run_ocr(top)\n    bt, bc = run_ocr(bottom)\n    return tt, tc, bt, bc\n\nwhile True:\n    msg = conn.recv()\n    if msg["type"] == "ocr":\n        arr = np.frombuffer(msg["jpeg"], np.uint8)\n        im = cv2.imdecode(arr, cv2.IMREAD_COLOR)\n        t = time.perf_counter()\n        try:\n            if msg["mode"] == "normal":\n                txt, cf = run_ocr(im)\n                payload = {"mode":"normal", "text":txt, "conf":cf}\n            else:\n                tt, tc, bt, bc = square_ocr(im)\n                payload = {"mode":"square", "top_text":tt, "top_conf":tc,\n                           "bottom_text":bt, "bottom_conf":bc}\n            payload.update({"jid":msg["jid"], "fid":msg["fid"],\n                            "ms":(time.perf_counter()-t)*1000.0})\n            conn.send({"type":"result", "payload":payload})\n        except Exception as e:\n            conn.send({"type":"error", "jid":msg["jid"], "fid":msg["fid"],\n                       "error":repr(e), "traceback":traceback.format_exc()})\n    elif msg["type"] == "stop":\n        break\nconn.close()\n', encoding='utf-8')
 
 def _env(ld):
     e=os.environ.copy()
@@ -228,20 +221,36 @@ class GPUOCR:
     def __init__(self, conn):
         self.conn=conn
         self.jid=0
+        self.last_payload={}
+
     def __call__(self, image):
         self.jid+=1
         ok,enc=cv2.imencode(".jpg",image,[cv2.IMWRITE_JPEG_QUALITY,95])
-        if not ok: return []
-        self.conn.send({"type":"ocr","jid":self.jid,"fid":self.jid,
-                        "mode":"normal","jpeg":enc.tobytes()})
+        if not ok:
+            return []
+
+        self.conn.send({
+            "type":"ocr",
+            "jid":self.jid,
+            "fid":self.jid,
+            "mode":"normal",
+            "jpeg":enc.tobytes()
+        })
+
         while True:
             m=self.conn.recv()
+
             if m.get("type")=="error":
                 raise RuntimeError("OCR ERROR: "+str(m))
+
             if m.get("type")=="result":
                 p=m["payload"]
-                # Return a dict-shaped result understood by _ocr_once replacement.
-                return [{"rec_text":p["text"],"rec_score":p["conf"]}]
+                self.last_payload=p
+
+                return [{
+                    "rec_text":p.get("text",""),
+                    "rec_score":p.get("conf",0.0)
+                }]
 
 GPU_YOLO = None
 GPU_OCR = None
@@ -552,18 +561,11 @@ def main():
     yl = Listener(("127.0.0.1", 0), authkey=os.urandom(32))
     ol = Listener(("127.0.0.1", 0), authkey=os.urandom(32))
 
-    yp = _spawn(YOLO_WORKER, YOLO_PYTHON, CUDA12, (ONNX_MODEL,), yl)
+    yp = _spawn(YOLO_WORKER, YOLO_PYTHON, CUDA_LIB, (ONNX_MODEL,), yl)
 
-    ocr_ld = ":".join([
-        str(OCR_VENV / "lib/python3.10/site-packages/nvidia/cuda_runtime/lib"),
-        str(OCR_VENV / "lib/python3.10/site-packages/nvidia/cublas/lib"),
-        str(OCR_VENV / "lib/python3.10/site-packages/nvidia/cudnn/lib"),
-        str(OCR_VENV / "lib/python3.10/site-packages/nvidia/curand/lib"),
-        str(OCR_VENV / "lib/python3.10/site-packages/nvidia/cufft/lib"),
-        str(OCR_VENV / "lib/python3.10/site-packages/nvidia/cuda_nvrtc/lib"),
-        os.environ.get("LD_LIBRARY_PATH", ""),
-    ])
-    op = _spawn(OCR_WORKER, OCR_PYTHON, ocr_ld, (), ol)
+    OCR_VARIANT_MODE = os.environ.get("OCR_VARIANT_MODE", "full")
+    print("OCR VARIANT MODE:", OCR_VARIANT_MODE, flush=True)
+    op = _spawn(OCR_WORKER, OCR_PYTHON, CUDA_LIB, (OCR_VARIANT_MODE,), ol)
 
     yc = yl.accept()
     YOLO_READY = yc.recv()
@@ -659,8 +661,14 @@ def main():
                             f"OCR ERROR: {msg.get('error')}"
                         )
                     if msg.get("type") == "result":
+                        payload = msg["payload"]
+                        print(
+                            "[OCR PAYLOAD KEYS]",
+                            list(payload.keys()),
+                            flush=True
+                        )
                         ocr_result_q.put(
-                            (mode, msg["payload"], t, det)
+                            (mode, payload, t, det)
                         )
                         break
             except Exception as exc:
@@ -842,6 +850,12 @@ def main():
                         "time": round(t, 2),
                         "plate": text,
                         "confidence": round(conf, 3),
+                        "ms": round(float(payload.get("ms", 0.0)), 2),
+                        "decode_ms": round(float(payload.get("decode_ms", 0.0)), 2),
+                        "variant_count": int(payload.get("variant_count", 0)),
+                        "prep_total_ms": round(float(payload.get("prep_total_ms", 0.0)), 2),
+                        "infer_total_ms": round(float(payload.get("infer_total_ms", 0.0)), 2),
+                        "variants": payload.get("variants", []),
                     })
                     consider_plate(text, conf, t, "normal")
                 visual_status = "NORMAL OCR"
@@ -864,6 +878,12 @@ def main():
                     "bottom_raw": bottom_text,
                     "bottom": bottom,
                     "bottom_conf": round(bottom_conf, 3),
+                    "ms": round(float(payload.get("ms", 0.0)), 2),
+                    "decode_ms": round(float(payload.get("decode_ms", 0.0)), 2),
+                    "variant_count": int(payload.get("variant_count", 0)),
+                    "prep_total_ms": round(float(payload.get("prep_total_ms", 0.0)), 2),
+                    "infer_total_ms": round(float(payload.get("infer_total_ms", 0.0)), 2),
+                    "variants": payload.get("variants", []),
                 })
 
                 add_vote(top_votes, top, top_conf, t)

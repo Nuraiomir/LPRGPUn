@@ -1,0 +1,816 @@
+{
+  "version": "v16_timing_profile_694BPT05",
+  "timing_profile": {
+    "total_wall_sec": 14.72338874032721,
+    "ocr_ready_sec": 6.681832975242287,
+    "yolo": {
+      "count": 91,
+      "sum_ms": 4198.054467793554,
+      "avg_ms": 46.13246667905005
+    },
+    "ocr": {
+      "count": 33,
+      "sum_ms": 457.7735965140164,
+      "avg_ms": 13.871927167091405
+    },
+    "writer": {
+      "count": 551,
+      "sum_ms": 2609.4930544495583,
+      "avg_ms": 4.73592205889212
+    }
+  },
+  "video": "/home/omirzakn/nurai_gpu/videos/20260908_150800.mp4",
+  "fps": 59.984004265529194,
+  "duration_sec": 9.252466666666667,
+  "frames_total": 555,
+  "checked_frames": 91,
+  "detections": 73,
+  "ocr_attempts": 51,
+  "square_ocr_frames": 34,
+  "confirmed_square": "",
+  "confirmed_plate_final": "502ARV02",
+  "switch_events": [
+    {
+      "time": 0.1,
+      "from": "",
+      "to": "822AKH02",
+      "source": "normal",
+      "confidence": 0.981
+    },
+    {
+      "time": 1.9,
+      "from": "822AKH02",
+      "to": "049BXS02",
+      "source": "square",
+      "confidence": 0.99
+    },
+    {
+      "time": 6.8,
+      "from": "049BXS02",
+      "to": "502ARV02",
+      "source": "normal",
+      "confidence": 0.951
+    }
+  ],
+  "out_of_order_decisions_ignored": 0,
+  "last_decision_t": 9.0024,
+  "ocr_backend": {
+    "type": "ready",
+    "device": "GPU",
+    "backend": "PaddleX en_PP-OCRv5_mobile_rec",
+    "paddle": "3.3.1"
+  },
+  "yolo_backend": {
+    "type": "ready",
+    "providers": [
+      "CUDAExecutionProvider",
+      "CPUExecutionProvider"
+    ]
+  },
+  "top_votes": [
+    {
+      "value": "049",
+      "weight": 2.7049940705299376,
+      "count": 2,
+      "best_conf": 0.9574882984161377
+    }
+  ],
+  "bottom_votes": [
+    {
+      "value": "02BXS",
+      "weight": 2.752955603599548,
+      "count": 2,
+      "best_conf": 0.9798104166984558
+    }
+  ],
+  "final_votes": [
+    {
+      "value": "049BXS02",
+      "weight": 1.3900000000000001,
+      "count": 1,
+      "best_conf": 0.99
+    }
+  ],
+  "square_readings": [
+    {
+      "time": 1.6,
+      "top_raw": "049",
+      "top": "049",
+      "top_conf": 0.957,
+      "bottom_raw": "02BXS",
+      "bottom": "02BXS",
+      "bottom_conf": 0.98,
+      "ms": 12.62,
+      "decode_ms": 0.67,
+      "variant_count": 4,
+      "prep_total_ms": 0.22,
+      "infer_total_ms": 12.36,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 3.32,
+          "conf": 0.846,
+          "early_exit": false,
+          "size": [
+            436,
+            194
+          ]
+        },
+        {
+          "variant": "upscaled",
+          "prep_ms": 0.14,
+          "infer_ms": 2.47,
+          "conf": 0.818,
+          "early_exit": false,
+          "size": [
+            872,
+            388
+          ]
+        },
+        {
+          "variant": "gray",
+          "prep_ms": 0.08,
+          "infer_ms": 3.57,
+          "conf": 0.957,
+          "early_exit": true,
+          "size": [
+            872,
+            388
+          ]
+        },
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 3.0,
+          "conf": 0.98,
+          "early_exit": true,
+          "size": [
+            436,
+            196
+          ]
+        }
+      ]
+    },
+    {
+      "time": 1.9,
+      "top_raw": "049",
+      "top": "049",
+      "top_conf": 0.948,
+      "bottom_raw": "02BXS",
+      "bottom": "02BXS",
+      "bottom_conf": 0.973,
+      "ms": 13.85,
+      "decode_ms": 1.0,
+      "variant_count": 4,
+      "prep_total_ms": 0.3,
+      "infer_total_ms": 13.49,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 3.88,
+          "conf": 0.616,
+          "early_exit": false,
+          "size": [
+            584,
+            218
+          ]
+        },
+        {
+          "variant": "upscaled",
+          "prep_ms": 0.17,
+          "infer_ms": 2.8,
+          "conf": 0.822,
+          "early_exit": false,
+          "size": [
+            1168,
+            436
+          ]
+        },
+        {
+          "variant": "gray",
+          "prep_ms": 0.13,
+          "infer_ms": 3.4,
+          "conf": 0.948,
+          "early_exit": true,
+          "size": [
+            1168,
+            436
+          ]
+        },
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 3.41,
+          "conf": 0.973,
+          "early_exit": true,
+          "size": [
+            584,
+            219
+          ]
+        }
+      ]
+    }
+  ],
+  "normal_readings": [
+    {
+      "time": 0.1,
+      "plate": "822AKH02",
+      "confidence": 0.981,
+      "ms": 289.89,
+      "decode_ms": 2.76,
+      "variant_count": 1,
+      "prep_total_ms": 0.0,
+      "infer_total_ms": 289.87,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 289.87,
+          "conf": 0.981,
+          "early_exit": true,
+          "size": [
+            1828,
+            343
+          ]
+        }
+      ]
+    },
+    {
+      "time": 0.2,
+      "plate": "822AKH02",
+      "confidence": 0.955,
+      "ms": 3.4,
+      "decode_ms": 2.98,
+      "variant_count": 1,
+      "prep_total_ms": 0.0,
+      "infer_total_ms": 3.32,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 3.32,
+          "conf": 0.955,
+          "early_exit": true,
+          "size": [
+            1838,
+            396
+          ]
+        }
+      ]
+    },
+    {
+      "time": 0.4,
+      "plate": "822AKH02",
+      "confidence": 0.988,
+      "ms": 4.85,
+      "decode_ms": 3.34,
+      "variant_count": 1,
+      "prep_total_ms": 0.0,
+      "infer_total_ms": 4.84,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 4.84,
+          "conf": 0.988,
+          "early_exit": true,
+          "size": [
+            1768,
+            444
+          ]
+        }
+      ]
+    },
+    {
+      "time": 6.8,
+      "plate": "502ARV02",
+      "confidence": 0.951,
+      "ms": 5.34,
+      "decode_ms": 1.2,
+      "variant_count": 1,
+      "prep_total_ms": 0.0,
+      "infer_total_ms": 5.32,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 5.32,
+          "conf": 0.951,
+          "early_exit": true,
+          "size": [
+            1237,
+            242
+          ]
+        }
+      ]
+    },
+    {
+      "time": 6.9,
+      "plate": "502ARV02",
+      "confidence": 0.977,
+      "ms": 4.12,
+      "decode_ms": 1.02,
+      "variant_count": 1,
+      "prep_total_ms": 0.0,
+      "infer_total_ms": 4.1,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 4.1,
+          "conf": 0.977,
+          "early_exit": true,
+          "size": [
+            1216,
+            238
+          ]
+        }
+      ]
+    },
+    {
+      "time": 7.0,
+      "plate": "502ARV02",
+      "confidence": 0.977,
+      "ms": 5.23,
+      "decode_ms": 0.76,
+      "variant_count": 1,
+      "prep_total_ms": 0.0,
+      "infer_total_ms": 5.22,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 5.22,
+          "conf": 0.977,
+          "early_exit": true,
+          "size": [
+            1208,
+            261
+          ]
+        }
+      ]
+    },
+    {
+      "time": 7.1,
+      "plate": "502ARV02",
+      "confidence": 0.981,
+      "ms": 4.62,
+      "decode_ms": 0.98,
+      "variant_count": 1,
+      "prep_total_ms": 0.0,
+      "infer_total_ms": 4.61,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 4.61,
+          "conf": 0.981,
+          "early_exit": true,
+          "size": [
+            1257,
+            282
+          ]
+        }
+      ]
+    },
+    {
+      "time": 7.2,
+      "plate": "502ARV02",
+      "confidence": 0.99,
+      "ms": 3.06,
+      "decode_ms": 0.82,
+      "variant_count": 1,
+      "prep_total_ms": 0.0,
+      "infer_total_ms": 3.04,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 3.04,
+          "conf": 0.99,
+          "early_exit": true,
+          "size": [
+            1250,
+            278
+          ]
+        }
+      ]
+    },
+    {
+      "time": 7.3,
+      "plate": "502ARV02",
+      "confidence": 0.993,
+      "ms": 3.49,
+      "decode_ms": 1.35,
+      "variant_count": 1,
+      "prep_total_ms": 0.0,
+      "infer_total_ms": 3.48,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 3.48,
+          "conf": 0.993,
+          "early_exit": true,
+          "size": [
+            1305,
+            300
+          ]
+        }
+      ]
+    },
+    {
+      "time": 7.4,
+      "plate": "502ARV02",
+      "confidence": 0.992,
+      "ms": 4.47,
+      "decode_ms": 1.53,
+      "variant_count": 1,
+      "prep_total_ms": 0.0,
+      "infer_total_ms": 4.46,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 4.46,
+          "conf": 0.992,
+          "early_exit": true,
+          "size": [
+            1359,
+            313
+          ]
+        }
+      ]
+    },
+    {
+      "time": 7.5,
+      "plate": "502ARV02",
+      "confidence": 0.994,
+      "ms": 4.24,
+      "decode_ms": 1.61,
+      "variant_count": 1,
+      "prep_total_ms": 0.0,
+      "infer_total_ms": 4.23,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 4.23,
+          "conf": 0.994,
+          "early_exit": true,
+          "size": [
+            1398,
+            343
+          ]
+        }
+      ]
+    },
+    {
+      "time": 7.6,
+      "plate": "502ARV02",
+      "confidence": 0.995,
+      "ms": 4.63,
+      "decode_ms": 1.68,
+      "variant_count": 1,
+      "prep_total_ms": 0.0,
+      "infer_total_ms": 4.62,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 4.62,
+          "conf": 0.995,
+          "early_exit": true,
+          "size": [
+            1379,
+            356
+          ]
+        }
+      ]
+    },
+    {
+      "time": 7.7,
+      "plate": "502ARV02",
+      "confidence": 0.988,
+      "ms": 4.26,
+      "decode_ms": 1.58,
+      "variant_count": 1,
+      "prep_total_ms": 0.0,
+      "infer_total_ms": 4.24,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 4.24,
+          "conf": 0.988,
+          "early_exit": true,
+          "size": [
+            1423,
+            353
+          ]
+        }
+      ]
+    },
+    {
+      "time": 7.8,
+      "plate": "502ARV02",
+      "confidence": 0.985,
+      "ms": 6.01,
+      "decode_ms": 1.6,
+      "variant_count": 1,
+      "prep_total_ms": 0.0,
+      "infer_total_ms": 6.0,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 6.0,
+          "conf": 0.985,
+          "early_exit": true,
+          "size": [
+            1426,
+            379
+          ]
+        }
+      ]
+    },
+    {
+      "time": 7.9,
+      "plate": "502ARV02",
+      "confidence": 0.993,
+      "ms": 4.76,
+      "decode_ms": 1.79,
+      "variant_count": 1,
+      "prep_total_ms": 0.0,
+      "infer_total_ms": 4.74,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 4.74,
+          "conf": 0.993,
+          "early_exit": true,
+          "size": [
+            1440,
+            371
+          ]
+        }
+      ]
+    },
+    {
+      "time": 8.0,
+      "plate": "502ARV02",
+      "confidence": 0.988,
+      "ms": 3.24,
+      "decode_ms": 1.18,
+      "variant_count": 1,
+      "prep_total_ms": 0.0,
+      "infer_total_ms": 3.23,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 3.23,
+          "conf": 0.988,
+          "early_exit": true,
+          "size": [
+            1462,
+            364
+          ]
+        }
+      ]
+    },
+    {
+      "time": 8.1,
+      "plate": "502ARV02",
+      "confidence": 0.987,
+      "ms": 6.03,
+      "decode_ms": 1.64,
+      "variant_count": 1,
+      "prep_total_ms": 0.0,
+      "infer_total_ms": 6.02,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 6.02,
+          "conf": 0.987,
+          "early_exit": true,
+          "size": [
+            1486,
+            379
+          ]
+        }
+      ]
+    },
+    {
+      "time": 8.2,
+      "plate": "502ARV02",
+      "confidence": 0.99,
+      "ms": 3.88,
+      "decode_ms": 1.46,
+      "variant_count": 1,
+      "prep_total_ms": 0.0,
+      "infer_total_ms": 3.87,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 3.87,
+          "conf": 0.99,
+          "early_exit": true,
+          "size": [
+            1494,
+            343
+          ]
+        }
+      ]
+    },
+    {
+      "time": 8.3,
+      "plate": "502ARV02",
+      "confidence": 0.994,
+      "ms": 4.36,
+      "decode_ms": 2.27,
+      "variant_count": 1,
+      "prep_total_ms": 0.0,
+      "infer_total_ms": 4.34,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 4.34,
+          "conf": 0.994,
+          "early_exit": true,
+          "size": [
+            1497,
+            331
+          ]
+        }
+      ]
+    },
+    {
+      "time": 8.4,
+      "plate": "502ARV02",
+      "confidence": 0.991,
+      "ms": 4.36,
+      "decode_ms": 1.06,
+      "variant_count": 1,
+      "prep_total_ms": 0.0,
+      "infer_total_ms": 4.35,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 4.35,
+          "conf": 0.991,
+          "early_exit": true,
+          "size": [
+            1527,
+            316
+          ]
+        }
+      ]
+    },
+    {
+      "time": 8.5,
+      "plate": "502ARV02",
+      "confidence": 0.985,
+      "ms": 5.97,
+      "decode_ms": 2.08,
+      "variant_count": 1,
+      "prep_total_ms": 0.0,
+      "infer_total_ms": 5.95,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 5.95,
+          "conf": 0.985,
+          "early_exit": true,
+          "size": [
+            1534,
+            308
+          ]
+        }
+      ]
+    },
+    {
+      "time": 8.6,
+      "plate": "502ARV02",
+      "confidence": 0.988,
+      "ms": 5.17,
+      "decode_ms": 1.56,
+      "variant_count": 1,
+      "prep_total_ms": 0.0,
+      "infer_total_ms": 5.16,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 5.16,
+          "conf": 0.988,
+          "early_exit": true,
+          "size": [
+            1545,
+            305
+          ]
+        }
+      ]
+    },
+    {
+      "time": 8.7,
+      "plate": "502ARV02",
+      "confidence": 0.987,
+      "ms": 3.58,
+      "decode_ms": 1.53,
+      "variant_count": 1,
+      "prep_total_ms": 0.0,
+      "infer_total_ms": 3.57,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 3.57,
+          "conf": 0.987,
+          "early_exit": true,
+          "size": [
+            1552,
+            331
+          ]
+        }
+      ]
+    },
+    {
+      "time": 8.8,
+      "plate": "502ARV02",
+      "confidence": 0.994,
+      "ms": 3.42,
+      "decode_ms": 1.34,
+      "variant_count": 1,
+      "prep_total_ms": 0.0,
+      "infer_total_ms": 3.41,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 3.41,
+          "conf": 0.994,
+          "early_exit": true,
+          "size": [
+            1574,
+            357
+          ]
+        }
+      ]
+    },
+    {
+      "time": 8.9,
+      "plate": "502ARV02",
+      "confidence": 0.978,
+      "ms": 3.2,
+      "decode_ms": 1.45,
+      "variant_count": 1,
+      "prep_total_ms": 0.0,
+      "infer_total_ms": 3.2,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 3.2,
+          "conf": 0.978,
+          "early_exit": true,
+          "size": [
+            1576,
+            422
+          ]
+        }
+      ]
+    },
+    {
+      "time": 9.0,
+      "plate": "502ARV02",
+      "confidence": 0.966,
+      "ms": 3.11,
+      "decode_ms": 2.18,
+      "variant_count": 1,
+      "prep_total_ms": 0.0,
+      "infer_total_ms": 3.1,
+      "variants": [
+        {
+          "variant": "original",
+          "prep_ms": 0.0,
+          "infer_ms": 3.1,
+          "conf": 0.966,
+          "early_exit": true,
+          "size": [
+            1630,
+            597
+          ]
+        }
+      ]
+    }
+  ]
+}
