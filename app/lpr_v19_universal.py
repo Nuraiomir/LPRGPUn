@@ -182,7 +182,7 @@ print("Метод: независимое временное голосован�
 print()
 
 
-YOLO_WORKER = TMP / 'v9_gpu_yolo_worker.py'
+YOLO_WORKER = ROOT.parent / "workers" / "yolo_gpu_worker.py"
 OCR_WORKER = ROOT.parent / "workers" / "ocr_gpu_worker.py"
 
 

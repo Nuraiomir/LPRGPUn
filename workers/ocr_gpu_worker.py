@@ -1,16 +1,7 @@
 """
 PaddleX PP-OCRv5 GPU recognition worker (subprocess), extracted verbatim from
 lpr_v19_universal.py, INCLUDING the v17 confidence-gated early-exit
-(OCR_EARLY_EXIT_CONF = 0.92
-
-# A/B experiment:
-# full        = original + upscaled + gray + enhanced
-# no-enhanced = original + upscaled + gray
-OCR_VARIANT_MODE = sys.argv[4] if len(sys.argv) > 4 else "full"
-ENABLE_ENHANCED = OCR_VARIANT_MODE != "no-enhanced"
-
-print(f"OCR VARIANT MODE: {OCR_VARIANT_MODE}", flush=True)
-) that cut average OCR latency roughly in half in
+(OCR_EARLY_EXIT_CONF = 0.92) that cut average OCR latency roughly in half in
 our own measurements, validated not to change recognition outcomes on the
 three reference videos.
 
@@ -37,6 +28,15 @@ import traceback
 from multiprocessing.connection import Client
 
 host, port, auth_hex = sys.argv[1], int(sys.argv[2]), sys.argv[3]
+
+# A/B experiment switch (argv[4], optional):
+#   full        = original + upscaled + gray + enhanced   (default)
+#   no-enhanced = original + upscaled + gray
+OCR_VARIANT_MODE = sys.argv[4] if len(sys.argv) > 4 else "full"
+if OCR_VARIANT_MODE not in ("full", "no-enhanced"):
+    raise SystemExit(f"unknown OCR_VARIANT_MODE: {OCR_VARIANT_MODE!r}")
+ENABLE_ENHANCED = OCR_VARIANT_MODE != "no-enhanced"
+print(f"OCR VARIANT MODE: {OCR_VARIANT_MODE}", flush=True)
 
 # Connect before importing Paddle/PaddleX so startup failures are visible.
 conn = Client((host, port), authkey=bytes.fromhex(auth_hex))
