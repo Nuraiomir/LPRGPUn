@@ -70,3 +70,11 @@ test_*.py
 
 # Python bytecode caches
 **/__pycache__/
+
+# Final v18 result videos — keep in GitHub
+!runs/real_video_v18_20260908_150800/result_A_full.mp4
+!runs/real_video_v18_20260908_150800/result_B_no_enhanced.mp4
+!runs/real_video_v18_20260908_150904/result_A_full.mp4
+!runs/real_video_v18_20260908_150904/result_B_no_enhanced.mp4
+!runs/real_video_v18_20260909_171120/result_A_full.mp4
+!runs/real_video_v18_20260909_171120/result_B_no_enhanced.mp4
