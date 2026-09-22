@@ -201,6 +201,71 @@ With `no-enhanced`, YOLO becomes the largest cost: about 44 ms per frame in
 the pipeline against about 1.3 ms of pure model inference. Most of that time
 is spent outside the GPU.
 
+### OCR A/B on `20260908_150904.mp4`
+
+Offline replay of `videos/20260908_150904.mp4` (18.19 s, 59.98 FPS, 1,091
+frames) through the same YOLO + OCR + voting pipeline, with `LIVE_MODE=False`
+so the frames selected for processing are never dropped.
+
+```text
+Video
+→ OpenCV
+→ every 6th frame
+→ YOLO on RTX 4090
+→ license plate crop
+→ PaddleX PP-OCRv5 on GPU
+→ voting and vehicle switching
+→ confirmed plate
+```
+
+The two modes differ only in the versions of each crop that OCR tries:
+
+| Mode | Crop versions |
+|---|---|
+| full | original → upscaled → grayscale → detailEnhance |
+| no-enhanced | original → upscaled → grayscale |
+
+`detailEnhance` is CPU preprocessing; the PP-OCRv5 inference itself runs on
+the GPU in both modes.
+
+| Metric | Full | No-enhanced |
+|---|---:|---:|
+| Processing time | 21.44 s | 18.91 s |
+| YOLO calls | 181 | 181 |
+| Detections | 148 | 148 |
+| OCR attempts | 118 | 118 |
+| OCR calls | 126 | 126 |
+| OCR time | 9.83 s | 1.46 s |
+| Final plate | 820BAQ02 | 820BAQ02 |
+| Square plate | 633BBT02 | 633BBT02 |
+| Vehicle switches | 6 | 6 |
+
+Both modes produced the same vehicle sequence, with all six switch timestamps
+identical:
+
+```text
+979CBB02 → 221ZVZ05 → 202NYM02 → 669BKH02 → 633BBT02 → 820BAQ02
+```
+
+Removing `detailEnhance` cut total processing time by 11.8% and OCR time by
+85.1%. The full run spent about 3.95 s in `detailEnhance`. That figure is
+summed over the OCR calls whose profiling was saved, not all of them, so the
+real total is at least that.
+
+What this does and does not show:
+
+- It compares processing time and pipeline behaviour. It is not an accuracy
+  benchmark: there is no verified ground truth for this video.
+- One video is not enough for a general conclusion about accuracy. Harder
+  conditions still need to be tested: low light, glare, motion blur, strong
+  perspective, dirt and greater distance.
+- The source video is 59.98 FPS, but YOLO processes about every sixth frame.
+  This is not 60 FPS recognition.
+- With `no-enhanced` the 18.19 s video was processed in 18.91 s, roughly its
+  own duration. Processing time is measured from the start of the run, so it
+  also includes starting the GPU workers and writing the annotated output
+  video.
+
 ## Known limitations
 
 - Not yet tested with a real phone camera over the network.
