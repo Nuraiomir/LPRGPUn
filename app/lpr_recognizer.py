@@ -383,8 +383,18 @@ class LPRRecognizer:
 
                         payload = prof.ocr("square", workers, sq, "square")
                         with prof.timed("voting_ms"):
-                            sq_changed, ocr_confidence = self._handle_square_result(payload, t)
+                            sq_changed, _ = self._handle_square_result(payload, t)
                         changed = changed or sq_changed
+
+                        # What OCR read in this frame. A square plate is only
+                        # as reliable as its weaker row. (The vote-based
+                        # confidence used for switching is not reported: it
+                        # stays high for seconds after the plate leaves view.)
+                        top_text = str(payload.get("top_text", ""))
+                        bottom_text = str(payload.get("bottom_text", ""))
+                        ocr_confidence = min(float(payload.get("top_conf", 0.0)),
+                                             float(payload.get("bottom_conf", 0.0)))
+                        raw_text = f"{top_text} / {bottom_text}"
 
                         # While a vehicle is confirmed, also read this crop as
                         # a single-row plate. When the camera moves to the next
@@ -395,9 +405,9 @@ class LPRRecognizer:
                             with prof.timed("voting_ms"):
                                 n_changed, n_conf, n_raw = self._handle_normal_result(payload2, t)
                             changed = changed or n_changed
-                            if ocr_confidence is None:
-                                ocr_confidence = n_conf
-                                raw_text = n_raw
+                            if n_changed:
+                                # this single-row read is what confirmed the plate
+                                ocr_confidence, raw_text = n_conf, n_raw
 
         self.drop_stale_plate(t)
         self.last_profile = prof.finish(plate_type, det is not None)

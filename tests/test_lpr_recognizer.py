@@ -263,6 +263,49 @@ def test_cleared_square_plate_is_not_revived_by_its_old_votes():
     assert not revived, f"633BBT02 came back at {revived[0]} s with no fresh reading"
     print("[OK] a cleared square plate is not confirmed again from its old votes")
 
+
+class SquareWorkers:
+    """Square-shaped detection; OCR answers from a (top, top_conf, bottom, bottom_conf) reading."""
+
+    def __init__(self):
+        self.reading = None
+
+    def detect(self, frame):
+        return (0, 0, 200, 160, 0.9)          # aspect 1.25 -> square plate
+
+    def ocr(self, crop, mode):
+        top, tc, bottom, bc = self.reading
+        if mode == "square":
+            return {"top_text": top, "top_conf": tc, "bottom_text": bottom, "bottom_conf": bc}
+        return {"text": "", "conf": 0.0}
+
+
+def test_square_ocr_confidence_is_the_weaker_row_of_this_frame():
+    """Real readings from videos/20260909_171120.mp4. At 9.0 s OCR read nothing
+    ('' / 'JO'); the old code reported the vote-based 0.99 there."""
+    rec, w = LPRRecognizer(), SquareWorkers()
+    frame = np.zeros((200, 220, 3), np.uint8)
+
+    def square_frame(t, reading):
+        w.reading = reading
+        for _ in range(3):                    # square OCR runs on every 3rd detection
+            r = rec.process_frame(frame, w, t)
+            if r["ocr_confidence"] is not None:
+                return r
+        raise AssertionError("square OCR did not run")
+
+    for t in (7.5, 7.8, 8.1):
+        r = square_frame(t, ("633", 0.995, "02BBT", 0.899))
+    assert r["plate"] == "633BBT02"
+    assert abs(r["ocr_confidence"] - 0.899) < 1e-9, r["ocr_confidence"]
+    assert r["raw_text"] == "633 / 02BBT", r["raw_text"]
+
+    r = square_frame(9.0, ("", 0.0, "JO", 0.289))
+    assert r["plate"] == "633BBT02", "the plate itself is still confirmed from votes"
+    assert r["ocr_confidence"] == 0.0, f"reported {r['ocr_confidence']} for an empty read"
+    assert r["raw_text"] == " / JO", r["raw_text"]
+    print("[OK] square ocr_confidence is this frame's weaker row; raw_text shows both rows")
+
 if __name__ == "__main__":
     test_video2_catches_short_lived_square_plate_979CBB02()
     test_single_strong_read_confirms_immediately()
@@ -276,4 +319,5 @@ if __name__ == "__main__":
     test_votes_for_a_gone_square_plate_do_not_keep_it_on_screen()
     test_square_plate_read_by_one_row_stays()
     test_cleared_square_plate_is_not_revived_by_its_old_votes()
+    test_square_ocr_confidence_is_the_weaker_row_of_this_frame()
     print("\nAll tests passed.")

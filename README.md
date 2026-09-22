@@ -127,7 +127,20 @@ Response:
 
 `plate` is the currently confirmed plate. `changed` is true only on the frame
 where a new plate was confirmed; that is when OCRM should search the bank
-database. `confidence` is the detector's, `ocr_confidence` the text reader's.
+database.
+
+`confidence` is the detector's confidence that there is a plate in `bbox`.
+`ocr_confidence` and `raw_text` describe what OCR read in this frame, before
+normalization, and are `null` when OCR did not run (no detection, or a square
+detection that was not sampled):
+
+- single-row plate: the read's confidence and text, e.g. `"545BDR05"`
+- square plate: the lower of the two row confidences, and both rows as read,
+  e.g. `"633 / 02BBT"`
+
+`ocr_confidence` says how sure OCR is about the text it read, not whether the
+text is a plate: `"0/BPT05 / KZ67"` can come with 0.80. Whether a plate was
+recognized is given by `plate` and `confirmed`.
 
 A confirmed plate that is not read again for 2 seconds is cleared: `plate`
 becomes `""` and `confirmed` becomes `false`, with `changed` staying `false`.
