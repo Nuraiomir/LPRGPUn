@@ -237,6 +237,32 @@ def test_square_plate_read_by_one_row_stays():
     assert all(p == "" for tt, p in shown.items() if tt >= 11.0), shown
     print("[OK] square plate with one readable row stays ~5 s, then is cleared")
 
+
+def test_cleared_square_plate_is_not_revived_by_its_old_votes():
+    """Real GPU run, videos/20260909_171120.mp4 at 10 fps: 633BBT02 was cleared
+    at 10.2 s, then confirmed again at 10.4 s from its own 3-second-old votes
+    while the camera was already on the next car. That must not happen."""
+    rec = LPRRecognizer(plate_hold_sec=2.0)
+    reads = {5.6: ("633", 0.972, "02BBT", 0.902), 5.9: ("633", 0.945, "02BBT", 0.981),
+             6.2: ("633", 0.936, "02BBT", 0.974), 6.6: ("633", 0.883, "02BBT", 0.962),
+             6.9: ("633", 0.968, "02BBT", 0.962), 7.2: ("633", 0.98, "02BBT", 0.92),
+             7.5: ("633", 0.995, "02BBT", 0.899), 7.8: ("Kz 633", 0.855, "02BBT", 0.97),
+             8.1: ("633", 0.993, "02BBT", 0.919), 9.0: ("", 0.0, "JO", 0.289),
+             10.4: ("0/BPT05", 0.856, "KZ67", 0.828), 10.8: ("/BPT05", 0.826, "KZ671", 0.817)}
+    shown = {}
+    for step in range(56, 120):               # 5.6 s .. 11.9 s at 10 fps
+        t = round(step * 0.1, 1)
+        if t in reads:
+            top, tc, bottom, bc = reads[t]
+            rec._handle_square_result({"top_text": top, "top_conf": tc,
+                                       "bottom_text": bottom, "bottom_conf": bc}, t)
+        rec.drop_stale_plate(t)
+        shown[t] = rec.confirmed_plate
+    assert shown[10.2] == "", shown[10.2]
+    revived = [t for t in shown if t > 10.2 and shown[t]]
+    assert not revived, f"633BBT02 came back at {revived[0]} s with no fresh reading"
+    print("[OK] a cleared square plate is not confirmed again from its old votes")
+
 if __name__ == "__main__":
     test_video2_catches_short_lived_square_plate_979CBB02()
     test_single_strong_read_confirms_immediately()
@@ -249,4 +275,5 @@ if __name__ == "__main__":
     test_zero_hold_disables_the_timeout()
     test_votes_for_a_gone_square_plate_do_not_keep_it_on_screen()
     test_square_plate_read_by_one_row_stays()
+    test_cleared_square_plate_is_not_revived_by_its_old_votes()
     print("\nAll tests passed.")

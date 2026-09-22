@@ -422,6 +422,12 @@ class LPRRecognizer:
             return False
         self.confirmed_plate = ""
         self.confirmed_history = []
+        # The square votes behind the cleared plate are stale by definition;
+        # left in place they would confirm it again from old evidence as soon
+        # as the next square crop is read, even if that crop is another car.
+        self.top_votes.clear()
+        self.bottom_votes.clear()
+        self.final_votes.clear()
         self.plate_clears += 1
         return True
 
