@@ -298,8 +298,12 @@ class LPRRecognizer:
 
         self._latest_t = float("-inf")
 
-    def consider_plate(self, candidate, conf, t, source):
-        """Returns True if this read switched the confirmed plate."""
+    def consider_plate(self, candidate, conf, t, source, fresh=True):
+        """Returns True if this read switched the confirmed plate.
+
+        fresh=False means the candidate comes from accumulated votes rather
+        than from what was read in this frame. It counts for switching exactly
+        as before, but does not keep the confirmed plate on screen."""
         if not candidate or not valid_kz_plate(candidate):
             return False
 
@@ -318,7 +322,8 @@ class LPRRecognizer:
         })
 
         if candidate == self.confirmed_plate:
-            self.last_confirmed_read_t = t
+            if fresh:
+                self.last_confirmed_read_t = t
             return False
 
         reads = [x for x in self.confirmed_history if x["plate"] == candidate]
@@ -467,7 +472,14 @@ class LPRRecognizer:
             # Both row weights above their minimums is enough to confirm;
             # waiting for the combined vote to repeat made short-lived square
             # plates (e.g. 979CBB02) leave the frame before confirmation.
-            changed = self.consider_plate(candidate, final_conf, t, "square")
+            #
+            # The candidate comes from votes over the last WINDOW_SEC seconds,
+            # so it can still name a car that has already left while the
+            # camera reads the next one. It keeps the plate on screen only if
+            # this frame's own reading matches at least one of its rows.
+            plate_bottom = candidate[6:8] + candidate[3:6]
+            fresh = (top == candidate[:3]) or (bottom == plate_bottom)
+            changed = self.consider_plate(candidate, final_conf, t, "square", fresh=fresh)
 
         self._trim_history(t)
         return changed, final_conf

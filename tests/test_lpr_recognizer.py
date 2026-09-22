@@ -190,6 +190,53 @@ def test_zero_hold_disables_the_timeout():
     assert run(rec, w, 60.0, None)["plate"] == "545BDR05"
     print("[OK] plate_hold_sec=0 keeps the old behaviour")
 
+
+def test_votes_for_a_gone_square_plate_do_not_keep_it_on_screen():
+    """Square plates are decided from votes over the last 3 s. While the camera
+    already reads the next car, those votes can still name the old plate; that
+    must not keep the old plate on screen. Readings below are from the real run
+    on videos/20260909_171120.mp4: at 10.4 s and 10.8 s the square path is
+    reading the next car (694BPT05), not 633BBT02."""
+    rec = LPRRecognizer(plate_hold_sec=2.0)
+    square = [(7.5, "633", 0.995, "02BBT", 0.899), (7.8, "Kz 633", 0.855, "02BBT", 0.97),
+              (8.1, "633", 0.993, "02BBT", 0.919), (9.0, "", 0.0, "JO", 0.289),
+              (10.4, "0/BPT05", 0.856, "KZ67", 0.828), (10.8, "/BPT05", 0.826, "KZ671", 0.817)]
+    shown = {}
+    for t, top, tc, bottom, bc in square:
+        rec._handle_square_result({"top_text": top, "top_conf": tc,
+                                   "bottom_text": bottom, "bottom_conf": bc}, t)
+        rec.drop_stale_plate(t)
+        shown[t] = rec.confirmed_plate
+    assert shown[8.1] == "633BBT02", shown
+    assert shown[9.0] == "633BBT02", "cleared before 2 s had passed"
+    assert shown[10.4] == "", f"old square plate kept alive by the next car: {shown[10.4]!r}"
+    print("[OK] votes for a square plate that has left do not keep it on screen")
+
+
+def test_square_plate_read_by_one_row_stays():
+    """One readable row keeps a square plate on screen while the other row's
+    votes are still within WINDOW_SEC. After that no full plate can be formed,
+    and the plate is cleared PLATE_HOLD_SEC later."""
+    rec = LPRRecognizer(plate_hold_sec=2.0)
+    for t in (5.0, 5.3, 5.6):                 # both rows read; last top read at 5.6
+        rec._handle_square_result({"top_text": "633", "top_conf": 0.97,
+                                   "bottom_text": "02BBT", "bottom_conf": 0.96}, t)
+    assert rec.confirmed_plate == "633BBT02"
+
+    t = 5.6
+    shown = {}
+    while t < 11.5:                           # from now on only the bottom row reads
+        t = round(t + 0.6, 1)
+        rec._handle_square_result({"top_text": "6?3", "top_conf": 0.5,
+                                   "bottom_text": "02BBT", "bottom_conf": 0.95}, t)
+        rec.drop_stale_plate(t)
+        shown[t] = rec.confirmed_plate
+    # top votes last until 5.6 + 3.0 = 8.6; the last keep-alive is at 8.6,
+    # so the plate stays through 10.6 and is gone after that
+    assert all(p == "633BBT02" for tt, p in shown.items() if tt <= 10.4), shown
+    assert all(p == "" for tt, p in shown.items() if tt >= 11.0), shown
+    print("[OK] square plate with one readable row stays ~5 s, then is cleared")
+
 if __name__ == "__main__":
     test_video2_catches_short_lived_square_plate_979CBB02()
     test_single_strong_read_confirms_immediately()
@@ -200,4 +247,6 @@ if __name__ == "__main__":
     test_reads_of_another_plate_do_not_keep_the_old_one()
     test_cleared_plate_is_confirmed_again_as_a_change()
     test_zero_hold_disables_the_timeout()
+    test_votes_for_a_gone_square_plate_do_not_keep_it_on_screen()
+    test_square_plate_read_by_one_row_stays()
     print("\nAll tests passed.")
