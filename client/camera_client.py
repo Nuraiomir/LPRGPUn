@@ -202,6 +202,14 @@ def main():
                 "to": plate,
                 "plate_type": result.get("plate_type"),
             })
+        elif last_plate and not plate:
+            marker = "   <<< НОМЕР СБРОШЕН (давно не читался)"
+            switch_log.append({
+                "video_time": round(frame_idx / video_fps, 2),
+                "from": last_plate,
+                "to": "",
+                "plate_type": "сброс",
+            })
         last_plate = plate
 
         ocr_conf = result.get("ocr_confidence")
@@ -273,7 +281,8 @@ def main():
         print("Распознанные номера по порядку:")
         for ev in switch_log:
             frm = ev["from"] or "-"
-            print(f"  {ev['video_time']:6.2f} сек   {frm:10s} -> {ev['to']:10s} ({ev['plate_type']})")
+            to = ev["to"] or "(пусто)"
+            print(f"  {ev['video_time']:6.2f} сек   {frm:10s} -> {to:10s} ({ev['plate_type']})")
 
     if profiles:
         print()

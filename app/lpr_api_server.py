@@ -9,6 +9,10 @@ or employees never share voting state. Requests of the same session are
 processed one at a time; different sessions run in parallel. Sessions that
 stay idle for SESSION_TTL_SEC are dropped.
 
+A confirmed plate that is not read again for PLATE_HOLD_SEC seconds (2 s by
+default) is cleared: plate becomes "" and confirmed false. A client should
+show vehicle data only while confirmed is true.
+
 Optional query parameters:
     profile=1   add a per-stage timing breakdown ("profile") to the response
     t=<sec>     use this timestamp for voting instead of the server clock.
@@ -46,7 +50,7 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from gpu_workers_client import WorkerError, WorkerStartupError, Workers  # noqa: E402
-from lpr_recognizer import LPRRecognizer  # noqa: E402
+from lpr_recognizer import PLATE_HOLD_SEC, LPRRecognizer  # noqa: E402
 
 
 HOST, PORT = "0.0.0.0", 8765
@@ -64,8 +68,8 @@ _PROFILE_MS_FIELDS = ("yolo_ms", "ocr_total_ms", "ocr_square_ms", "ocr_normal_ms
 class _Session:
     __slots__ = ("recognizer", "lock", "last_used")
 
-    def __init__(self):
-        self.recognizer = LPRRecognizer()
+    def __init__(self, plate_hold_sec):
+        self.recognizer = LPRRecognizer(plate_hold_sec=plate_hold_sec)
         self.lock = threading.Lock()
         self.last_used = time.monotonic()
 
@@ -73,8 +77,10 @@ class _Session:
 class SessionStore:
     """Thread-safe map session_id -> recognizer, with idle expiry and a size cap."""
 
-    def __init__(self, ttl_sec=SESSION_TTL_SEC, max_sessions=MAX_SESSIONS):
+    def __init__(self, ttl_sec=SESSION_TTL_SEC, max_sessions=MAX_SESSIONS,
+                 plate_hold_sec=PLATE_HOLD_SEC):
         self._ttl = ttl_sec
+        self.plate_hold_sec = plate_hold_sec
         self._max = max_sessions
         self._sessions = {}
         self._lock = threading.Lock()
@@ -91,7 +97,7 @@ class SessionStore:
                 if len(self._sessions) >= self._max:
                     oldest = min(self._sessions, key=lambda k: self._sessions[k].last_used)
                     del self._sessions[oldest]
-                session = self._sessions[session_id] = _Session()
+                session = self._sessions[session_id] = _Session(self.plate_hold_sec)
             session.last_used = now
             return session
 
@@ -225,15 +231,18 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main(project_root, yolo_python, ocr_python, onnx_model,
-         yolo_cuda_ld_path, ocr_cuda_ld_path, ocr_variant_mode="full", port=None):
-    global WORKERS, PORT
+         yolo_cuda_ld_path, ocr_cuda_ld_path, ocr_variant_mode="full", port=None,
+         plate_hold_sec=PLATE_HOLD_SEC):
+    global WORKERS, PORT, SESSIONS
     if port is not None:
         PORT = port
+    SESSIONS = SessionStore(plate_hold_sec=plate_hold_sec)
 
     print("=" * 70)
     print("LPR HTTP SERVER")
     print("=" * 70)
     print(f"OCR variant mode: {ocr_variant_mode}")
+    print(f"Plate hold:       {plate_hold_sec} s" + (" (disabled)" if plate_hold_sec <= 0 else ""))
     print(f"Project root:     {project_root}")
     print(f"YOLO model:       {onnx_model}")
     print(f"Worker python:    {yolo_python}")
@@ -275,6 +284,8 @@ if __name__ == "__main__":
     parser.add_argument("--ocr-variants", choices=["full", "no-enhanced"], default="full",
                         help="no-enhanced skips cv2.detailEnhance")
     parser.add_argument("--port", type=int, default=PORT)
+    parser.add_argument("--plate-hold-sec", type=float, default=PLATE_HOLD_SEC,
+                        help="clear a plate not read for this long; 0 disables")
     args = parser.parse_args()
 
     main(project_root=gpu_env.PROJECT_ROOT,
@@ -284,4 +295,5 @@ if __name__ == "__main__":
          yolo_cuda_ld_path=gpu_env.YOLO_CUDA_LD_PATH,
          ocr_cuda_ld_path=gpu_env.OCR_CUDA_LD_PATH,
          ocr_variant_mode=args.ocr_variants,
-         port=args.port)
+         port=args.port,
+         plate_hold_sec=args.plate_hold_sec)

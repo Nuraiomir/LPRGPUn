@@ -14,6 +14,10 @@ Plate format: three digits, three Latin letters, two digits (e.g. 545BDR05).
 A square plate carries the digits on the top row and region + letters on the
 bottom row (e.g. top "633", bottom "02BBT" -> 633BBT02).
 
+The HTTP path (process_frame) drops a confirmed plate that has not been read
+for PLATE_HOLD_SEC seconds. The offline pipeline only uses consider_plate and
+is not affected.
+
 Note on OCR_EVERY_N_DETECTIONS: only every third square-shaped detection is
 sent to OCR. The value was tuned for a 60 fps offline loop. A live camera that
 sends far fewer frames per second may need a smaller value.
@@ -44,6 +48,13 @@ MIN_FINAL_WEIGHT = 2.50
 SWITCH_WINDOW_SEC = 1.5
 SWITCH_CONFIRM_READS = 2      # matching reads needed to switch plates
 SWITCH_STRONG_CONF = 0.95     # ...or one read at least this confident
+
+# A confirmed plate that has not been read again for this many seconds is
+# dropped, so the previous car is not shown after the camera has moved away.
+# On the reference videos the longest gap between reads of a plate that was
+# still in view was 0.7 s. Only reads of the confirmed plate itself keep it
+# alive; a detection of some other plate does not. 0 disables the timeout.
+PLATE_HOLD_SEC = 2.0
 
 # Memory bounds for long-running sessions. Voting only looks back WINDOW_SEC,
 # so older votes can never influence a decision. They are kept for ten
@@ -262,7 +273,11 @@ class LPRRecognizer:
     asynchronous OCR result cannot roll the confirmed plate back.
     """
 
-    def __init__(self):
+    def __init__(self, plate_hold_sec=PLATE_HOLD_SEC):
+        self.plate_hold_sec = plate_hold_sec
+        self.last_confirmed_read_t = float("-inf")
+        self.plate_clears = 0
+
         self.confirmed_plate = ""
         self.confirmed_history = []
         self.last_decision_t = -1.0
@@ -303,6 +318,7 @@ class LPRRecognizer:
         })
 
         if candidate == self.confirmed_plate:
+            self.last_confirmed_read_t = t
             return False
 
         reads = [x for x in self.confirmed_history if x["plate"] == candidate]
@@ -311,6 +327,7 @@ class LPRRecognizer:
             old = self.confirmed_plate
             self.confirmed_plate = candidate
             self.confirmed_history = []
+            self.last_confirmed_read_t = t
             self.switch_events.append({
                 "time": round(t, 2), "from": old, "to": candidate,
                 "source": source, "confidence": round(float(conf), 3),
@@ -377,6 +394,7 @@ class LPRRecognizer:
                                 ocr_confidence = n_conf
                                 raw_text = n_raw
 
+        self.drop_stale_plate(t)
         self.last_profile = prof.finish(plate_type, det is not None)
 
         return {
@@ -389,6 +407,18 @@ class LPRRecognizer:
             "plate_type": plate_type,
             "raw_text": raw_text,
         }
+
+    def drop_stale_plate(self, t):
+        """Clears the confirmed plate if it was not read for plate_hold_sec.
+        Returns True if the plate was cleared."""
+        if not self.confirmed_plate or not self.plate_hold_sec or self.plate_hold_sec <= 0:
+            return False
+        if t - self.last_confirmed_read_t <= self.plate_hold_sec:
+            return False
+        self.confirmed_plate = ""
+        self.confirmed_history = []
+        self.plate_clears += 1
+        return True
 
     def _handle_normal_result(self, payload, t):
         raw_text = str(payload.get("text", ""))

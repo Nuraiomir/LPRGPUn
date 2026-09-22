@@ -106,9 +106,98 @@ def test_invalid_format_never_confirms():
     assert rec.confirmed_plate == ""
 
 
+
+# ---------------------------------------------------------------------------
+# Stale plate timeout (HTTP path, process_frame)
+# ---------------------------------------------------------------------------
+
+import numpy as np  # noqa: E402
+
+FRAME = np.zeros((120, 420, 3), np.uint8)
+NORMAL_BOX = (0, 0, 400, 100, 0.9)          # aspect 4.0 -> single-row plate
+
+
+class ScriptedWorkers:
+    """detect() and ocr() answer from a script: None = no plate in view,
+    otherwise (plate_text, ocr_conf)."""
+
+    def __init__(self):
+        self.next = None
+
+    def detect(self, frame):
+        return None if self.next is None else NORMAL_BOX
+
+    def ocr(self, crop, mode):
+        text, conf = self.next
+        return {"text": text, "conf": conf}
+
+
+def run(rec, workers, t, reading):
+    workers.next = reading
+    return rec.process_frame(FRAME, workers, t)
+
+
+def test_stale_plate_is_cleared_after_hold():
+    rec, w = LPRRecognizer(plate_hold_sec=2.0), ScriptedWorkers()
+    r = run(rec, w, 0.0, ("545BDR05", 0.99))
+    assert r["plate"] == "545BDR05" and r["changed"] is True
+    assert run(rec, w, 1.9, None)["plate"] == "545BDR05", "cleared too early"
+    r = run(rec, w, 2.1, None)
+    assert r["plate"] == "" and r["confirmed"] is False, r
+    assert r["changed"] is False, "a clear must not ask OCRM to search"
+    assert rec.plate_clears == 1
+    print("[OK] plate not read for more than 2 s is cleared; clearing does not set changed")
+
+
+def test_plate_is_kept_while_it_keeps_being_read():
+    rec, w = LPRRecognizer(plate_hold_sec=2.0), ScriptedWorkers()
+    t = 0.0
+    run(rec, w, t, ("545BDR05", 0.99))
+    for _ in range(30):                       # 0.7 s gaps: the longest seen on real video
+        t += 0.35
+        run(rec, w, t, None)
+        t += 0.35
+        r = run(rec, w, t, ("545BDR05", 0.93))
+        assert r["plate"] == "545BDR05", f"cleared at t={t:.2f} while still being read"
+    assert rec.plate_clears == 0
+    print("[OK] plate read every 0.7 s for 21 s is never cleared")
+
+
+def test_reads_of_another_plate_do_not_keep_the_old_one():
+    rec, w = LPRRecognizer(plate_hold_sec=2.0), ScriptedWorkers()
+    run(rec, w, 0.0, ("545BDR05", 0.99))
+    # Camera moves to the next car: its plate is seen, but read too weakly
+    # and too rarely to confirm (reads further apart than SWITCH_WINDOW_SEC).
+    # The old plate must not stay on screen meanwhile.
+    run(rec, w, 0.9, ("633BBT02", 0.80))
+    r = run(rec, w, 2.6, ("633BBT02", 0.80))
+    assert r["plate"] == "", f"old plate kept alive by another car: {r['plate']!r}"
+    print("[OK] reads of a different plate do not keep the previous plate on screen")
+
+
+def test_cleared_plate_is_confirmed_again_as_a_change():
+    rec, w = LPRRecognizer(plate_hold_sec=2.0), ScriptedWorkers()
+    run(rec, w, 0.0, ("545BDR05", 0.99))
+    run(rec, w, 3.0, None)                    # cleared
+    r = run(rec, w, 4.0, ("545BDR05", 0.99))
+    assert r["plate"] == "545BDR05" and r["changed"] is True, r
+    print("[OK] the same car coming back is confirmed again with changed=true")
+
+
+def test_zero_hold_disables_the_timeout():
+    rec, w = LPRRecognizer(plate_hold_sec=0), ScriptedWorkers()
+    run(rec, w, 0.0, ("545BDR05", 0.99))
+    assert run(rec, w, 60.0, None)["plate"] == "545BDR05"
+    print("[OK] plate_hold_sec=0 keeps the old behaviour")
+
 if __name__ == "__main__":
     test_video2_catches_short_lived_square_plate_979CBB02()
     test_single_strong_read_confirms_immediately()
     test_out_of_order_result_does_not_roll_back_confirmed_plate()
     test_invalid_format_never_confirms()
+    test_stale_plate_is_cleared_after_hold()
+    test_plate_is_kept_while_it_keeps_being_read()
+    test_reads_of_another_plate_do_not_keep_the_old_one()
+    test_cleared_plate_is_confirmed_again_as_a_change()
+    test_zero_hold_disables_the_timeout()
     print("\nAll tests passed.")

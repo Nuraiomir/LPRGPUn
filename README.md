@@ -81,7 +81,7 @@ calls were lost.
 
 ```bash
 cp config/gpu_env.example.py config/gpu_env.py     # once
-.venv_gpu/bin/python app/lpr_api_server.py         # options: --ocr-variants no-enhanced, --port 8765
+.venv_gpu/bin/python app/lpr_api_server.py         # options: --ocr-variants, --port, --plate-hold-sec
 ```
 
 Send a video through it as if it were a camera:
@@ -126,8 +126,19 @@ Response:
 ```
 
 `plate` is the currently confirmed plate. `changed` is true only on the frame
-where the confirmed plate changed; that is when OCRM should search the bank
+where a new plate was confirmed; that is when OCRM should search the bank
 database. `confidence` is the detector's, `ocr_confidence` the text reader's.
+
+A confirmed plate that is not read again for 2 seconds is cleared: `plate`
+becomes `""` and `confirmed` becomes `false`, with `changed` staying `false`.
+OCRM should show vehicle data only while `confirmed` is `true`. Only reads of
+the confirmed plate itself keep it on screen, so pointing the camera at the
+next car does not extend the previous one. On the reference videos the longest
+gap between reads of a plate still in view was 0.7 s. If the same car comes
+back after a clear, it is confirmed again with `changed: true`. Change the
+timeout with `--plate-hold-sec` (0 disables it). When sending a recorded video
+through the server, use `camera_client.py --video-time-voting` so the timeout
+is measured in video time rather than in processing time.
 
 Errors return `{"ok": false, "error": "...", "error_code": "..."}`:
 
@@ -182,7 +193,5 @@ is spent outside the GPU.
 - Not yet tested with a real phone camera over the network.
 - No authentication, rate limiting or TLS on the HTTP server.
 - One plate per frame: the detector returns only the most confident box.
-- The confirmed plate stays in the response until a new one is confirmed, so
-  right after the camera moves away the previous car's plate is still shown.
 - `OCR_EVERY_N_DETECTIONS = 3` was tuned for 60 fps video; a live camera
   sending fewer frames may need a lower value.
