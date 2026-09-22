@@ -220,8 +220,8 @@ class Handler(BaseHTTPRequestHandler):
             print(f"[FRAME] internal error: {exc!r}", flush=True)
             self._send_error(500, "internal_error", repr(exc))
 
-    def log_message(self, *args):
-        print("[HTTP]", *args, flush=True)
+    def log_message(self, format, *args):
+        print(f"[HTTP] {self.address_string()} {format % args}", flush=True)
 
 
 def main(project_root, yolo_python, ocr_python, onnx_model,
