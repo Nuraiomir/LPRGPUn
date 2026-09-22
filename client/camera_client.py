@@ -1,29 +1,26 @@
 #!/usr/bin/env python3
 """
-Simulated-camera client for the LPR API server.
+Camera simulator for the LPR HTTP server.
 
-This does NOT replace physical camera testing (see docs/architecture.md,
-"NOT YET VERIFIED"). It is a transport/integration test: it turns a
-recorded video into a sequence of HTTP POSTs exactly the way a future real
-camera client would, so the API layer (server, sessions, JSON contract) can
-be exercised end-to-end before physical camera access exists.
+Reads a recorded video and sends it frame by frame to POST /frame, the same
+way a phone camera client would, then prints the recognized plate, latency
+and a summary. Requests are strictly sequential: the next frame is sent only
+after the previous response has arrived.
+
+This tests the HTTP path (server, sessions, JSON), not a physical camera or
+a mobile network.
 
 Usage:
-    python client/camera_client.py \\
-        --video 20260909_171120.mp4 \\
-        --server http://127.0.0.1:8765 \\
-        --fps 10 \\
-        --jpeg-quality 90 \\
-        --session-id cam1
+    python client/camera_client.py \
+        --video videos/20260909_171120.mp4 \
+        --server http://127.0.0.1:8765 \
+        --session-id cam1 \
+        --fps 10
 
-If the server currently running is the OLD lpr_camera_server.py prototype
-rather than the new app/lpr_api_server.py, the JSON shape is still
-compatible for the fields both share (ok/plate/confirmed/bbox/confidence/
-changed) -- but its recognition behavior is the OLDER, documented-as-buggy
-logic (see docs/LPR_API_CONTRACT_REVIEW.md), not v19's. This script does not
-know or care which server it's talking to; it only speaks the shared HTTP
-contract. Check the server's own startup banner to know which one you're
-running against.
+Useful options:
+    --profile              ask the server for a per-stage timing breakdown
+    --video-time-voting    send the video timestamp (?t=) for fair A/B runs
+    --save-responses FILE  write every response and the summary to JSON
 """
 
 import argparse

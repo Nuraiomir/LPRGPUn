@@ -1,21 +1,16 @@
 """
-Regression test for app/lpr_recognizer.py.
+Regression test for app/lpr_recognizer.py. No GPU needed.
 
-IMPORTANT ON SCOPE: this test does NOT run YOLO or PaddleOCR -- there is no
-GPU in this environment. What it verifies is narrower but still meaningful:
-that LPRRecognizer, fed the EXACT OCR outputs that the real GPU pipeline
-produced during the already-validated v19 run on Video 2
-(20260908_150904.mp4, results_vehicle_switch_GPU.json from that run), makes
-the SAME vehicle-switch decisions the real run made -- specifically that it
-still catches the short-lived square plate 979CBB02, which is the whole
-point of the v19 fix this module is supposed to preserve.
+Feeds LPRRecognizer the OCR readings that the GPU pipeline produced on
+videos/20260908_150904.mp4 and checks that it makes the same decisions as
+that run: in particular that the short-lived square plate 979CBB02 is
+confirmed at 2.4 s and the switch to 221ZVZ05 happens at 3.7 s.
 
-This is a REPLAY test against real captured ground truth, not synthetic
-data. It does NOT prove the extraction is GPU-behavior-identical to v19 --
-that requires actually running client/camera_client.py against
-app/lpr_api_server.py on the real GPU server and diffing outputs, per
-docs/architecture.md's verification checklist. What it DOES prove: the
-normalization/voting/switching arithmetic itself was transplanted correctly.
+The readings are recorded pipeline output, not verified ground truth. This
+test proves the voting and switching logic, not OCR accuracy.
+
+Run:
+    python3 tests/test_lpr_recognizer.py
 """
 
 import sys

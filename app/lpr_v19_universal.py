@@ -1,28 +1,33 @@
 
 import cv2
 import json
-import re
 import os
 import sys
 import time
 import subprocess
-import tempfile
 import threading
 import queue
 from pathlib import Path
-from collections import defaultdict
-from multiprocessing.connection import Listener, Client
+from multiprocessing.connection import Listener
 
-import numpy as np
 
 
 ROOT = Path(__file__).resolve().parent
 
-# v18: video file is now a command-line argument instead of hardcoded,
-# so the same validated pipeline can be pointed at any test video without
-# touching recognition logic. Falls back to the original video if none is
-# given, so old invocations still work unchanged.
-DEFAULT_VIDEO_NAME = "20260909_171120.mp4"
+# Recognition logic (constants, normalization, voting, vehicle switching)
+# lives in lpr_recognizer.py and is shared with the HTTP server, so both
+# entry points run exactly the same rules.
+sys.path.insert(0, str(ROOT))
+from lpr_recognizer import (  # noqa: E402
+    LPRRecognizer,
+    OCR_EVERY_N_DETECTIONS, SQUARE_ASPECT_MAX, MIN_SQUARE_W, MIN_SQUARE_H,
+    MIN_TOP_WEIGHT, MIN_BOTTOM_WEIGHT, MIN_FINAL_WEIGHT,
+    valid_kz_plate, clean_text, normalize_top, normalize_bottom,
+    add_vote, best_top, best_bottom, aggregate_all,
+)
+
+# Video path from the command line, relative to the project root.
+DEFAULT_VIDEO_NAME = "videos/20260909_171120.mp4"
 VIDEO_ARG = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_VIDEO_NAME
 VIDEO = (ROOT.parent / VIDEO_ARG) if not Path(VIDEO_ARG).is_absolute() else Path(VIDEO_ARG)
 VIDEO_STEM = VIDEO.stem
@@ -50,40 +55,21 @@ CUDA_LIB = ":".join([
     str(GPU_VENV / "lib/python3.12/site-packages/nvidia/nvjitlink/lib"),
 ])
 
-TMP = Path(tempfile.gettempdir()) / "lpr_gpu_v9_exact"
-TMP.mkdir(parents=True, exist_ok=True)
 
-# False (default here): reading from a recorded FILE for benchmarking.
-# The YOLO submit queue uses BACKPRESSURE — it blocks until the worker
-# is free, so every one of the FRAME_STEP-selected frames is guaranteed
-# to actually reach YOLO. This is what keeps vote counts comparable to
-# the fully-synchronous v9 run while still overlapping frame read/decode
-# with GPU inference.
-#
-# True: reading from a LIVE camera in real time. The queue instead keeps
-# only the newest submitted frame (drop-stale) — losing an intermediate
-# frame is fine, minimizing latency to "now" matters more.
+# LIVE_MODE=False (recorded file): the YOLO queue blocks until the worker is
+# free, so every frame selected by FRAME_STEP reaches YOLO and runs are
+# repeatable.
+# LIVE_MODE=True (live camera): only the newest frame is kept and an older
+# unprocessed one is dropped, because latency matters more than completeness.
 LIVE_MODE = False
 
 FRAME_STEP = 6
-OCR_EVERY_N_DETECTIONS = 3
 
-YOLO_CONF = 0.40
-SQUARE_ASPECT_MAX = 1.80
-MIN_SQUARE_W = 130
-MIN_SQUARE_H = 85
 
-WINDOW_SEC = 3.0
-MIN_TOP_WEIGHT = 1.60
-MIN_BOTTOM_WEIGHT = 2.00
-MIN_FINAL_WEIGHT = 2.50
 
 # Vehicle switching: keep the currently confirmed plate until a different
 # complete KZ plate is independently read at least twice in a short window.
-SWITCH_WINDOW_SEC = 1.5
-SWITCH_CONFIRM_READS = 2
 # A single very strong valid read can confirm a new vehicle.
-SWITCH_STRONG_CONF = 0.95
 
 
 class FrameRelay:
@@ -168,11 +154,6 @@ class FrameRelay:
             self._cv.notify_all()
 
 
-def valid_kz_plate(text):
-    text = re.sub(r"[^A-Z0-9]", "", (text or "").upper())
-    return bool(re.fullmatch(r"\d{3}[A-Z]{3}\d{2}", text))
-
-
 print("=" * 72)
 print("REAL VIDEO TEST — v9 SQUARE TEMPORAL ROW VOTING")
 print("=" * 72)
@@ -217,333 +198,9 @@ class GPUYOLO:
             if m.get("type")=="result":
                 return m["det"]
 
-class GPUOCR:
-    def __init__(self, conn):
-        self.conn=conn
-        self.jid=0
-        self.last_payload={}
-
-    def __call__(self, image):
-        self.jid+=1
-        ok,enc=cv2.imencode(".jpg",image,[cv2.IMWRITE_JPEG_QUALITY,95])
-        if not ok:
-            return []
-
-        self.conn.send({
-            "type":"ocr",
-            "jid":self.jid,
-            "fid":self.jid,
-            "mode":"normal",
-            "jpeg":enc.tobytes()
-        })
-
-        while True:
-            m=self.conn.recv()
-
-            if m.get("type")=="error":
-                raise RuntimeError("OCR ERROR: "+str(m))
-
-            if m.get("type")=="result":
-                p=m["payload"]
-                self.last_payload=p
-
-                return [{
-                    "rec_text":p.get("text",""),
-                    "rec_score":p.get("conf",0.0)
-                }]
-
 GPU_YOLO = None
-GPU_OCR = None
 YOLO_READY = None
 OCR_READY = None
-
-
-def _ocr_once(image):
-    if GPU_OCR is None or image is None or image.size == 0:
-        return "", 0.0
-    if len(image.shape) == 2:
-        image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
-    h, w = image.shape[:2]
-    if h < 32:
-        scale = max(2.0, 64.0 / max(1, h))
-        image = cv2.resize(image, None, fx=scale, fy=scale,
-                           interpolation=cv2.INTER_CUBIC)
-    try:
-        results = GPU_OCR(image)
-    except Exception as e:
-        print("OCR ERROR:", repr(e), flush=True)
-        return "", 0.0
-    best_text = ""
-    best_conf = 0.0
-    for item in results:
-        text = item.get("rec_text") if isinstance(item, dict) else getattr(item, "rec_text", None)
-        conf = item.get("rec_score") if isinstance(item, dict) else getattr(item, "rec_score", None)
-        try:
-            conf = float(conf or 0.0)
-        except Exception:
-            conf = 0.0
-        if text and conf > best_conf:
-            best_text = str(text).strip()
-            best_conf = conf
-    return best_text, best_conf
-
-
-
-def clean_text(s):
-    return re.sub(r"[^A-Z0-9]", "", (s or "").upper())
-
-
-def normalize_top(s):
-    """
-    Square top row should be exactly 3 digits.
-    We deliberately do NOT aggressively convert arbitrary letters to digits.
-    This avoids turning APAJERO into a false numeric candidate.
-    """
-    s = clean_text(s)
-
-    m = re.search(r"(\d{3})", s)
-    if m:
-        return m.group(1)
-
-    # Common OCR confusion only when the result is exactly three symbols.
-    if len(s) == 3:
-        trans = str.maketrans({
-            "O": "0",
-            "Q": "0",
-            "D": "0",
-            "I": "1",
-            "L": "1",
-            "Z": "2",
-            "E": "3",
-            "A": "4",
-            "S": "5",
-            "G": "6",
-            "T": "7",
-            "B": "8",
-            "P": "9",
-        })
-        mapped = s.translate(trans)
-        if mapped.isdigit() and len(mapped) == 3:
-            return mapped
-
-    return ""
-
-
-def normalize_bottom(s):
-    """
-    Returns bottom row as RRLLL, e.g. 02BBT.
-    """
-    s = clean_text(s).replace("KZ", "")
-
-    m = re.fullmatch(r"(\d{2})([A-Z]{3})", s)
-    if m:
-        return m.group(1) + m.group(2)
-
-    m = re.fullmatch(r"([A-Z]{3})(\d{2})", s)
-    if m:
-        return m.group(2) + m.group(1)
-
-    # Search inside noisy OCR.
-    m = re.search(r"(\d{2})([A-Z]{3})", s)
-    if m:
-        return m.group(1) + m.group(2)
-
-    m = re.search(r"([A-Z]{3})(\d{2})", s)
-    if m:
-        return m.group(2) + m.group(1)
-
-    return ""
-
-
-def run_ocr(crop):
-    """
-    v6.6-style multi-pass OCR:
-    original -> upscale -> gray -> enhanced.
-    """
-    if crop is None or crop.size == 0:
-        return "", 0.0
-
-    variants = []
-
-    variants.append(("original", crop))
-
-    up = cv2.resize(
-        crop, None, fx=2.0, fy=2.0,
-        interpolation=cv2.INTER_CUBIC
-    )
-    variants.append(("upscaled", up))
-
-    gray = cv2.cvtColor(up, cv2.COLOR_BGR2GRAY)
-    gray3 = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
-    variants.append(("gray", gray3))
-
-    enhanced = cv2.detailEnhance(up, sigma_s=10, sigma_r=0.15)
-    variants.append(("enhanced", enhanced))
-
-    best_text = ""
-    best_conf = 0.0
-    best_source = ""
-
-    for source, image in variants:
-        text, conf = _ocr_once(image)
-
-        if text:
-            print(
-                f"BEST RAW OCR: {text} "
-                f"conf={conf:.3f} source={source}"
-            )
-
-        if text and conf > best_conf:
-            best_text = text
-            best_conf = conf
-            best_source = source
-
-    if best_text:
-        print(
-            f"BEST FAST OCR: {best_text} "
-            f"conf={best_conf:.3f} source={best_source}"
-        )
-
-    return best_text, best_conf
-
-
-def letterbox(img, size=512):
-    h, w = img.shape[:2]
-    scale = min(size / w, size / h)
-    nw, nh = int(round(w * scale)), int(round(h * scale))
-
-    resized = cv2.resize(img, (nw, nh), interpolation=cv2.INTER_LINEAR)
-    canvas = np.full((size, size, 3), 114, dtype=np.uint8)
-
-    dx = (size - nw) // 2
-    dy = (size - nh) // 2
-    canvas[dy:dy + nh, dx:dx + nw] = resized
-
-    return canvas, scale, dx, dy
-
-
-def detect_plate_simple(frame):
-    if GPU_YOLO is None:
-        raise RuntimeError("GPU YOLO worker is not initialized")
-    return GPU_YOLO.detect(frame)
-
-
-def add_vote(votes, value, conf, t):
-    if not value or conf < 0.50:
-        return
-
-    weight = float(conf)
-
-    # Strong readings receive extra weight.
-    if conf >= 0.90:
-        weight += 0.40
-
-    votes.append({
-        "time": float(t),
-        "value": value,
-        "weight": weight,
-        "conf": float(conf),
-    })
-
-
-def aggregate(votes, now):
-    agg = defaultdict(lambda: {
-        "weight": 0.0,
-        "count": 0,
-        "best_conf": 0.0,
-    })
-
-    for v in votes:
-        if now - v["time"] <= WINDOW_SEC:
-            a = agg[v["value"]]
-            a["weight"] += v["weight"]
-            a["count"] += 1
-            a["best_conf"] = max(a["best_conf"], v["conf"])
-
-    result = []
-    for value, a in agg.items():
-        result.append(
-            (
-                value,
-                a["weight"],
-                a["count"],
-                a["best_conf"],
-            )
-        )
-
-    result.sort(key=lambda x: x[1], reverse=True)
-    return result
-
-
-def best_top(votes, now):
-    agg = aggregate(votes, now)
-
-    if agg and agg[0][1] >= MIN_TOP_WEIGHT:
-        return agg[0][0], agg[0][1], agg[0][2], agg
-
-    # Character-level temporal fallback.
-    recent = [
-        v for v in votes
-        if now - v["time"] <= WINDOW_SEC
-        and len(v["value"]) == 3
-        and v["value"].isdigit()
-    ]
-
-    if not recent:
-        return "", 0.0, 0, agg
-
-    pos = [defaultdict(float) for _ in range(3)]
-
-    for v in recent:
-        for i, ch in enumerate(v["value"]):
-            pos[i][ch] += v["weight"]
-
-    if any(not p for p in pos):
-        return "", 0.0, 0, agg
-
-    candidate = "".join(
-        max(p.items(), key=lambda kv: kv[1])[0]
-        for p in pos
-    )
-
-    weight = sum(pos[i][candidate[i]] for i in range(3))
-
-    if weight >= MIN_TOP_WEIGHT:
-        return candidate, weight, len(recent), agg
-
-    return "", 0.0, 0, agg
-
-
-def best_bottom(votes, now):
-    agg = aggregate(votes, now)
-
-    if not agg:
-        return "", 0.0, 0, agg
-
-    return agg[0][0], agg[0][1], agg[0][2], agg
-
-
-
-def aggregate_all(votes):
-    groups = {}
-    for v in votes:
-        value = v["value"]
-        groups.setdefault(value, {
-            "weight": 0.0,
-            "count": 0,
-            "best": 0.0,
-        })
-        groups[value]["weight"] += float(v["weight"])
-        groups[value]["count"] += 1
-        groups[value]["best"] = max(
-            groups[value]["best"], float(v["conf"])
-        )
-    rows = [
-        (k, d["weight"], d["count"], d["best"])
-        for k, d in groups.items()
-    ]
-    rows.sort(key=lambda x: (x[1], x[2], x[3]), reverse=True)
-    return rows
 
 def main():
     global GPU_YOLO, GPU_OCR, YOLO_READY, OCR_READY
@@ -692,17 +349,9 @@ def main():
         else:
             ocr_square_relay.submit(item)
 
-    # --- Async YOLO worker via FrameRelay. The main loop no longer
-    # blocks on the YOLO IPC round-trip (jpeg encode -> send -> inference
-    # -> recv). Frame capture and video writing keep running while
-    # detection happens in the background; results (with the exact frame
-    # they belong to) come back through yolo_result_q.
-    #
-    # LIVE_MODE=False (this file's default, for the recorded-video
-    # benchmark): FrameRelay blocks submit_yolo() until the worker is
-    # free, so every FRAME_STEP-selected frame is guaranteed to reach
-    # YOLO -- vote counts stay comparable to a synchronous v9 run.
-    # LIVE_MODE=True (live camera): FrameRelay drops stale frames instead.
+    # YOLO runs in its own thread, so reading and writing frames continue
+    # while the GPU is busy. Results come back through yolo_result_q together
+    # with the frame they belong to. See LIVE_MODE for the queue behaviour.
     yolo_relay = FrameRelay(live_mode=LIVE_MODE)
     yolo_result_q = queue.Queue()
 
@@ -749,73 +398,29 @@ def main():
     square_readings = []
     normal_readings = []
 
+    # Vehicle switching, including the guard against out-of-order OCR
+    # results, is decided by the shared LPRRecognizer. confirmed_plate mirrors
+    # its state for the rest of this loop; switch_events is the same list.
+    switcher = LPRRecognizer()
     confirmed_plate = ""
-    confirmed_history = []
-    switch_events = []
-    # Async OCR results can finish out of video-time order.  A result whose
-    # video timestamp is older than a decision already made must not be
-    # allowed to rewrite confirmed_plate retroactively.
-    last_decision_t = -1.0
-    out_of_order_decisions = 0
+    switch_events = switcher.switch_events
 
     def consider_plate(candidate, conf, t, source):
-        nonlocal confirmed_plate, confirmed_history
-        nonlocal last_decision_t, out_of_order_decisions
-
-        if not candidate or not valid_kz_plate(candidate):
-            return False
-
-        if t < last_decision_t - 1e-6:
-            # The OCR result belongs to an older video moment but finished
-            # after a newer decision. Keep it in diagnostics/votes, but do
-            # not let it change confirmed_plate retroactively.
-            out_of_order_decisions += 1
+        nonlocal confirmed_plate
+        ignored_before = switcher.out_of_order_decisions
+        changed = switcher.consider_plate(candidate, conf, t, source)
+        if switcher.out_of_order_decisions > ignored_before:
             print(
                 f"[OUT-OF-ORDER DECISION IGNORED] "
-                f"t={t:.2f}s < last_decision_t={last_decision_t:.2f}s "
+                f"t={t:.2f}s < last_decision_t={switcher.last_decision_t:.2f}s "
                 f"candidate={candidate} source={source}",
                 flush=True,
             )
-            return False
-
-        last_decision_t = max(last_decision_t, t)
-
-        confirmed_history = [
-            x for x in confirmed_history
-            if t - x["time"] <= SWITCH_WINDOW_SEC
-        ]
-        confirmed_history.append({
-            "plate": candidate,
-            "time": t,
-            "source": source,
-            "conf": conf
-        })
-
-        if candidate == confirmed_plate:
-            return False
-
-        reads = [x for x in confirmed_history if x["plate"] == candidate]
-        # Keep the original 2-read protection for ordinary OCR results,
-        # but allow one exceptionally strong valid read to confirm a switch.
-        strong_single = float(conf) >= SWITCH_STRONG_CONF
-        if len(reads) >= SWITCH_CONFIRM_READS or strong_single:
+        if changed:
             old = confirmed_plate
-            confirmed_plate = candidate
-            confirmed_history = []
-            switch_events.append({
-                "time": round(t, 2),
-                "from": old,
-                "to": candidate,
-                "source": source,
-                "confidence": round(float(conf), 3),
-            })
-            print(
-                f"*** VEHICLE SWITCH: {old or '-'} -> "
-                f"{candidate} ({source}) ***",
-                flush=True
-            )
-            return True
-        return False
+            confirmed_plate = switcher.confirmed_plate
+            print(f"*** VEHICLE SWITCH: {old or '-'} -> {candidate} ({source}) ***", flush=True)
+        return changed
 
     def process_ocr_results():
         nonlocal visual_status, visual_text
@@ -909,29 +514,10 @@ def main():
                         (top_weight + bottom_weight) / 4.0
                     )
                     add_vote(final_votes, candidate, final_conf, t)
-                    # v19: top_weight/bottom_weight are themselves built up
-                    # from sustained temporal evidence (that's what makes
-                    # them cross MIN_TOP_WEIGHT/MIN_BOTTOM_WEIGHT in the
-                    # first place). Requiring this SAME simultaneous
-                    # crossing to additionally recur inside a second,
-                    # independent final_votes window was redundant --
-                    # MIN_TOP_WEIGHT + MIN_BOTTOM_WEIGHT already exceeds
-                    # MIN_FINAL_WEIGHT by construction (1.60 + 2.00 > 2.50).
-                    # On a vehicle only briefly visible at a square angle,
-                    # that redundant second gate could mean a correctly
-                    # read plate never gets confirmed at all, because the
-                    # vehicle leaves view before a second qualifying
-                    # moment can occur. consider_plate() below still
-                    # applies its own SWITCH_CONFIRM_READS /
-                    # SWITCH_STRONG_CONF gate before this can actually
-                    # change confirmed_plate -- this only removes the
-                    # extra, unjustified recurrence requirement upstream
-                    # of that.
+                    # Both row weights above their minimums is enough to
+                    # confirm. Waiting for the combined vote to repeat made
+                    # short-lived square plates leave the frame first.
                     consider_plate(candidate, final_conf, t, "square")
-
-                # Reporting-only from here: still shown in the end-of-run
-                # summary and JSON, no longer gates the online decision.
-                final_summary = aggregate(final_votes, t)
 
                 visual_status = "SQUARE / OCR"
                 visual_text = candidate or (
@@ -1010,11 +596,9 @@ def main():
 
                     submit_ocr("square", sq, t, det)
 
-                    # v19: was hardcoded to one specific test plate
-                    # (633BBT02) from the original single-video demo --
-                    # generalized to fire for whichever vehicle is
-                    # currently confirmed, so it helps catch the next
-                    # transition on any video, not just that one.
+                    # While a vehicle is confirmed, also read this crop as a
+                    # single-row plate: when the camera moves to the next
+                    # car, YOLO's box can stay square for a few frames.
                     if confirmed_plate:
                         print(
                             f"[NORMAL FALLBACK SUBMIT] t={t:5.2f}s "
@@ -1049,10 +633,8 @@ def main():
                 checked += 1
                 submit_yolo(frame, t)
 
-            # Unified drawing/writing path for every frame, whether or not
-            # it was submitted this iteration: the overlay always reflects
-            # the most recent detection/OCR state, same as v9's "skipped
-            # frame" branch did.
+            # Every frame is drawn and written, whether or not it went to
+            # YOLO; the overlay shows the latest detection and OCR state.
             display = cv2.resize(
                 frame, (out_w, out_h),
                 interpolation=cv2.INTER_AREA
@@ -1133,9 +715,8 @@ def main():
             except Exception:
                 pass
 
-    final_now = duration
-    # Reporting only: use the complete accumulated vote history.
-    # Online confirmation still uses the original v9 3-second window.
+    # End-of-run report over the whole vote history. Online decisions use
+    # only the last WINDOW_SEC seconds (see lpr_recognizer.py).
     top_summary = aggregate_all(top_votes)
     bottom_summary = aggregate_all(bottom_votes)
     final_summary = aggregate_all(final_votes)
@@ -1146,7 +727,7 @@ def main():
 
     print()
     print("=" * 72)
-    print("SQUARE ROW TEMPORAL VOTING RESULT — v17 OCR EARLY-EXIT")
+    print("SQUARE ROW TEMPORAL VOTING RESULT")
     print("=" * 72)
 
     print("TOP ROW VOTES:")
@@ -1197,7 +778,8 @@ def main():
     }
 
     result = {
-        "version": "v16_timing_profile_694BPT05",
+        "version": "lpr_v19_universal",
+        "ocr_variant_mode": OCR_VARIANT_MODE,
         "timing_profile": profile,
         "video": str(VIDEO),
         "fps": fps,
@@ -1210,8 +792,8 @@ def main():
         "confirmed_square": confirmed_square,
         "confirmed_plate_final": confirmed_plate,
         "switch_events": switch_events,
-        "out_of_order_decisions_ignored": out_of_order_decisions,
-        "last_decision_t": last_decision_t,
+        "out_of_order_decisions_ignored": switcher.out_of_order_decisions,
+        "last_decision_t": switcher.last_decision_t,
         "ocr_backend": OCR_READY,
         "yolo_backend": YOLO_READY,
         "top_votes": [
@@ -1238,7 +820,7 @@ def main():
 
     print()
     print("=" * 72)
-    print("ИТОГ V17 — OCR early-exit (voting не менялся)")
+    print(f"ИТОГ — lpr_v19_universal, режим OCR: {OCR_VARIANT_MODE}")
     print("=" * 72)
     print(f"FPS:                 {fps:.2f}")
     print(f"Длительность:        {duration:.2f} сек")
@@ -1247,7 +829,7 @@ def main():
     print(f"Square OCR кадров:   {square_ocr_frames}")
     print(f"ПОДТВЕРЖДЁННЫЙ SQUARE: {confirmed_square or 'НЕТ'}")
     print(f"ПОДТВЕРЖДЁННЫЙ FINAL:  {confirmed_plate or 'НЕТ'}")
-    print(f"OUT-OF-ORDER DECISIONS IGNORED: {out_of_order_decisions}")
+    print(f"OUT-OF-ORDER DECISIONS IGNORED: {switcher.out_of_order_decisions}")
     print("SWITCH EVENTS:")
     for event in switch_events:
         print(

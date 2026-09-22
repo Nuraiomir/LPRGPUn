@@ -1,13 +1,9 @@
 """
-YOLO GPU detection worker (subprocess), extracted verbatim from the recognition
-logic validated in lpr_v19_universal.py (three-video smoke test: 545BDR05,
-979CBB02, 049BXS02 and their full sequences, all confirmed correctly).
+YOLO license plate detector, run as a subprocess.
 
-Not a rewrite: this is the exact byte-for-byte YOLO_WORKER source that v19
-writes to a temp file and spawns as a subprocess, now saved as a real,
-importable/inspectable project file instead of an inline string literal.
-Both the offline evaluator and the API server spawn THIS file, so there is
-one single YOLO worker implementation instead of two slowly-diverging copies.
+Used by app/lpr_v19_universal.py and, through app/gpu_workers_client.py, by
+the HTTP server. Runs best_512.onnx with ONNX Runtime on CUDA and returns the
+single highest-confidence plate box per frame.
 
 Protocol (multiprocessing.connection, authkey-secured):
   argv: host, port, authkey_hex, onnx_model_path

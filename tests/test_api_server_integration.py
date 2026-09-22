@@ -1,21 +1,19 @@
 """
-End-to-end integration test for app/lpr_api_server.py + client/camera_client.py.
+Integration test for app/lpr_api_server.py and client/camera_client.py.
+No GPU needed.
 
-GPU calls (Workers.detect/ocr) are replaced with a fake that replays the same
-real, captured v19 OCR sequence used in tests/test_lpr_recognizer.py -- so
-this test additionally proves the HTTP transport, URL/query parsing,
-session isolation, and JSON response shape all work correctly together,
-which a recognizer-only unit test cannot show by itself.
+The GPU workers are replaced by a fake that replays recorded OCR readings
+(the same ones as tests/test_lpr_recognizer.py). The test checks the whole
+HTTP path: query parsing, session isolation, response JSON, error codes, and
+that camera_client.py runs against a live server.
 
-Still NOT a substitute for running against the real GPU workers on the real
-project videos (see docs/architecture.md).
+Run:
+    python3 tests/test_api_server_integration.py
 """
 
-import json
 import sys
 import os
 import threading
-import time
 import subprocess
 from http.server import ThreadingHTTPServer
 
@@ -78,10 +76,10 @@ class FakeWorkers:
 
 def build_script():
     script = []
-    for t, top, tc, bot, bc in REAL_SQUARE_SEQUENCE:
+    for _t, top, tc, bot, bc in REAL_SQUARE_SEQUENCE:
         script.append(("square", {"mode": "square", "top_text": top, "top_conf": tc,
                                    "bottom_text": bot, "bottom_conf": bc}))
-    for t, plate, conf in REAL_NORMAL_FOLLOWUP:
+    for _t, plate, conf in REAL_NORMAL_FOLLOWUP:
         script.append(("normal", {"mode": "normal", "text": plate, "conf": conf}))
     return script
 
@@ -112,7 +110,7 @@ def test_full_http_stack_reproduces_real_v19_switch_sequence():
         lpr_api_server.WORKERS.set_phase("square")
         seen_switch_to_979 = False
         last_plate = ""
-        for i in range(27):
+        for _ in range(27):
             resp = requests.post(base + "?session_id=camA", data=jpeg, timeout=5)
             assert resp.status_code == 200
             r = resp.json()
@@ -142,8 +140,9 @@ def test_full_http_stack_reproduces_real_v19_switch_sequence():
         # Health check
         health = requests.get(f"http://127.0.0.1:{port}/", timeout=5).json()
         assert health["ok"] is True
-        assert set(health["active_sessions"]) == {"camA", "camB"}
-        print("[OK] GET / reports both active sessions")
+        assert health["session_count"] == 2
+        assert "active_sessions" not in health, "health check must not expose session ids"
+        print("[OK] GET / reports the session count without exposing session ids")
 
         # Wrong path -> 404 with error_code
         bad = requests.post(f"http://127.0.0.1:{port}/wrong", data=jpeg, timeout=5)
@@ -151,11 +150,11 @@ def test_full_http_stack_reproduces_real_v19_switch_sequence():
         assert bad.json()["error_code"] == "not_found"
         print("[OK] wrong path -> 404 with error_code=not_found")
 
-        # Garbage bytes -> 500 with error_code=decode_failed
+        # Garbage bytes -> 400 with error_code=decode_failed (a client error)
         bad2 = requests.post(base, data=b"not a jpeg", timeout=5)
-        assert bad2.status_code == 500
+        assert bad2.status_code == 400
         assert bad2.json()["error_code"] == "decode_failed"
-        print("[OK] undecodable body -> 500 with error_code=decode_failed")
+        print("[OK] undecodable body -> 400 with error_code=decode_failed")
 
     finally:
         server.shutdown()

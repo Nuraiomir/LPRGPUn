@@ -128,6 +128,13 @@ def main():
             return None, attempts, done
         return done >= attempts, attempts, done
 
+    mode_a, mode_b = a.get("ocr_variant_mode"), b.get("ocr_variant_mode")
+    if mode_a and mode_b and mode_a == mode_b:
+        print("!" * 80)
+        print(f"СРАВНЕНИЕ НЕВОЗМОЖНО: оба прогона в режиме '{mode_a}'")
+        print("!" * 80)
+        sys.exit(1)
+
     broken = []
     for label, d in (("A", a), ("B", b)):
         ok, att, done = integrity(d)
@@ -152,8 +159,8 @@ def main():
     print("=" * 80)
     print("СРАВНЕНИЕ A / B: ОФЛАЙН-ПАЙПЛАЙН")
     print("=" * 80)
-    print(f"  A = {sys.argv[1]}")
-    print(f"  B = {sys.argv[2]}")
+    print(f"  A = {sys.argv[1]}   режим: {a.get('ocr_variant_mode') or 'не записан'}")
+    print(f"  B = {sys.argv[2]}   режим: {b.get('ocr_variant_mode') or 'не записан'}")
     print()
     va_ = a.get("video", "?")
     vb_ = b.get("video", "?")
@@ -213,7 +220,7 @@ def main():
         print()
         print("    Время переключений:")
         print(f"      {'номер':>12s} {'A, сек':>9s} {'B, сек':>9s} {'разница':>10s}")
-        for ea, eb in zip(sw_a, sw_b):
+        for ea, eb in zip(sw_a, sw_b, strict=True):
             ta, tb = ea.get("time"), eb.get("time")
             if isinstance(ta, (int, float)) and isinstance(tb, (int, float)):
                 print(f"      {str(ea.get('to')):>12s} {ta:9.2f} {tb:9.2f} {tb-ta:+10.2f}")

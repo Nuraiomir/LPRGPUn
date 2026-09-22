@@ -1,44 +1,47 @@
 """
-GPU environment configuration for app/lpr_api_server.py.
+GPU environment for app/lpr_api_server.py.
 
-Copy this file to config/gpu_env.py and adjust if your paths differ.
+Copy to config/gpu_env.py (ignored by git) and adjust if your layout differs:
 
-Paths match the current repository layout on the server:
+    cp config/gpu_env.example.py config/gpu_env.py
 
-    nurai/
-      app/        lpr_v19_universal.py, lpr_api_server.py, ...
-      model/      best_512.onnx
-      videos/     test videos
-      runs/       offline run outputs
-      .venv_kz_gpu/, .venv_paddlex_gpu/
+Expected layout:
 
-The CUDA library paths below are copied verbatim from the working
-configuration on the project's JupyterHub GPU container.
+    nurai_gpu/
+      app/          lpr_v19_universal.py, lpr_api_server.py, ...
+      workers/      yolo_gpu_worker.py, ocr_gpu_worker.py
+      model/        best_512.onnx
+      .venv_gpu/    one environment for both workers (onnxruntime-gpu, paddlepaddle-gpu, paddlex)
+
+These values match the settings app/lpr_v19_universal.py uses on the host.
 """
 
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent  # .../nurai/
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
-YOLO_PYTHON = PROJECT_ROOT / ".venv_kz_gpu" / "bin" / "python"
-OCR_PYTHON = PROJECT_ROOT / ".venv_paddlex_gpu" / "bin" / "python"
+GPU_VENV = PROJECT_ROOT / ".venv_gpu"
+YOLO_PYTHON = GPU_VENV / "bin" / "python"
+OCR_PYTHON = GPU_VENV / "bin" / "python"
 ONNX_MODEL = PROJECT_ROOT / "model" / "best_512.onnx"
 
-# Copied from lpr_camera_server.py's CUDA12 / OCR_CUDA constants.
-YOLO_CUDA_LD_PATH = ":".join([
-    "/opt/conda/lib/python3.11/site-packages/nvidia/cuda_runtime/lib",
-    "/opt/conda/lib/python3.11/site-packages/nvidia/cuda_nvrtc/lib",
-    "/opt/conda/lib/python3.11/site-packages/nvidia/cublas/lib",
-    "/opt/conda/lib/python3.11/site-packages/nvidia/cudnn/lib",
-    "/opt/conda/lib/python3.11/site-packages/nvidia/curand/lib",
-    "/opt/conda/lib/python3.11/site-packages/nvidia/cufft/lib",
-])
+# CUDA libraries shipped as pip packages (nvidia-*). The python3.X directory
+# is discovered instead of hardcoded, so upgrading Python does not silently
+# break the library path.
+_NVIDIA_LIBS = ("cuda_runtime", "cuda_nvrtc", "cublas", "cudnn",
+                "curand", "cufft", "nvjitlink")
 
-OCR_CUDA_LD_PATH = ":".join([
-    str(OCR_PYTHON.parent.parent / "lib/python3.10/site-packages/nvidia/cuda_runtime/lib"),
-    str(OCR_PYTHON.parent.parent / "lib/python3.10/site-packages/nvidia/cuda_nvrtc/lib"),
-    str(OCR_PYTHON.parent.parent / "lib/python3.10/site-packages/nvidia/cublas/lib"),
-    str(OCR_PYTHON.parent.parent / "lib/python3.10/site-packages/nvidia/cudnn/lib"),
-    str(OCR_PYTHON.parent.parent / "lib/python3.10/site-packages/nvidia/curand/lib"),
-    str(OCR_PYTHON.parent.parent / "lib/python3.10/site-packages/nvidia/cufft/lib"),
-])
+
+def _nvidia_lib_path(venv: Path) -> str:
+    site_packages = sorted(venv.glob("lib/python3.*/site-packages"))
+    if not site_packages:
+        return ""
+    base = site_packages[-1] / "nvidia"
+    return ":".join(str(base / name / "lib") for name in _NVIDIA_LIBS)
+
+
+CUDA_LD_PATH = _nvidia_lib_path(GPU_VENV)
+
+# Both workers run in the same environment, so they share one library path.
+YOLO_CUDA_LD_PATH = CUDA_LD_PATH
+OCR_CUDA_LD_PATH = CUDA_LD_PATH

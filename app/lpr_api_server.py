@@ -1,92 +1,119 @@
 """
-LPR API server -- Option C from the architecture discussion: a NEW, thin
-HTTP adapter around the shared app/lpr_recognizer.py core, rather than
-patching the old lpr_camera_server.py prototype's own copy of the
-recognition logic (Option A) or writing a second, differently-behaved
-implementation from scratch (Option B, which is what happened by accident
-the first time -- see docs/LPR_API_CONTRACT_REVIEW.md).
+HTTP server for license plate recognition.
 
-lpr_camera_server.py is left in place, unmodified, per "do not delete old
-working files" -- but it should be considered DEPRECATED once this server
-has been verified end-to-end (see docs/architecture.md checklist), because
-having two servers with two different recognition behaviors is exactly the
-"behavioral drift" risk this refactor exists to remove.
+    POST /frame?session_id=<id>      body: one JPEG frame (raw bytes)
+    GET  /                           health check
 
-What is NEW here relative to the prototype, and why:
-  - `session_id` (query param, default "default"): each session_id gets its
-    OWN LPRRecognizer instance and therefore its own temporal-voting state.
-    This directly fixes the global-shared-state problem documented in
-    LPR_API_CONTRACT_REVIEW.md ("if two cameras post to the same server,
-    their frames get mixed into one vote history"). A client that never
-    passes session_id gets the SAME single-shared-session behavior the
-    prototype always had -- this is backward compatible by default.
-  - `ocr_confidence`, `plate_type`, `raw_text` in the response: already
-    computed internally by LPRRecognizer.process_frame(), simply not
-    discarded. Additive only -- every field the prototype returned is still
-    present with the same name and meaning.
-  - `error_code` alongside `error` in error responses: a small, fixed set of
-    machine-readable strings ("not_found", "decode_failed",
-    "internal_error") instead of only a free-text repr(). This is NOT the
-    full structured-error taxonomy proposed in LPR_API_CONTRACT.md section B
-    -- just the smallest useful step, since "do not over-engineer" was an
-    explicit instruction for this task.
+Each session_id gets its own LPRRecognizer, so frames from different phones
+or employees never share voting state. Requests of the same session are
+processed one at a time; different sessions run in parallel. Sessions that
+stay idle for SESSION_TTL_SEC are dropped.
 
-What is UNCHANGED / NOT done here, on purpose:
-  - No authentication (still open, like the prototype) -- proposed, not
-    implemented, per LPR_API_CONTRACT.md section B.
-  - No JSON-wrapped request body -- still raw JPEG bytes in, exactly like
-    the prototype, so existing test tooling keeps working unchanged.
-  - No request timeout on the YOLO/OCR calls -- still absent, same
-    limitation as the prototype, documented, not silently fixed here.
-  - No multi-plate-per-frame support -- Workers.detect() still returns at
-    most one box, exactly like both prior implementations.
+Optional query parameters:
+    profile=1   add a per-stage timing breakdown ("profile") to the response
+    t=<sec>     use this timestamp for voting instead of the server clock.
+                For offline A/B runs only: voting windows are measured in
+                seconds, so a faster run would otherwise fit more frames into
+                each window and look better just for being faster.
 
-NOT YET VERIFIED end-to-end against real GPU hardware (no GPU in this
-environment). See docs/architecture.md "Verification status" for the exact
-steps to run before treating this as equivalent to v19 in production.
+Response fields: ok, plate, confirmed, changed, bbox, confidence,
+ocr_confidence, plate_type, raw_text, session_id, processing_time_ms,
+frame_size, ocr_variant_mode.
+
+Errors return {"ok": false, "error": ..., "error_code": ...}:
+    400 bad_request         missing/invalid Content-Length, session_id or t
+    400 decode_failed       body is not a decodable image
+    404 not_found           unknown path
+    413 payload_too_large   body larger than MAX_FRAME_BYTES
+    503 worker_unavailable  a GPU worker timed out or crashed (it is restarted)
+    500 internal_error      anything else
+
+Not implemented yet: authentication, rate limiting, TLS.
 """
 
+import argparse
 import json
+import re
 import sys
+import threading
+import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import urlparse, parse_qs
-
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from lpr_recognizer import LPRRecognizer  # noqa: E402
-from gpu_workers_client import Workers  # noqa: E402
+from urllib.parse import parse_qs, urlparse
 
 import cv2
 import numpy as np
-import time
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from gpu_workers_client import WorkerError, WorkerStartupError, Workers  # noqa: E402
+from lpr_recognizer import LPRRecognizer  # noqa: E402
 
 
 HOST, PORT = "0.0.0.0", 8765
 
+MAX_FRAME_BYTES = 10 * 1024 * 1024
+SESSION_TTL_SEC = 30 * 60
+MAX_SESSIONS = 1000
+SOCKET_TIMEOUT_SEC = 30
+SESSION_ID_RE = re.compile(r"[A-Za-z0-9._:@-]{1,128}")
 
-class SessionStore:
-    """One LPRRecognizer per session_id. Not persisted across process
-    restarts -- a restart resets all sessions, exactly like the prototype's
-    single global Recognizer resets on restart today."""
+_PROFILE_MS_FIELDS = ("yolo_ms", "ocr_total_ms", "ocr_square_ms", "ocr_normal_ms",
+                      "ocr_fallback_ms", "crop_ms", "voting_ms", "total_ms")
+
+
+class _Session:
+    __slots__ = ("recognizer", "lock", "last_used")
 
     def __init__(self):
+        self.recognizer = LPRRecognizer()
+        self.lock = threading.Lock()
+        self.last_used = time.monotonic()
+
+
+class SessionStore:
+    """Thread-safe map session_id -> recognizer, with idle expiry and a size cap."""
+
+    def __init__(self, ttl_sec=SESSION_TTL_SEC, max_sessions=MAX_SESSIONS):
+        self._ttl = ttl_sec
+        self._max = max_sessions
         self._sessions = {}
+        self._lock = threading.Lock()
 
     def get(self, session_id):
-        if session_id not in self._sessions:
-            self._sessions[session_id] = LPRRecognizer()
-        return self._sessions[session_id]
+        now = time.monotonic()
+        with self._lock:
+            expired = [k for k, s in self._sessions.items() if now - s.last_used > self._ttl]
+            for key in expired:
+                del self._sessions[key]
 
-    def ids(self):
-        return list(self._sessions.keys())
+            session = self._sessions.get(session_id)
+            if session is None:
+                if len(self._sessions) >= self._max:
+                    oldest = min(self._sessions, key=lambda k: self._sessions[k].last_used)
+                    del self._sessions[oldest]
+                session = self._sessions[session_id] = _Session()
+            session.last_used = now
+            return session
+
+    def count(self):
+        with self._lock:
+            return len(self._sessions)
 
 
 WORKERS = None
 SESSIONS = SessionStore()
 
 
+class _ClientError(Exception):
+    def __init__(self, status, code, message):
+        super().__init__(message)
+        self.status = status
+        self.code = code
+
+
 class Handler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
+    timeout = SOCKET_TIMEOUT_SEC
 
     def _send_json(self, obj, status=200):
         body = json.dumps(obj, ensure_ascii=False).encode("utf-8")
@@ -97,188 +124,164 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _send_error(self, status, code, message):
+        self._send_json({"ok": False, "error": message, "error_code": code}, status)
+
     def do_GET(self):
         self._send_json({
             "ok": True,
             "service": "lpr-api-server",
             "port": PORT,
-            "active_sessions": SESSIONS.ids(),
+            "session_count": SESSIONS.count(),
+            "ocr_variant_mode": getattr(WORKERS, "ocr_variant_mode", "unknown"),
+            "worker_restarts": getattr(WORKERS, "restarts", None),
         })
+
+    def _read_frame(self):
+        raw_length = self.headers.get("Content-Length")
+        if raw_length is None:
+            raise _ClientError(400, "bad_request", "Content-Length header is required")
+        try:
+            length = int(raw_length)
+        except ValueError:
+            raise _ClientError(400, "bad_request", "invalid Content-Length") from None
+        if length <= 0:
+            raise _ClientError(400, "bad_request", "empty request body")
+        if length > MAX_FRAME_BYTES:
+            raise _ClientError(413, "payload_too_large",
+                               f"frame is {length} bytes, limit is {MAX_FRAME_BYTES}")
+
+        data = self.rfile.read(length)
+        frame = cv2.imdecode(np.frombuffer(data, np.uint8), cv2.IMREAD_COLOR)
+        if frame is None:
+            raise _ClientError(400, "decode_failed", "body is not a decodable image")
+        return frame, length
 
     def do_POST(self):
         parsed = urlparse(self.path)
         if parsed.path != "/frame":
-            self._send_json(
-                {"ok": False, "error": "Use POST /frame", "error_code": "not_found"},
-                404,
-            )
+            self._send_error(404, "not_found", "Use POST /frame")
             return
 
-        session_id = parse_qs(parsed.query).get("session_id", ["default"])[0]
-        want_profile = parse_qs(parsed.query).get("profile", ["0"])[0] in ("1", "true", "yes")
+        query = parse_qs(parsed.query)
+        session_id = query.get("session_id", ["default"])[0]
+        want_profile = query.get("profile", ["0"])[0] in ("1", "true", "yes")
+        t_param = query.get("t", [None])[0]
 
         t_req = time.perf_counter()
         try:
-            length = int(self.headers.get("Content-Length", "0"))
-            data = self.rfile.read(length)
-            t_read = time.perf_counter()
-
-            frame = cv2.imdecode(np.frombuffer(data, np.uint8), cv2.IMREAD_COLOR)
-            if frame is None:
-                raise ValueError("JPEG decode failed")
-            t_decode = time.perf_counter()
-
-            recognizer = SESSIONS.get(session_id)
-
-            # Voting clock. By default this is the server's wall clock,
-            # exactly as in production.
-            #
-            # EXPERIMENT-ONLY: if the client sends ?t=<seconds>, that value
-            # is used as the voting timestamp instead. This exists because
-            # the temporal windows (WINDOW_SEC=3.0, SWITCH_WINDOW_SEC=1.5)
-            # are measured in real seconds: a FASTER server packs more
-            # frames into the same 3-second window and would therefore look
-            # more accurate purely by being faster. Feeding video time makes
-            # an A/B comparison of OCR variants apples-to-apples. Production
-            # clients do not send ?t and get unchanged behaviour.
-            t_param = parse_qs(parsed.query).get("t", [None])[0]
+            if not SESSION_ID_RE.fullmatch(session_id):
+                raise _ClientError(400, "bad_request",
+                                   "session_id must be 1-128 characters: letters, digits, . _ : @ -")
             if t_param is not None:
                 try:
-                    t = float(t_param)
+                    t_vote = float(t_param)
                 except ValueError:
-                    t = time.monotonic()
-            else:
-                t = time.monotonic()
+                    raise _ClientError(400, "bad_request", "t must be a number") from None
 
-            proc_t0 = time.perf_counter()
-            result = recognizer.process_frame(frame, WORKERS, t)
-            proc_ms = (time.perf_counter() - proc_t0) * 1000.0
+            t_read_start = time.perf_counter()
+            frame, length = self._read_frame()
+            t_decoded = time.perf_counter()
+
+            session = SESSIONS.get(session_id)
+            with session.lock:
+                t = t_vote if t_param is not None else time.monotonic()
+                proc_t0 = time.perf_counter()
+                result = session.recognizer.process_frame(frame, WORKERS, t)
+                proc_ms = (time.perf_counter() - proc_t0) * 1000.0
+                profile = dict(session.recognizer.last_profile or {}) if want_profile else None
 
             result["session_id"] = session_id
-            # Server-side processing time (YOLO + OCR + voting), excluding
-            # HTTP transfer. Lets the client separate network overhead from
-            # actual inference cost.
             result["processing_time_ms"] = round(proc_ms, 1)
             result["frame_size"] = [int(frame.shape[1]), int(frame.shape[0])]
+            result["ocr_variant_mode"] = getattr(WORKERS, "ocr_variant_mode", "unknown")
 
-            if want_profile:
-                # Optional, non-breaking: only present when ?profile=1.
-                prof = dict(getattr(recognizer, "last_profile", None) or {})
-                prof["body_read_ms"] = round((t_read - t_req) * 1000.0, 2)
-                prof["jpeg_decode_ms"] = round((t_decode - t_read) * 1000.0, 2)
-                prof["request_bytes"] = length
-                for k in ("yolo_ms", "ocr_total_ms", "ocr_square_ms",
-                          "ocr_normal_ms", "ocr_fallback_ms", "crop_ms",
-                          "voting_ms", "total_ms"):
-                    if k in prof:
-                        prof[k] = round(prof[k], 2)
-                for d in prof.get("worker_detail", []):
-                    for k, v in list(d.items()):
-                        if isinstance(v, float):
-                            d[k] = round(v, 2)
-                result["profile"] = prof
+            if profile is not None:
+                profile["body_read_ms"] = round((t_read_start - t_req) * 1000.0, 2)
+                profile["jpeg_decode_ms"] = round((t_decoded - t_read_start) * 1000.0, 2)
+                profile["request_bytes"] = length
+                for key in _PROFILE_MS_FIELDS:
+                    if key in profile:
+                        profile[key] = round(profile[key], 2)
+                profile["worker_detail"] = [
+                    {k: round(v, 2) if isinstance(v, float) else v for k, v in d.items()}
+                    for d in profile.get("worker_detail", [])
+                ]
+                result["profile"] = profile
 
-            t_ser = time.perf_counter()
             self._send_json({"ok": True, **result})
-            if want_profile:
-                # Serialization time can't be inside the payload it measures;
-                # log it instead.
-                ser_ms = (time.perf_counter() - t_ser) * 1000.0
-                if ser_ms > 5.0:
-                    print(f"[PROFILE] медленная сериализация/отправка: {ser_ms:.1f} мс", flush=True)
 
-        except ValueError as e:
-            self._send_json(
-                {"ok": False, "error": repr(e), "error_code": "decode_failed"}, 500
-            )
-        except Exception as e:
-            print("FRAME ERROR:", repr(e), flush=True)
-            self._send_json(
-                {"ok": False, "error": repr(e), "error_code": "internal_error"}, 500
-            )
+        except _ClientError as exc:
+            self._send_error(exc.status, exc.code, str(exc))
+        except (WorkerError, WorkerStartupError) as exc:
+            print(f"[FRAME] worker unavailable: {exc}", flush=True)
+            self._send_error(503, "worker_unavailable", str(exc))
+        except Exception as exc:  # noqa: BLE001
+            print(f"[FRAME] internal error: {exc!r}", flush=True)
+            self._send_error(500, "internal_error", repr(exc))
 
     def log_message(self, *args):
         print("[HTTP]", *args, flush=True)
 
 
 def main(project_root, yolo_python, ocr_python, onnx_model,
-         yolo_cuda_ld_path, ocr_cuda_ld_path, ocr_variant_mode="full",
-         port=None):
+         yolo_cuda_ld_path, ocr_cuda_ld_path, ocr_variant_mode="full", port=None):
     global WORKERS, PORT
     if port is not None:
         PORT = port
+
     print("=" * 70)
     print("LPR HTTP SERVER")
     print("=" * 70)
-    print(f"Режим вариантов OCR: {ocr_variant_mode}"
-          + ("  (эксперимент: без detailEnhance)" if ocr_variant_mode == "no-enhanced" else ""))
-    print(f"Корень проекта:  {project_root}")
-    print(f"Модель YOLO:     {onnx_model}")
-    print(f"Python YOLO:     {yolo_python}")
-    print(f"Python OCR:      {ocr_python}")
-    print()
-    print("Запуск GPU-воркеров, это займёт несколько секунд...", flush=True)
+    print(f"OCR variant mode: {ocr_variant_mode}")
+    print(f"Project root:     {project_root}")
+    print(f"YOLO model:       {onnx_model}")
+    print(f"Worker python:    {yolo_python}")
+    print("\nStarting GPU workers...", flush=True)
 
-    WORKERS = Workers(
-        Path(project_root), Path(yolo_python), Path(ocr_python), Path(onnx_model),
-        yolo_cuda_ld_path, ocr_cuda_ld_path, ocr_variant_mode=ocr_variant_mode,
-    )
+    WORKERS = Workers(project_root, yolo_python, ocr_python, onnx_model,
+                      yolo_cuda_ld_path, ocr_cuda_ld_path,
+                      ocr_variant_mode=ocr_variant_mode)
 
     providers = WORKERS.yolo_info.get("providers", [])
-    print()
-    print("YOLO:")
-    print(f"  ONNX Runtime providers: {providers}")
-    print(f"  CUDA доступна:          {'CUDAExecutionProvider' in providers}")
-    print("OCR:")
-    print(f"  Устройство:             {WORKERS.ocr_info.get('device')}")
-    print(f"  Бэкенд:                 {WORKERS.ocr_info.get('backend')}")
-    print(f"  Paddle:                 {WORKERS.ocr_info.get('paddle')}")
-    print()
+    print(f"\nYOLO providers:   {providers}")
+    print(f"YOLO on CUDA:     {'CUDAExecutionProvider' in providers}")
+    print(f"OCR device:       {WORKERS.ocr_info.get('device')}")
+    print(f"OCR backend:      {WORKERS.ocr_info.get('backend')}")
     print("=" * 70)
-    print(f"ГОТОВ: http://{HOST}:{PORT}/frame?session_id=<id>")
-    print(f"Health-check: http://{HOST}:{PORT}/")
+    print(f"READY: http://{HOST}:{PORT}/frame?session_id=<id>")
     print("=" * 70, flush=True)
 
     server = ThreadingHTTPServer((HOST, PORT), Handler)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        print("\nОстановка сервера...", flush=True)
+        print("\nStopping...", flush=True)
     finally:
         server.server_close()
-        if WORKERS:
-            WORKERS.close()
-        print("Сервер остановлен.", flush=True)
+        WORKERS.close()
 
 
 if __name__ == "__main__":
-    # Make the project root importable regardless of the current working
-    # directory, so `python app/lpr_api_server.py` works from anywhere.
-    PROJECT_ROOT = Path(__file__).resolve().parent.parent
-    sys.path.insert(0, str(PROJECT_ROOT))
+    project_root = Path(__file__).resolve().parent.parent
+    sys.path.insert(0, str(project_root))
     try:
         import config.gpu_env as gpu_env
     except ModuleNotFoundError:
-        print("ОШИБКА: не найден config/gpu_env.py")
-        print("Скопируйте config/gpu_env.example.py в config/gpu_env.py и проверьте пути.")
-        sys.exit(1)
+        sys.exit("config/gpu_env.py not found. Create it with:\n"
+                 "    cp config/gpu_env.example.py config/gpu_env.py")
 
-    import argparse
-    ap = argparse.ArgumentParser(description="LPR HTTP server")
-    ap.add_argument("--ocr-variants", choices=["full", "no-enhanced"],
-                    default="full",
-                    help="full = original,upscaled,gray,enhanced (продакшн). "
-                         "no-enhanced = без cv2.detailEnhance (эксперимент B)")
-    ap.add_argument("--port", type=int, default=PORT, help="порт сервера")
-    cli = ap.parse_args()
+    parser = argparse.ArgumentParser(description="LPR HTTP server")
+    parser.add_argument("--ocr-variants", choices=["full", "no-enhanced"], default="full",
+                        help="no-enhanced skips cv2.detailEnhance")
+    parser.add_argument("--port", type=int, default=PORT)
+    args = parser.parse_args()
 
-    main(
-        project_root=gpu_env.PROJECT_ROOT,
-        yolo_python=gpu_env.YOLO_PYTHON,
-        ocr_python=gpu_env.OCR_PYTHON,
-        onnx_model=gpu_env.ONNX_MODEL,
-        yolo_cuda_ld_path=gpu_env.YOLO_CUDA_LD_PATH,
-        ocr_cuda_ld_path=gpu_env.OCR_CUDA_LD_PATH,
-        ocr_variant_mode=cli.ocr_variants,
-        port=cli.port,
-    )
+    main(project_root=gpu_env.PROJECT_ROOT,
+         yolo_python=gpu_env.YOLO_PYTHON,
+         ocr_python=gpu_env.OCR_PYTHON,
+         onnx_model=gpu_env.ONNX_MODEL,
+         yolo_cuda_ld_path=gpu_env.YOLO_CUDA_LD_PATH,
+         ocr_cuda_ld_path=gpu_env.OCR_CUDA_LD_PATH,
+         ocr_variant_mode=args.ocr_variants,
+         port=args.port)

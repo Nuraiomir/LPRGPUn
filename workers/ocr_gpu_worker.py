@@ -1,24 +1,25 @@
 """
-PaddleX PP-OCRv5 GPU recognition worker (subprocess), extracted verbatim from
-lpr_v19_universal.py, INCLUDING the v17 confidence-gated early-exit
-(OCR_EARLY_EXIT_CONF = 0.92) that cut average OCR latency roughly in half in
-our own measurements, validated not to change recognition outcomes on the
-three reference videos.
+Plate text recognition with PaddleX PP-OCRv5 on the GPU, run as a subprocess.
 
-This is intentionally NOT the older, no-early-exit OCR logic embedded in the
-current lpr_camera_server.py prototype -- that is a documented, known
-discrepancy (see docs/LPR_API_CONTRACT_REVIEW.md). This file is the one
-authoritative OCR worker going forward; both the offline evaluator and the
-new API server (app/lpr_api_server.py) spawn this same file.
+Used by app/lpr_v19_universal.py and, through app/gpu_workers_client.py, by
+the HTTP server.
+
+Each crop is tried in up to four versions: original, 2x upscaled, grayscale,
+and cv2.detailEnhance. The first version that reaches OCR_EARLY_EXIT_CONF
+stops the search. detailEnhance runs on the CPU and is by far the most
+expensive step; mode "no-enhanced" skips it. Square plates are split into a
+top and a bottom row, and each row is read separately.
 
 Protocol (multiprocessing.connection, authkey-secured):
-  argv: host, port, authkey_hex
+  argv: host, port, authkey_hex, [mode]   mode: "full" (default) or "no-enhanced"
   -> sends {"type":"booting", ...} then {"type":"ready", ...} once PaddleX
      is loaded on GPU (or {"type":"startup_error", ...} and exits on failure)
   recv {"type":"ocr","mode":"normal"|"square","jpeg":<bytes>,"jid":...,"fid":...}
     -> "normal": {"type":"result","payload":{"mode":"normal","text":str,"conf":float,"jid":...,"fid":...,"ms":float}}
     -> "square": {"type":"result","payload":{"mode":"square","top_text":str,"top_conf":float,
                   "bottom_text":str,"bottom_conf":float,"jid":...,"fid":...,"ms":float}}
+       Both payloads also carry timing: decode_ms, prep_total_ms, infer_total_ms,
+       variant_count and a per-version "variants" list.
     -> or {"type":"error","jid":...,"fid":...,"error":repr(exc),"traceback":str}
   recv {"type":"stop"} -> exits cleanly
 """
