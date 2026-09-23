@@ -334,6 +334,8 @@ class LPRRecognizer:
 
         self.square_readings = []
         self.normal_readings = []
+        # Diagnostics only: the row votes behind the last square decision.
+        self.last_square_votes = None
 
         self._latest_t = float("-inf")
 
@@ -424,6 +426,7 @@ class LPRRecognizer:
                         with prof.timed("voting_ms"):
                             sq_changed, _ = self._handle_square_result(payload, t)
                         changed = changed or sq_changed
+                        prof.data["square_votes"] = self.last_square_votes
 
                         # What OCR read in this frame. A square plate is only
                         # as reliable as its weaker row. (The vote-based
@@ -513,6 +516,17 @@ class LPRRecognizer:
 
         candidate, vote_conf = square_candidate(
             self.top_votes, self.bottom_votes, self.square_readings, t)
+
+        # Diagnostics only: which row values are competing right now, and how
+        # much weight each has. Needed to judge when two candidates are too
+        # close to tell apart. Does not affect any decision.
+        self.last_square_votes = {
+            "top": [{"value": v, "weight": round(w, 3), "reads": c}
+                    for v, w, c, _ in aggregate(self.top_votes, t)[:4]],
+            "bottom": [{"value": v, "weight": round(w, 3), "reads": c}
+                       for v, w, c, _ in aggregate(self.bottom_votes, t)[:4]],
+            "chosen": candidate,
+        }
 
         changed = False
         final_conf = max(top_conf, bottom_conf)
