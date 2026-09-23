@@ -85,6 +85,13 @@ def normalize_top(s):
     """
     s = clean_text(s)
 
+    # More than three digits is ambiguous: "KZ 049" read with the Z as a 2
+    # gives "2049", and the extra digit can sit on either side ("16330" for
+    # 633). Taking the first three produced wrong plates such as 204BXS02,
+    # so such a read does not vote at all.
+    if len(re.sub(r"\D", "", s)) > 3:
+        return ""
+
     m = re.search(r"(\d{3})", s)
     if m:
         return m.group(1)
@@ -170,7 +177,10 @@ def best_top(votes, now):
         return "", 0.0, 0, agg
 
     candidate = "".join(max(p.items(), key=lambda kv: kv[1])[0] for p in pos)
-    weight = sum(pos[i][candidate[i]] for i in range(3))
+    # A candidate built digit by digit is only as well supported as its
+    # weakest digit. Summing the three positions counted every read three
+    # times, so a single read could pass MIN_TOP_WEIGHT on its own.
+    weight = min(pos[i][candidate[i]] for i in range(3))
     if weight >= MIN_TOP_WEIGHT:
         return candidate, weight, len(recent), agg
     return "", 0.0, 0, agg
@@ -181,6 +191,35 @@ def best_bottom(votes, now):
     if not agg:
         return "", 0.0, 0, agg
     return agg[0][0], agg[0][1], agg[0][2], agg
+
+
+def square_candidate(top_votes, bottom_votes, square_readings, t):
+    """
+    Decides whether the square-plate votes support a plate at time t.
+    Returns (plate, confidence), or ("", 0.0) if they do not.
+
+    The top and bottom rows are voted on separately, so their winners can come
+    from different frames, even from two different cars in view within
+    WINDOW_SEC. The plate is accepted only if its top and bottom were read
+    together in at least one frame of the last WINDOW_SEC. square_readings are
+    the normalized per-frame readings, newest last, including the current one.
+    """
+    best_t, top_weight, _, _ = best_top(top_votes, t)
+    best_b, bottom_weight, _, _ = best_bottom(bottom_votes, t)
+    if not best_t or not best_b:
+        return "", 0.0
+    plate = best_t + best_b[2:] + best_b[:2]
+    if not valid_kz_plate(plate):
+        return "", 0.0
+    if top_weight < MIN_TOP_WEIGHT or bottom_weight < MIN_BOTTOM_WEIGHT:
+        return "", 0.0
+    read_together = any(
+        r["top"] == best_t and r["bottom"] == best_b and t - r["time"] <= WINDOW_SEC
+        for r in square_readings
+    )
+    if not read_together:
+        return "", 0.0
+    return plate, min(0.99, (top_weight + bottom_weight) / 4.0)
 
 
 def aggregate_all(votes):
@@ -472,18 +511,13 @@ class LPRRecognizer:
         add_vote(self.top_votes, top, top_conf, t)
         add_vote(self.bottom_votes, bottom, bottom_conf, t)
 
-        best_t, top_weight, _, _ = best_top(self.top_votes, t)
-        best_b, bottom_weight, _, _ = best_bottom(self.bottom_votes, t)
-
-        candidate = ""
-        if best_t and best_b:
-            candidate = best_t + best_b[2:] + best_b[:2]
+        candidate, vote_conf = square_candidate(
+            self.top_votes, self.bottom_votes, self.square_readings, t)
 
         changed = False
         final_conf = max(top_conf, bottom_conf)
-        if (candidate and valid_kz_plate(candidate)
-                and top_weight >= MIN_TOP_WEIGHT and bottom_weight >= MIN_BOTTOM_WEIGHT):
-            final_conf = min(0.99, (top_weight + bottom_weight) / 4.0)
+        if candidate:
+            final_conf = vote_conf
             add_vote(self.final_votes, candidate, final_conf, t)
             # Both row weights above their minimums is enough to confirm;
             # waiting for the combined vote to repeat made short-lived square

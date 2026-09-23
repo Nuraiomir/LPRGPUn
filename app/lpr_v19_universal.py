@@ -21,9 +21,9 @@ sys.path.insert(0, str(ROOT))
 from lpr_recognizer import (  # noqa: E402
     LPRRecognizer,
     OCR_EVERY_N_DETECTIONS, SQUARE_ASPECT_MAX, MIN_SQUARE_W, MIN_SQUARE_H,
-    MIN_TOP_WEIGHT, MIN_BOTTOM_WEIGHT, MIN_FINAL_WEIGHT,
+    MIN_FINAL_WEIGHT,
     valid_kz_plate, clean_text, normalize_top, normalize_bottom,
-    add_vote, best_top, best_bottom, aggregate_all,
+    add_vote, aggregate_all, square_candidate,
 )
 
 # Video path from the command line, relative to the project root.
@@ -494,25 +494,13 @@ def main():
                 add_vote(top_votes, top, top_conf, t)
                 add_vote(bottom_votes, bottom, bottom_conf, t)
 
-                best_t, top_weight, _, _ = best_top(top_votes, t)
-                best_b, bottom_weight, _, _ = best_bottom(
-                    bottom_votes, t
+                # Same decision as the HTTP server: see square_candidate()
+                # in lpr_recognizer.py.
+                candidate, final_conf = square_candidate(
+                    top_votes, bottom_votes, square_readings, t
                 )
 
-                candidate = ""
-                if best_t and best_b:
-                    candidate = best_t + best_b[2:] + best_b[:2]
-
-                if (
-                    candidate
-                    and valid_kz_plate(candidate)
-                    and top_weight >= MIN_TOP_WEIGHT
-                    and bottom_weight >= MIN_BOTTOM_WEIGHT
-                ):
-                    final_conf = min(
-                        0.99,
-                        (top_weight + bottom_weight) / 4.0
-                    )
+                if candidate:
                     add_vote(final_votes, candidate, final_conf, t)
                     # Both row weights above their minimums is enough to
                     # confirm. Waiting for the combined vote to repeat made
@@ -521,7 +509,7 @@ def main():
 
                 visual_status = "SQUARE / OCR"
                 visual_text = candidate or (
-                    f"TOP={best_t or '-'}  BOTTOM={best_b or '-'}"
+                    f"TOP={top or '-'}  BOTTOM={bottom or '-'}"
                 )
 
                 print(

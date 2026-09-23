@@ -215,8 +215,8 @@ def test_votes_for_a_gone_square_plate_do_not_keep_it_on_screen():
 
 def test_square_plate_read_by_one_row_stays():
     """One readable row keeps a square plate on screen while the other row's
-    votes are still within WINDOW_SEC. After that no full plate can be formed,
-    and the plate is cleared PLATE_HOLD_SEC later."""
+    votes still support it. After that no full plate can be formed, and the
+    plate is cleared PLATE_HOLD_SEC later."""
     rec = LPRRecognizer(plate_hold_sec=2.0)
     for t in (5.0, 5.3, 5.6):                 # both rows read; last top read at 5.6
         rec._handle_square_result({"top_text": "633", "top_conf": 0.97,
@@ -231,11 +231,11 @@ def test_square_plate_read_by_one_row_stays():
                                    "bottom_text": "02BBT", "bottom_conf": 0.95}, t)
         rec.drop_stale_plate(t)
         shown[t] = rec.confirmed_plate
-    # top votes last until 5.6 + 3.0 = 8.6; the last keep-alive is at 8.6,
-    # so the plate stays through 10.6 and is gone after that
-    assert all(p == "633BBT02" for tt, p in shown.items() if tt <= 10.4), shown
-    assert all(p == "" for tt, p in shown.items() if tt >= 11.0), shown
-    print("[OK] square plate with one readable row stays ~5 s, then is cleared")
+    # The last full reading is at 5.6. Its top-row vote can hold the plate for
+    # another WINDOW_SEC, and PLATE_HOLD_SEC on top of that.
+    assert all(p == "633BBT02" for tt, p in shown.items() if tt <= 9.8), shown
+    assert all(p == "" for tt, p in shown.items() if tt >= 10.4), shown
+    print("[OK] square plate with one readable row stays a few seconds, then is cleared")
 
 
 def test_cleared_square_plate_is_not_revived_by_its_old_votes():
@@ -306,6 +306,49 @@ def test_square_ocr_confidence_is_the_weaker_row_of_this_frame():
     assert r["raw_text"] == " / JO", r["raw_text"]
     print("[OK] square ocr_confidence is this frame's weaker row; raw_text shows both rows")
 
+
+def test_wrong_square_plates_from_the_hard_conditions_run():
+    """Four wrong plates confirmed during the hard-conditions benchmark, built
+    from the readings the server actually logged. Each one came from a
+    different mechanism, and none of them may be confirmed."""
+    cases = {
+        # 'K2049' is "049" with the KZ marker read as a 2: more than three
+        # digits, so the read is ambiguous and must not vote.
+        "004BXS02": [(1.10, "02.47", 0.90, "02BXS", 0.95), (1.40, "049", 0.90, "02BXS", 0.95),
+                     (1.70, "K2049", 0.90, "02BXS", 0.95)],
+        # A single reading of "099" (dark, 4 read as 9) used to be enough,
+        # because the digit-by-digit vote counted it once per position.
+        "099BXS02": [(0.70, "BXS", 0.50, "02BXS", 0.95), (1.00, "2Rvo", 0.60, "02BXS", 0.95),
+                     (1.30, "R09", 0.70, "02BXS", 0.95), (1.60, "099", 0.95, "02BXS", 0.95)],
+        "204BXS02": [(1.30, "040", 0.90, "02BXS", 0.95), (1.60, "2049", 0.90, "02BXS", 0.95)],
+        # "P05" is the tail of the previous car's plate 545BDR05; the bottom
+        # row belongs to the next car. The two were never read together.
+        "905BBT02": [(3.70, "P05", 0.90, "BDRO", 0.60), (5.10, "APAJER", 0.50, "02BBT", 0.93),
+                     (5.40, "TAPAJERO", 0.50, "02BBT", 0.93)],
+    }
+    for wrong, reads in cases.items():
+        rec = LPRRecognizer(plate_hold_sec=0)
+        for t, top, tc, bottom, bc in reads:
+            rec._handle_square_result({"top_text": top, "top_conf": tc,
+                                       "bottom_text": bottom, "bottom_conf": bc}, t)
+            assert rec.confirmed_plate == "", (
+                f"confirmed {rec.confirmed_plate} at {t} s from readings that never "
+                f"showed a plate (field run confirmed {wrong} here)")
+    print("[OK] the four wrong square plates seen in the field are no longer confirmed")
+
+
+def test_square_plate_needs_its_rows_read_in_one_frame():
+    rec = LPRRecognizer(plate_hold_sec=0)
+    # Two strong readings of each row, but never both rows in the same frame.
+    for t, top, bottom in [(0.0, "633", ""), (0.3, "", "02BBT"), (0.6, "633", ""), (0.9, "", "02BBT")]:
+        rec._handle_square_result({"top_text": top, "top_conf": 0.97 if top else 0.0,
+                                   "bottom_text": bottom, "bottom_conf": 0.97 if bottom else 0.0}, t)
+    assert rec.confirmed_plate == "", rec.confirmed_plate
+    rec._handle_square_result({"top_text": "633", "top_conf": 0.97,
+                               "bottom_text": "02BBT", "bottom_conf": 0.97}, 1.2)
+    assert rec.confirmed_plate == "633BBT02", "one frame with both rows should confirm"
+    print("[OK] a square plate is confirmed only after its rows are read together")
+
 if __name__ == "__main__":
     test_video2_catches_short_lived_square_plate_979CBB02()
     test_single_strong_read_confirms_immediately()
@@ -320,4 +363,6 @@ if __name__ == "__main__":
     test_square_plate_read_by_one_row_stays()
     test_cleared_square_plate_is_not_revived_by_its_old_votes()
     test_square_ocr_confidence_is_the_weaker_row_of_this_frame()
+    test_wrong_square_plates_from_the_hard_conditions_run()
+    test_square_plate_needs_its_rows_read_in_one_frame()
     print("\nAll tests passed.")
