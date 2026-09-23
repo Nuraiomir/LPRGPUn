@@ -1,0 +1,22 @@
+{
+  "_comment": "Plates actually present in each test video, in order of appearance, as stated by the project owner. square = two-row plate.",
+  "20260909_171120": [
+    {"plate": "545BDR05"},
+    {"plate": "633BBT02", "square": true},
+    {"plate": "694BPT05"}
+  ],
+  "20260908_150904": [
+    {"plate": "979CBB02", "square": true},
+    {"plate": "221ZVZ05"},
+    {"plate": "202NYM02"},
+    {"plate": "669BKH02"},
+    {"plate": "633BBT02", "square": true},
+    {"plate": "820BAQ02"}
+  ],
+  "20260908_150800": [
+    {"plate": "822AKH02"},
+    {"plate": "049BXS02", "square": true},
+    {"plate": "205BBG05"},
+    {"plate": "502ARV02"}
+  ]
+}

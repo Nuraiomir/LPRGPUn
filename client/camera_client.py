@@ -33,6 +33,9 @@ import urllib.request
 
 import cv2
 
+sys.path.insert(0, str(__import__("pathlib").Path(__file__).resolve().parent))
+from degradations import Degrader, all_variants  # noqa: E402
+
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
@@ -43,6 +46,9 @@ def main():
     p.add_argument("--session-id", default=None, help="session_id для всего видео (один и тот же на все кадры)")
     p.add_argument("--max-frames", type=int, default=None, help="Остановиться после N кадров (по умолчанию: всё видео)")
     p.add_argument("--timeout", type=float, default=30.0, help="Таймаут одного запроса, секунд")
+    p.add_argument("--degrade", default=None, metavar="NAME:LEVEL",
+                   help="damage each frame before sending, e.g. blur:2 or phone:2. "
+                        "Choices: " + ", ".join(all_variants()))
     p.add_argument("--save-responses", default=None, help="Путь для сохранения всех ответов сервера в JSON")
     p.add_argument("--profile", action="store_true", help="Запросить у сервера разбивку по стадиям (?profile=1)")
     p.add_argument("--video-time-voting", action="store_true",
@@ -79,6 +85,7 @@ def main():
     print(f"POSTing to {url}")
     print()
 
+    degrader = Degrader(args.degrade) if args.degrade else None
     frame_idx = 0
     sent = 0
     failed = 0
@@ -117,6 +124,8 @@ def main():
             time.sleep(next_send_at - now)
         next_send_at = max(next_send_at + send_interval, time.monotonic())
 
+        if degrader is not None:
+            frame = degrader(frame)
         ok, buf = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, args.jpeg_quality])
         if not ok:
             continue
@@ -234,6 +243,7 @@ def main():
     print("=" * 64)
     print(f"Видео:                    {args.video}")
     print(f"session_id:               {args.session_id or '(не передавался)'}")
+    print(f"Ухудшение кадров:         {args.degrade or 'нет'}")
     print(f"Отправлено кадров:        {sent}")
     print(f"Успешных ответов:         {sent - failed}")
     print(f"Ошибок всего:             {failed}")
@@ -356,6 +366,7 @@ def main():
         out = {
             "video": args.video,
             "session_id": args.session_id,
+            "degrade": args.degrade,
             "requested_fps": args.fps,
             "jpeg_quality": args.jpeg_quality,
             "frames_sent": sent,

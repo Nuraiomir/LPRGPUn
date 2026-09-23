@@ -24,6 +24,10 @@ workers/
   ocr_gpu_worker.py      text recognition subprocess
 client/
   camera_client.py       sends a video to the server frame by frame, like a camera
+  degradations.py        damages frames to imitate hard conditions (--degrade)
+bench/
+  hard_conditions.py     OCR mode benchmark on degraded video, scored against labels
+  labels.json            plates present in each test video
 config/
   gpu_env.example.py     paths for the HTTP server (copy to gpu_env.py)
 model/best_512.onnx
@@ -179,6 +183,7 @@ python3 tests/test_ocr_worker_static.py       # OCR worker code is well-formed
 python3 tests/test_gpu_workers_client.py      # worker timeouts, crashes, restarts
 python3 tests/test_api_server_limits.py       # size limit, validation, session locking
 python3 tests/test_api_server_integration.py  # full HTTP path with camera_client
+python3 tests/test_degradations.py            # degraded frames are identical across runs
 ```
 
 ## Measured results
@@ -265,6 +270,45 @@ What this does and does not show:
   own duration. Processing time is measured from the start of the run, so it
   also includes starting the GPU workers and writing the annotated output
   video.
+
+## Hard-conditions benchmark
+
+The three test videos are daytime footage with large, clear plates, which is
+where `detailEnhance` is not expected to help. `bench/hard_conditions.py`
+damages each frame before sending it, sends every video through the HTTP
+server at 10 fps in both OCR modes, and scores each run against
+`bench/labels.json`, the plates actually present in each video.
+
+```bash
+.venv_gpu/bin/python bench/hard_conditions.py                  # everything, about 40 min
+.venv_gpu/bin/python bench/hard_conditions.py --score-only     # re-print scores of saved runs
+```
+
+Degradations, each at levels 1 (mild) to 3 (strong), set for 4K frames:
+
+| Name | Imitates |
+|---|---|
+| `far` | plate far away: resolution lost, frame keeps its size |
+| `blur` | hand shake or motion |
+| `dark` | dusk or an underground car park |
+| `lowcon` | backlight, haze, a dirty plate |
+| `phone` | the frame a phone would send: 1080p, 720p or 480p, JPEG-compressed |
+| `darkblur` | dark and blurred at once (level 2 only) |
+
+`phone` sends the smaller frame as is. This matters because the pipeline's
+square-plate thresholds are in pixels (`MIN_SQUARE_W = 130`,
+`MIN_SQUARE_H = 85`): at 720p some square plates from the test videos fall
+below them and would be read as single-row plates.
+
+Per run the script reports plates found, plates missed, wrong plates (a
+confirmed plate that is not in the video; OCRM would look up another car) and
+server-side processing time per frame. Runs are saved in `runs/hard_conditions/`
+and skipped when the script is started again. Inspect how a level looks with
+`python3 client/degradations.py <video> --at <seconds> --out <dir>`.
+
+Synthetic degradations are cleaner than real dirt, rain, glare or angle, so
+this complements real hard-condition footage rather than replacing it. To add
+such a video, put it in `videos/` and list its plates in `bench/labels.json`.
 
 ## Known limitations
 
