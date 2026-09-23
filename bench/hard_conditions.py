@@ -82,7 +82,7 @@ def stop_server(proc, handle):
     handle.close()
 
 
-def run_all(labels, videos, variants, modes, port, fps, force):
+def run_all(labels, videos, variants, modes, port, fps, force, profile=False):
     todo = {m: [(v, d) for v in videos for d in variants
                 if force or not run_path(m, v, d).exists()] for m in modes}
     total = sum(len(t) for t in todo.values())
@@ -108,6 +108,8 @@ def run_all(labels, videos, variants, modes, port, fps, force):
                        "--save-responses", str(out)]
                 if variant != "none":
                     cmd += ["--degrade", variant]
+                if profile:
+                    cmd += ["--profile"]
                 t0 = time.monotonic()
                 res = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
                 done += 1
@@ -213,6 +215,8 @@ def main():
                     help="where to write runs (use a new directory to keep earlier results)")
     ap.add_argument("--port", type=int, default=8799)
     ap.add_argument("--fps", type=float, default=10.0)
+    ap.add_argument("--profile", action="store_true",
+                    help="also save the per-stage timing and the row votes behind each decision")
     ap.add_argument("--force", action="store_true", help="run again even if results exist")
     ap.add_argument("--score-only", action="store_true")
     args = ap.parse_args()
@@ -230,7 +234,8 @@ def main():
         sys.exit(f"unknown variants: {bad}; choose from none, {', '.join(all_variants())}")
 
     if not args.score_only:
-        run_all(labels, videos, variants, args.modes, args.port, args.fps, args.force)
+        run_all(labels, videos, variants, args.modes, args.port, args.fps, args.force,
+                profile=args.profile)
     score(labels, videos, variants, args.modes)
 
 
