@@ -349,6 +349,29 @@ def test_square_plate_needs_its_rows_read_in_one_frame():
     assert rec.confirmed_plate == "633BBT02", "one frame with both rows should confirm"
     print("[OK] a square plate is confirmed only after its rows are read together")
 
+
+def test_junk_detections_are_not_sent_to_ocr():
+    """Box sizes from the real parking video. The small ones are badges and
+    lettering the detector fired on; the large ones did produce plates."""
+    from lpr_recognizer import looks_like_plate
+    frame = (2160, 3840)                    # the parking video, held upright
+
+    junk = [(105, 114), (78, 218), (121, 132), (57, 70), (85, 167), (69, 191)]
+    for w, h in junk:
+        assert not looks_like_plate(w, h, *frame), f"{w}x{h} should be skipped"
+
+    plates = [(1751, 833), (2067, 755), (1907, 603), (358, 379), (1516, 909)]
+    for w, h in plates:
+        assert looks_like_plate(w, h, *frame), f"{w}x{h} produced a plate, must pass"
+
+    # The same crops on a phone-sized frame, and in landscape: the rule holds.
+    assert looks_like_plate(1751 // 3, 833 // 3, 2160 // 3, 3840 // 3)
+    assert not looks_like_plate(105 // 3, 114 // 3, 2160 // 3, 3840 // 3)
+    assert looks_like_plate(1300, 340, 3840, 2160), "landscape video, real plate"
+    assert not looks_like_plate(105, 114, 3840, 2160)
+    print("[OK] badge-sized detections are skipped, plate-sized ones pass at any frame size")
+
+
 if __name__ == "__main__":
     test_video2_catches_short_lived_square_plate_979CBB02()
     test_single_strong_read_confirms_immediately()
@@ -365,4 +388,5 @@ if __name__ == "__main__":
     test_square_ocr_confidence_is_the_weaker_row_of_this_frame()
     test_wrong_square_plates_from_the_hard_conditions_run()
     test_square_plate_needs_its_rows_read_in_one_frame()
+    test_junk_detections_are_not_sent_to_ocr()
     print("\nAll tests passed.")

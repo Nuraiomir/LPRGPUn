@@ -23,7 +23,7 @@ from lpr_recognizer import (  # noqa: E402
     OCR_EVERY_N_DETECTIONS, SQUARE_ASPECT_MAX, MIN_SQUARE_W, MIN_SQUARE_H,
     MIN_FINAL_WEIGHT,
     valid_kz_plate, clean_text, normalize_top, normalize_bottom,
-    add_vote, aggregate_all, square_candidate,
+    add_vote, aggregate_all, square_candidate, looks_like_plate,
 )
 
 # Video path from the command line, relative to the project root.
@@ -555,6 +555,10 @@ def main():
             crop = frame_copy[y1:y2, x1:x2]
 
             if crop.size == 0:
+                continue
+
+            # Same shape check as the HTTP server: see looks_like_plate().
+            if not looks_like_plate(x2 - x1, y2 - y1, frame_copy.shape[1], frame_copy.shape[0]):
                 continue
 
             h, w = crop.shape[:2]

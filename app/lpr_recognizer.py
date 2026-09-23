@@ -56,6 +56,24 @@ SWITCH_STRONG_CONF = 0.95     # ...or one read at least this confident
 # alive; a detection of some other plate does not. 0 disables the timeout.
 PLATE_HOLD_SEC = 2.0
 
+# A detection this small or this oddly shaped cannot be a plate. On real
+# parking footage the detector also fires on badges, lights and lettering, and
+# such a crop costs an OCR call without ever producing a plate.
+#
+# The thresholds are fractions of the frame's SHORTER side. A phone held
+# upright has a narrower horizontal view, so the same plate covers a larger
+# share of the width than in a landscape frame; the shorter side is the same
+# in both and keeps one rule valid for either orientation, and for a
+# phone-sized frame as well.
+#
+# Measured over four videos (244 detections that never produced a plate): the
+# smallest crop that did produce a plate was about 17% of the shorter side,
+# so 7% keeps a wide margin.
+PLATE_MIN_WIDTH_FRAC = 0.07
+PLATE_MIN_HEIGHT_FRAC = 0.025
+PLATE_ASPECT_MIN = 0.55
+PLATE_ASPECT_MAX = 6.5
+
 # Memory bounds for long-running sessions. Voting only looks back WINDOW_SEC,
 # so older votes can never influence a decision. They are kept for ten
 # windows before being dropped, which leaves room for small clock steps
@@ -67,6 +85,18 @@ MAX_READINGS = 500            # diagnostic history kept per session
 # ---------------------------------------------------------------------------
 # Text normalization
 # ---------------------------------------------------------------------------
+
+def looks_like_plate(width, height, frame_width, frame_height):
+    """Can a crop of this size and shape be a plate at all?"""
+    if width <= 0 or height <= 0:
+        return False
+    short_side = min(frame_width, frame_height)
+    if width < PLATE_MIN_WIDTH_FRAC * short_side:
+        return False
+    if height < PLATE_MIN_HEIGHT_FRAC * short_side:
+        return False
+    return PLATE_ASPECT_MIN <= width / height <= PLATE_ASPECT_MAX
+
 
 def valid_kz_plate(text):
     text = re.sub(r"[^A-Z0-9]", "", (text or "").upper())
@@ -403,7 +433,7 @@ class LPRRecognizer:
             with prof.timed("crop_ms"):
                 crop = frame_bgr[y1:y2, x1:x2]
 
-            if crop.size != 0:
+            if crop.size != 0 and looks_like_plate(x2 - x1, y2 - y1, frame_bgr.shape[1], frame_bgr.shape[0]):
                 h, w = crop.shape[:2]
                 aspect = w / max(1, h)
 
