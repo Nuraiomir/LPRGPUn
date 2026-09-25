@@ -310,6 +310,32 @@ Synthetic degradations are cleaner than real dirt, rain, glare or angle, so
 this complements real hard-condition footage rather than replacing it. To add
 such a video, put it in `videos/` and list its plates in `bench/labels.json`.
 
+## Mock server for integration
+
+`tools/mock_lpr_server.py` speaks the same HTTP contract but recognizes
+nothing: it replays a fixed sequence of responses. It lets the client side be
+written and tested before the real service is reachable. One standard-library
+file, no GPU and no dependencies:
+
+```bash
+python3 tools/mock_lpr_server.py          # listens on 0.0.0.0:8765
+```
+
+Each request for a session moves one step along the scenario: nothing
+recognized, a plate confirmed (`changed: true`), the same plate held
+(`changed: false`), the plate cleared (`confirmed: false`), then a second,
+two-row plate. Add `&step=<n>` to ask for one specific step instead, which
+makes a request repeatable. `GET /scenario` returns the whole sequence.
+
+Its responses carry the same fields as the real service, including the error
+shapes, so client code written against it works against the real one. The
+plates it returns are made up; no real plate is ever sent out with it.
+
+`tools/LPR_API.postman_collection.json` imports into Postman and covers every
+request and every error code; `tools/sample_frame.jpg` is a frame to attach
+(it shows an invented plate). Point the `baseUrl` variable at the real service
+when the network access is in place.
+
 ## Known limitations
 
 - Not yet tested with a real phone camera over the network.

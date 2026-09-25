@@ -1,0 +1,542 @@
+{
+  "info": {
+    "name": "LPR API",
+    "description": "License plate recognition service.\n\nRequest: POST /frame?session_id=<id> with one JPEG frame as the raw request body (not JSON, not base64, not multipart).\nResponse: JSON with the currently confirmed plate.\n\nRules for the client:\n1. Search the database only when changed = true.\n2. Show the vehicle card only while confirmed = true. When confirmed becomes false, hide it: the camera has moved away from the car.\n3. Use one session_id per device or scanning session. A UUID is fine. Allowed: 1-128 characters, letters, digits and . _ : @ -\n\nRequests marked 'attach sample_frame.jpg' need a file selected in the Body tab: choose the sample_frame.jpg that came with this collection.\n\nAgainst the mock server, add &step=<n> to always get one specific response. Without it, each request moves one step along the scenario.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8765",
+      "description": "mock server; replace with the real service address later"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            ""
+          ]
+        },
+        "description": "Is the service up. Returns the number of active sessions."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200', () => pm.response.to.have.status(200));",
+              "pm.test('ok', () => pm.expect(pm.response.json().ok).to.eql(true));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Scenario (mock only)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/scenario",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "scenario"
+          ]
+        },
+        "description": "Every response the mock server can return, with comments."
+      }
+    },
+    {
+      "name": "1. No plate yet (step 0)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "image/jpeg"
+          }
+        ],
+        "body": {
+          "mode": "file",
+          "file": {
+            "src": "sample_frame.jpg"
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/frame?session_id=demo-session&step=0",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "frame"
+          ],
+          "query": [
+            {
+              "key": "session_id",
+              "value": "demo-session"
+            },
+            {
+              "key": "step",
+              "value": "0"
+            }
+          ]
+        },
+        "description": "Nothing recognized: plate empty, confirmed false. Attach sample_frame.jpg."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200', () => pm.response.to.have.status(200));",
+              "pm.test('nothing confirmed', () => {",
+              "  const b = pm.response.json();",
+              "  pm.expect(b.confirmed).to.eql(false);",
+              "  pm.expect(b.plate).to.eql('');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Plate confirmed (step 2)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "image/jpeg"
+          }
+        ],
+        "body": {
+          "mode": "file",
+          "file": {
+            "src": "sample_frame.jpg"
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/frame?session_id=demo-session&step=2",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "frame"
+          ],
+          "query": [
+            {
+              "key": "session_id",
+              "value": "demo-session"
+            },
+            {
+              "key": "step",
+              "value": "2"
+            }
+          ]
+        },
+        "description": "changed = true: this is the moment OCRM searches the database. Attach sample_frame.jpg."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200', () => pm.response.to.have.status(200));",
+              "pm.test('confirmed and changed', () => {",
+              "  const b = pm.response.json();",
+              "  pm.expect(b.confirmed).to.eql(true);",
+              "  pm.expect(b.changed).to.eql(true);",
+              "  pm.expect(b.plate).to.match(/^[0-9]{3}[A-Z]{3}[0-9]{2}$/);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Same car, no new search (step 3)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "image/jpeg"
+          }
+        ],
+        "body": {
+          "mode": "file",
+          "file": {
+            "src": "sample_frame.jpg"
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/frame?session_id=demo-session&step=3",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "frame"
+          ],
+          "query": [
+            {
+              "key": "session_id",
+              "value": "demo-session"
+            },
+            {
+              "key": "step",
+              "value": "3"
+            }
+          ]
+        },
+        "description": "Same plate, changed = false. Do not search the database again. Attach sample_frame.jpg."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('same plate, changed=false', () => {",
+              "  const b = pm.response.json();",
+              "  pm.expect(b.confirmed).to.eql(true);",
+              "  pm.expect(b.changed).to.eql(false);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Plate cleared (step 6)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "image/jpeg"
+          }
+        ],
+        "body": {
+          "mode": "file",
+          "file": {
+            "src": "sample_frame.jpg"
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/frame?session_id=demo-session&step=6",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "frame"
+          ],
+          "query": [
+            {
+              "key": "session_id",
+              "value": "demo-session"
+            },
+            {
+              "key": "step",
+              "value": "6"
+            }
+          ]
+        },
+        "description": "The plate has not been read for 2 seconds: plate empty, confirmed false, changed false. Hide the vehicle card. Attach sample_frame.jpg."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('cleared without a new search', () => {",
+              "  const b = pm.response.json();",
+              "  pm.expect(b.confirmed).to.eql(false);",
+              "  pm.expect(b.changed).to.eql(false);",
+              "  pm.expect(b.plate).to.eql('');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Two-row plate confirmed (step 8)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "image/jpeg"
+          }
+        ],
+        "body": {
+          "mode": "file",
+          "file": {
+            "src": "sample_frame.jpg"
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/frame?session_id=demo-session&step=8",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "frame"
+          ],
+          "query": [
+            {
+              "key": "session_id",
+              "value": "demo-session"
+            },
+            {
+              "key": "step",
+              "value": "8"
+            }
+          ]
+        },
+        "description": "A square (two-row) plate. raw_text shows the rows as 'top / bottom' and ocr_confidence is the weaker row. Attach sample_frame.jpg."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('square plate', () => {",
+              "  const b = pm.response.json();",
+              "  pm.expect(b.plate_type).to.eql('square');",
+              "  pm.expect(b.changed).to.eql(true);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Walk the whole sequence",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "image/jpeg"
+          }
+        ],
+        "body": {
+          "mode": "file",
+          "file": {
+            "src": "sample_frame.jpg"
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/frame?session_id=demo-session",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "frame"
+          ],
+          "query": [
+            {
+              "key": "session_id",
+              "value": "demo-session"
+            }
+          ]
+        },
+        "description": "No step parameter: every send moves one step. Send it ten times in a row to see a full session. Attach sample_frame.jpg."
+      }
+    },
+    {
+      "name": "Error: body is not an image",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "image/jpeg"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "this is not a jpeg"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/frame?session_id=demo-session",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "frame"
+          ],
+          "query": [
+            {
+              "key": "session_id",
+              "value": "demo-session"
+            }
+          ]
+        },
+        "description": "400 decode_failed. This one needs no file: the body is plain text."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 decode_failed', () => {",
+              "  pm.response.to.have.status(400);",
+              "  pm.expect(pm.response.json().error_code).to.eql('decode_failed');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Error: invalid session_id",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "image/jpeg"
+          }
+        ],
+        "body": {
+          "mode": "file",
+          "file": {
+            "src": "sample_frame.jpg"
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/frame?session_id=bad%20id",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "frame"
+          ],
+          "query": [
+            {
+              "key": "session_id",
+              "value": "bad%20id"
+            }
+          ]
+        },
+        "description": "400 bad_request: a space is not allowed. Attach sample_frame.jpg."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 bad_request', () => {",
+              "  pm.response.to.have.status(400);",
+              "  pm.expect(pm.response.json().error_code).to.eql('bad_request');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Error: service unavailable (mock only)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "image/jpeg"
+          }
+        ],
+        "body": {
+          "mode": "file",
+          "file": {
+            "src": "sample_frame.jpg"
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/frame?session_id=unavailable",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "frame"
+          ],
+          "query": [
+            {
+              "key": "session_id",
+              "value": "unavailable"
+            }
+          ]
+        },
+        "description": "503 worker_unavailable: the recognition worker is restarting. The client should retry in about a second. Attach sample_frame.jpg."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('503 worker_unavailable', () => {",
+              "  pm.response.to.have.status(503);",
+              "  pm.expect(pm.response.json().error_code).to.eql('worker_unavailable');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Error: wrong path",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{baseUrl}}/recognize",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "recognize"
+          ]
+        },
+        "description": "404 not_found: the only endpoint is /frame."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('404 not_found', () => {",
+              "  pm.response.to.have.status(404);",
+              "  pm.expect(pm.response.json().error_code).to.eql('not_found');",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
