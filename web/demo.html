@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LPR Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+            background: #f5f5f5;
+        }
+
+        h1 {
+            margin-bottom: 8px;
+        }
+
+        .card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        label {
+            display: block;
+            margin-top: 14px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        input[type="file"] {
+            margin-top: 8px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            background: #222;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #preview {
+            max-width: 100%;
+            max-height: 400px;
+            margin-top: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        #status {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 18px;
+            background: #f0f0f0;
+            border-radius: 8px;
+        }
+
+        .plate {
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            margin: 10px 0;
+        }
+
+        .error {
+            color: #b00020;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>LPR Test</h1>
+<p>Тестовый интерфейс распознавания ГРНЗ</p>
+
+<div class="card">
+    <label for="apiKey">API Key</label>
+    <input id="apiKey" type="password" placeholder="Введите API key">
+
+    <label for="sessionId">Session ID</label>
+    <input id="sessionId" type="text" value="web-test">
+
+    <label for="image">Фото автомобиля</label>
+    <input id="image" type="file" accept="image/jpeg,image/png">
+
+    <img id="preview" alt="Preview">
+
+    <button id="recognize">Распознать номер</button>
+
+    <div id="status"></div>
+</div>
+
+<div class="card" id="resultCard" style="display:none;">
+    <h2>Результат</h2>
+
+    <div class="result">
+        <div>ГРНЗ:</div>
+        <div class="plate" id="plate">-</div>
+
+        <div>Confidence: <span id="confidence">-</span></div>
+        <div>OCR confidence: <span id="ocrConfidence">-</span></div>
+        <div>Тип номера: <span id="plateType">-</span></div>
+        <div>Подтвержден: <span id="confirmed">-</span></div>
+        <div>Время обработки: <span id="processingTime">-</span> ms</div>
+    </div>
+</div>
+
+<script>
+const imageInput = document.getElementById("image");
+const preview = document.getElementById("preview");
+const recognizeButton = document.getElementById("recognize");
+const status = document.getElementById("status");
+const resultCard = document.getElementById("resultCard");
+
+imageInput.addEventListener("change", () => {
+    const file = imageInput.files[0];
+
+    if (!file) {
+        preview.style.display = "none";
+        return;
+    }
+
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = "block";
+});
+
+recognizeButton.addEventListener("click", async () => {
+    const apiKey = document.getElementById("apiKey").value.trim();
+    const sessionId = document.getElementById("sessionId").value.trim();
+    const file = imageInput.files[0];
+
+    if (!apiKey) {
+        status.textContent = "Введите API key";
+        status.className = "error";
+        return;
+    }
+
+    if (!sessionId) {
+        status.textContent = "Введите session ID";
+        status.className = "error";
+        return;
+    }
+
+    if (!file) {
+        status.textContent = "Выберите фотографию";
+        status.className = "error";
+        return;
+    }
+
+    recognizeButton.disabled = true;
+    status.className = "";
+    status.textContent = "Распознавание...";
+
+    resultCard.style.display = "none";
+
+    try {
+        const response = await fetch(
+            "/frame?session_id=" + encodeURIComponent(sessionId),
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": file.type || "image/jpeg",
+                    "Authorization": "Bearer " + apiKey
+                },
+                body: file
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.ok) {
+            throw new Error(
+                data.error || ("HTTP " + response.status)
+            );
+        }
+
+        document.getElementById("plate").textContent =
+            data.plate || "Не распознано";
+
+        document.getElementById("confidence").textContent =
+            data.confidence != null
+                ? Number(data.confidence).toFixed(3)
+                : "-";
+
+        document.getElementById("ocrConfidence").textContent =
+            data.ocr_confidence != null
+                ? Number(data.ocr_confidence).toFixed(3)
+                : "-";
+
+        document.getElementById("plateType").textContent =
+            data.plate_type || "-";
+
+        document.getElementById("confirmed").textContent =
+            data.confirmed ? "Да" : "Нет";
+
+        document.getElementById("processingTime").textContent =
+            data.processing_time_ms != null
+                ? data.processing_time_ms
+                : "-";
+
+        resultCard.style.display = "block";
+        status.textContent = "Готово";
+    } catch (error) {
+        status.textContent = "Ошибка: " + error.message;
+        status.className = "error";
+    } finally {
+        recognizeButton.disabled = false;
+    }
+});
+</script>
+
+</body>
+</html>

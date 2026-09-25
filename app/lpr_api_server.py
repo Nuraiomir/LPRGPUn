@@ -170,6 +170,28 @@ class Handler(BaseHTTPRequestHandler):
         self._send_json({"ok": False, "error": message, "error_code": code}, status)
 
     def do_GET(self):
+        parsed = urlparse(self.path)
+
+        if parsed.path == "/demo":
+            demo_path = Path(__file__).resolve().parent.parent / "web" / "demo.html"
+            try:
+                body = demo_path.read_bytes()
+            except OSError as exc:
+                self._send_error(500, "demo_unavailable", str(exc))
+                return
+
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.send_header("Connection", "close")
+            self.end_headers()
+            self.wfile.write(body)
+            return
+
+        if parsed.path != "/":
+            self._send_error(404, "not_found", "Use GET / or GET /demo")
+            return
+
         self._send_json({
             "ok": True,
             "service": "lpr-api-server",
