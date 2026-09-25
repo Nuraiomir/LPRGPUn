@@ -102,3 +102,10 @@ test_*.py
 !runs/real_video_v17_ocr_early_exit/*.json
 !runs/real_video_v18_20260908_150630/
 !runs/real_video_v18_20260908_150630/*.json
+
+# access keys and TLS material: never commit
+*.pem
+*.key
+*.crt
+api_keys*.txt
+config/api_keys*

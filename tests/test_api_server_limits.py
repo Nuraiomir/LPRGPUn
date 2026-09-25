@@ -9,6 +9,10 @@ Run:
 
 import json
 import socket
+import ssl
+import subprocess
+import tempfile
+import urllib.request
 import sys
 import threading
 import time
@@ -172,10 +176,95 @@ def test_idle_sessions_expire_and_count_is_capped():
     print("[OK] idle sessions expire; number of sessions is capped")
 
 
+
+def serve_with_keys(keys, certfile=None, keyfile=None):
+    lpr_api_server.WORKERS = ConcurrencyWorkers()
+    lpr_api_server.SESSIONS = lpr_api_server.SessionStore()
+    lpr_api_server.API_KEYS = set(keys)
+    server = ThreadingHTTPServer(("127.0.0.1", 0), lpr_api_server.Handler)
+    if certfile:
+        import ssl
+        ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        ctx.load_cert_chain(certfile, keyfile)
+        server.socket = ctx.wrap_socket(server.socket, server_side=True)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    return server, server.server_address[1]
+
+
+def post_with_header(port, header=None, body=JPEG):
+    head = (f"POST /frame?session_id=a HTTP/1.1\r\nHost: x\r\n"
+            f"Content-Type: image/jpeg\r\nContent-Length: {len(body)}\r\n"
+            + (f"Authorization: {header}\r\n" if header else "") + "\r\n")
+    return raw_request(port, head, body)
+
+
+def test_access_key_is_required_only_when_configured():
+    server, port = serve_with_keys([])                 # no keys: open service
+    try:
+        status, _ = post_with_header(port)
+        assert status == 200, status
+    finally:
+        server.shutdown()
+    print("[OK] with no keys configured the service stays open")
+
+
+def test_wrong_or_missing_key_is_rejected():
+    server, port = serve_with_keys(["s3cret-key", "second-key"])
+    try:
+        for header, why in [(None, "no header"),
+                            ("Bearer wrong-key", "wrong key"),
+                            ("Bearer ", "empty key"),
+                            ("s3cret-key", "key without the Bearer scheme"),
+                            ("Basic s3cret-key", "wrong scheme")]:
+            status, body = post_with_header(port, header)
+            assert status == 401 and body["error_code"] == "unauthorized", (why, status, body)
+
+        for key in ("s3cret-key", "second-key"):
+            status, body = post_with_header(port, f"Bearer {key}")
+            assert status == 200 and body["ok"] is True, (key, status, body)
+
+        # a health check stays open, so monitoring needs no key
+        status, body = raw_request(port, "GET / HTTP/1.1\r\nHost: x\r\n\r\n")
+        assert status == 200 and body["ok"] is True, (status, body)
+    finally:
+        server.shutdown()
+    print("[OK] missing, wrong and malformed keys give 401; valid keys pass; health stays open")
+
+
+def test_https_serves_the_same_answers():
+    cert = Path(tempfile.mkdtemp()) / "cert.pem"
+    key = cert.with_name("key.pem")
+    made = subprocess.run(
+        ["openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "1",
+         "-subj", "/CN=localhost", "-keyout", str(key), "-out", str(cert)],
+        capture_output=True)
+    if made.returncode != 0:
+        print("[SKIP] openssl not available, cannot test https")
+        return
+
+    server, port = serve_with_keys(["k"], certfile=str(cert), keyfile=str(key))
+    try:
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        req = urllib.request.Request(f"https://127.0.0.1:{port}/frame?session_id=a",
+                                     data=JPEG, method="POST",
+                                     headers={"Content-Type": "image/jpeg",
+                                              "Authorization": "Bearer k"})
+        with urllib.request.urlopen(req, timeout=10, context=ctx) as r:
+            body = json.loads(r.read())
+        assert r.status == 200 and body["ok"] is True, body
+    finally:
+        server.shutdown()
+    print("[OK] over https the service answers the same, and still checks the key")
+
 if __name__ == "__main__":
     test_oversized_frame_is_rejected_without_reading_it()
     test_invalid_input_is_a_client_error()
     test_worker_failure_is_503_and_server_keeps_working()
     test_same_session_is_serialized_other_sessions_run_in_parallel()
     test_idle_sessions_expire_and_count_is_capped()
+    test_access_key_is_required_only_when_configured()
+    test_wrong_or_missing_key_is_rejected()
+    test_https_serves_the_same_answers()
     print("\nAll tests passed.")

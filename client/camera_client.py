@@ -26,6 +26,7 @@ Useful options:
 import argparse
 import json
 import socket
+import ssl
 import sys
 import time
 import urllib.error
@@ -46,6 +47,10 @@ def main():
     p.add_argument("--session-id", default=None, help="session_id для всего видео (один и тот же на все кадры)")
     p.add_argument("--max-frames", type=int, default=None, help="Остановиться после N кадров (по умолчанию: всё видео)")
     p.add_argument("--timeout", type=float, default=30.0, help="Таймаут одного запроса, секунд")
+    p.add_argument("--api-key", default=None,
+                   help="access key, sent as Authorization: Bearer <key>")
+    p.add_argument("--insecure", action="store_true",
+                   help="for https with a self-signed certificate: do not verify it")
     p.add_argument("--degrade", default=None, metavar="NAME:LEVEL",
                    help="damage each frame before sending, e.g. blur:2 or phone:2. "
                         "Choices: " + ", ".join(all_variants()))
@@ -86,6 +91,14 @@ def main():
     print()
 
     degrader = Degrader(args.degrade) if args.degrade else None
+    headers = {"Content-Type": "image/jpeg"}
+    if args.api_key:
+        headers["Authorization"] = f"Bearer {args.api_key}"
+    tls_context = None
+    if args.insecure:
+        tls_context = ssl.create_default_context()
+        tls_context.check_hostname = False
+        tls_context.verify_mode = ssl.CERT_NONE
     frame_idx = 0
     sent = 0
     failed = 0
@@ -134,9 +147,9 @@ def main():
         try:
             req = urllib.request.Request(
                 build_url(frame_idx / video_fps), data=buf.tobytes(), method="POST",
-                headers={"Content-Type": "image/jpeg"},
+                headers=headers,
             )
-            with urllib.request.urlopen(req, timeout=args.timeout) as r:
+            with urllib.request.urlopen(req, timeout=args.timeout, context=tls_context) as r:
                 status = r.status
                 raw = r.read().decode("utf-8", errors="replace")
         except urllib.error.HTTPError as e:

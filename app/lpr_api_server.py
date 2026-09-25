@@ -24,20 +24,34 @@ Response fields: ok, plate, confirmed, changed, bbox, confidence,
 ocr_confidence, plate_type, raw_text, session_id, processing_time_ms,
 frame_size, ocr_variant_mode.
 
+Access control (optional, off unless keys are configured):
+    every request to /frame must carry   Authorization: Bearer <key>
+    Keys come from the LPR_API_KEYS environment variable (comma separated) or
+    from --api-keys-file, one key per line. They are never stored in the code
+    or in the repository. With no keys configured the server runs open and
+    says so at startup. GET / stays open either way, for monitoring.
+
+TLS: pass --cert and --key to serve HTTPS. A browser only gives a web page
+access to the camera over HTTPS, so the phone-side page will need it.
+
 Errors return {"ok": false, "error": ..., "error_code": ...}:
     400 bad_request         missing/invalid Content-Length, session_id or t
+    401 unauthorized        missing or wrong access key
     400 decode_failed       body is not a decodable image
     404 not_found           unknown path
     413 payload_too_large   body larger than MAX_FRAME_BYTES
     503 worker_unavailable  a GPU worker timed out or crashed (it is restarted)
     500 internal_error      anything else
 
-Not implemented yet: authentication, rate limiting, TLS.
+Not implemented yet: rate limiting.
 """
 
 import argparse
+import hmac
 import json
+import os
 import re
+import ssl
 import sys
 import threading
 import time
@@ -108,6 +122,7 @@ class SessionStore:
 
 WORKERS = None
 SESSIONS = SessionStore()
+API_KEYS = set()          # empty means access control is switched off
 
 
 class _ClientError(Exception):
@@ -115,6 +130,27 @@ class _ClientError(Exception):
         super().__init__(message)
         self.status = status
         self.code = code
+
+
+def check_key(header_value):
+    """True if the Authorization header carries one of the configured keys."""
+    if not API_KEYS:
+        return True
+    if not header_value:
+        return False
+    scheme, _, key = header_value.partition(" ")
+    if scheme.lower() != "bearer" or not key:
+        return False
+    # compare_digest keeps the time taken the same whatever the key is, so a
+    # wrong key cannot be guessed character by character from response times
+    try:
+        candidate = key.strip().encode("utf-8")
+        return any(
+            hmac.compare_digest(candidate, known.encode("utf-8"))
+            for known in API_KEYS
+        )
+    except (UnicodeEncodeError, AttributeError):
+        return False
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -167,6 +203,11 @@ class Handler(BaseHTTPRequestHandler):
         parsed = urlparse(self.path)
         if parsed.path != "/frame":
             self._send_error(404, "not_found", "Use POST /frame")
+            return
+
+        if not check_key(self.headers.get("Authorization")):
+            self._send_error(401, "unauthorized",
+                             "send Authorization: Bearer <key>")
             return
 
         query = parse_qs(parsed.query)
@@ -230,19 +271,38 @@ class Handler(BaseHTTPRequestHandler):
         print(f"[HTTP] {self.address_string()} {format % args}", flush=True)
 
 
+def load_api_keys(path=None):
+    """Keys from --api-keys-file (one per line) or from LPR_API_KEYS."""
+    keys = set()
+    if path:
+        for line in Path(path).read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line and not line.startswith("#"):
+                keys.add(line)
+    for key in os.environ.get("LPR_API_KEYS", "").split(","):
+        key = key.strip()
+        if key:
+            keys.add(key)
+    return keys
+
+
 def main(project_root, yolo_python, ocr_python, onnx_model,
          yolo_cuda_ld_path, ocr_cuda_ld_path, ocr_variant_mode="full", port=None,
-         plate_hold_sec=PLATE_HOLD_SEC):
-    global WORKERS, PORT, SESSIONS
+         plate_hold_sec=PLATE_HOLD_SEC, api_keys=None, certfile=None, keyfile=None):
+    global WORKERS, PORT, SESSIONS, API_KEYS
     if port is not None:
         PORT = port
     SESSIONS = SessionStore(plate_hold_sec=plate_hold_sec)
+    API_KEYS = set(api_keys or ())
 
     print("=" * 70)
     print("LPR HTTP SERVER")
     print("=" * 70)
     print(f"OCR variant mode: {ocr_variant_mode}")
     print(f"Plate hold:       {plate_hold_sec} s" + (" (disabled)" if plate_hold_sec <= 0 else ""))
+    print(f"Access keys:      {len(API_KEYS)}" if API_KEYS
+          else "Access keys:      none -- ANY CLIENT CAN SEND FRAMES")
+    print(f"TLS:              {'on' if certfile else 'off -- traffic is not encrypted'}")
     print(f"Project root:     {project_root}")
     print(f"YOLO model:       {onnx_model}")
     print(f"Worker python:    {yolo_python}")
@@ -257,11 +317,20 @@ def main(project_root, yolo_python, ocr_python, onnx_model,
     print(f"YOLO on CUDA:     {'CUDAExecutionProvider' in providers}")
     print(f"OCR device:       {WORKERS.ocr_info.get('device')}")
     print(f"OCR backend:      {WORKERS.ocr_info.get('backend')}")
+    scheme = "https" if certfile else "http"
     print("=" * 70)
-    print(f"READY: http://{HOST}:{PORT}/frame?session_id=<id>")
+    print(f"READY: {scheme}://{HOST}:{PORT}/frame?session_id=<id>")
+    if not API_KEYS or not certfile:
+        print("NOT production-ready yet:"
+              + ("" if API_KEYS else " no access keys;")
+              + ("" if certfile else " no TLS."))
     print("=" * 70, flush=True)
 
     server = ThreadingHTTPServer((HOST, PORT), Handler)
+    if certfile:
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        context.load_cert_chain(certfile, keyfile)
+        server.socket = context.wrap_socket(server.socket, server_side=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
@@ -272,6 +341,19 @@ def main(project_root, yolo_python, ocr_python, onnx_model,
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="LPR HTTP server")
+    parser.add_argument("--ocr-variants", choices=["full", "no-enhanced"], default="full",
+                        help="no-enhanced skips cv2.detailEnhance")
+    parser.add_argument("--port", type=int, default=PORT)
+    parser.add_argument("--plate-hold-sec", type=float, default=PLATE_HOLD_SEC,
+                        help="clear a plate not read for this long; 0 disables")
+    parser.add_argument("--api-keys-file",
+                        help="file with access keys, one per line; "
+                             "keys can also come from LPR_API_KEYS")
+    parser.add_argument("--cert", help="TLS certificate (PEM) to serve HTTPS")
+    parser.add_argument("--key", help="private key for --cert")
+    args = parser.parse_args()
+
     project_root = Path(__file__).resolve().parent.parent
     sys.path.insert(0, str(project_root))
     try:
@@ -279,14 +361,6 @@ if __name__ == "__main__":
     except ModuleNotFoundError:
         sys.exit("config/gpu_env.py not found. Create it with:\n"
                  "    cp config/gpu_env.example.py config/gpu_env.py")
-
-    parser = argparse.ArgumentParser(description="LPR HTTP server")
-    parser.add_argument("--ocr-variants", choices=["full", "no-enhanced"], default="full",
-                        help="no-enhanced skips cv2.detailEnhance")
-    parser.add_argument("--port", type=int, default=PORT)
-    parser.add_argument("--plate-hold-sec", type=float, default=PLATE_HOLD_SEC,
-                        help="clear a plate not read for this long; 0 disables")
-    args = parser.parse_args()
 
     main(project_root=gpu_env.PROJECT_ROOT,
          yolo_python=gpu_env.YOLO_PYTHON,
@@ -296,4 +370,7 @@ if __name__ == "__main__":
          ocr_cuda_ld_path=gpu_env.OCR_CUDA_LD_PATH,
          ocr_variant_mode=args.ocr_variants,
          port=args.port,
-         plate_hold_sec=args.plate_hold_sec)
+         plate_hold_sec=args.plate_hold_sec,
+         api_keys=load_api_keys(args.api_keys_file),
+         certfile=args.cert,
+         keyfile=args.key)

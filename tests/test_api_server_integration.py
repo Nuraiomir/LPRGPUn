@@ -87,6 +87,7 @@ def build_script():
 def test_full_http_stack_reproduces_real_v19_switch_sequence():
     lpr_api_server.WORKERS = FakeWorkers(build_script())
     lpr_api_server.SESSIONS = lpr_api_server.SessionStore()
+    lpr_api_server.API_KEYS = set()
 
     server = ThreadingHTTPServer(("127.0.0.1", 0), lpr_api_server.Handler)
     port = server.server_address[1]
@@ -168,6 +169,7 @@ def test_camera_client_runs_against_live_server():
     server doesn't need to line up with this video's actual content."""
     lpr_api_server.WORKERS = FakeWorkers(build_script())
     lpr_api_server.SESSIONS = lpr_api_server.SessionStore()
+    lpr_api_server.API_KEYS = set()
     server = ThreadingHTTPServer(("127.0.0.1", 0), lpr_api_server.Handler)
     port = server.server_address[1]
     thread = threading.Thread(target=server.serve_forever, daemon=True)
