@@ -40,21 +40,57 @@ import cv2
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "app"))
-from lpr_recognizer import clean_text, valid_kz_plate  # noqa: E402
+# extract_plate is imported, not copied: the benchmark has to measure the rule
+# the service actually runs. A second copy here would keep reporting the old
+# number after the pipeline changed, which is exactly the mistake this file is
+# meant to catch.
+from lpr_recognizer import clean_text, extract_plate, valid_kz_plate  # noqa: E402
 
 IMAGE_SUFFIXES = (".png", ".jpg", ".jpeg", ".bmp")
 NEW_KZ = re.compile(r"\d{3}[A-Z]{3}\d{2}")     # 123ABC02, what the service confirms
-# Overlapping search for a plate sitting inside a longer reading. Kazakh plates
-# carry a printed "KZ" block, so OCR legitimately returns "KZ001AP06" for a
-# plate labelled "001AP06"; the current rule throws that reading away.
-PLATE_INSIDE = re.compile(r"(?=(\d{3}[A-Z]{3}\d{2}))")
 OLD_KZ = re.compile(r"\d{3}[A-Z]{2}\d{2}")     # 249AS16, the pre-2012 layout
 
+# Not yet in the pipeline, measured here first: a reading where a letter slot
+# came back as a digit (106BOA11 read as 106B0A11). Such a reading is rejected
+# today, so repairing it can only add plates -- but 0 could be O, Q or D, and a
+# wrong guess sends OCRM looking for a different car. The two cases are counted
+# apart so the risk is visible before any of this reaches the service.
+PLATE_LEN = 8
+LETTER_SLOTS = (3, 4, 5)
+DIGIT_TO_LETTER = {"0": ("O", "Q", "D"), "1": ("I",), "2": ("Z",), "4": ("A",),
+                   "5": ("S",), "6": ("G",), "7": ("T",), "8": ("B",)}
 
-def extract_plate(text):
-    """The plate inside a longer reading, but only when it is unambiguous."""
-    found = {m.group(1) for m in PLATE_INSIDE.finditer(text)}
-    return found.pop() if len(found) == 1 else ""
+
+def repair_letter_slots(text):
+    """(plate, certainty) for a reading whose letter slots hold digits.
+
+    Scans every 8-character window the way extract_plate does and answers only
+    when exactly one candidate comes out. certainty is "однозначно" when every
+    repaired digit maps to a single letter, "догадка" when at least one digit
+    is ambiguous. ("", "") means nothing fits.
+    """
+    found = {}
+    for start in range(len(text) - PLATE_LEN + 1):
+        window = text[start:start + PLATE_LEN]
+        if not (window[:3].isdigit() and window[6:].isdigit()):
+            continue
+        if all(window[i].isalpha() for i in LETTER_SLOTS):
+            continue          # already a plate; extract_plate handles this one
+        chars, guessed, fits = list(window), False, True
+        for i in LETTER_SLOTS:
+            if window[i].isalpha():
+                continue
+            options = DIGIT_TO_LETTER.get(window[i])
+            if not options:
+                fits = False
+                break
+            chars[i] = options[0]
+            guessed = guessed or len(options) > 1
+        if fits:
+            found["".join(chars)] = "догадка" if guessed else "однозначно"
+    if len(found) != 1:
+        return "", ""
+    return next(iter(found.items()))
 
 
 def plate_format(text):
@@ -169,6 +205,7 @@ def evaluate(root, split, limit, report_dir, ocr_mode):
     shapes = Counter()
     shape_examples = {}
     wrong_pulls = []
+    wrong_repairs = []
     failures = []
     char_errors = char_total = 0
     t_start = time.monotonic()
@@ -202,6 +239,17 @@ def evaluate(root, split, limit, report_dir, ocr_mode):
                     wrong_pulls.append(f"{label} -> {got} -> {pulled}")
             elif kind == "new (3 цифры + 3 буквы + 2 цифры)":
                 stats["извлечение: ничего"] += 1
+
+            # Only readings the service rejects outright are offered to the
+            # repair rule, so it can never change a plate confirmed today.
+            if not pulled:
+                repaired, certainty = repair_letter_slots(got)
+                if repaired:
+                    hit = "верно" if repaired == label else "НЕВЕРНО"
+                    stats[f"буквы {certainty}: {hit}"] += 1
+                    if hit == "НЕВЕРНО" and len(wrong_repairs) < 12:
+                        wrong_repairs.append(f"{label} -> {got} -> {repaired} ({certainty})")
+
             bucket["OCR верно" if correct else "OCR неверно"] += 1
             if correct:
                 stats["OCR верно"] += 1
@@ -250,7 +298,7 @@ def evaluate(root, split, limit, report_dir, ocr_mode):
           f"({100 * stats['принято сервисом'] / n:5.1f}%)")
     print(f"  ошибок в символах:        {100 * char_errors / max(char_total, 1):5.1f}%")
 
-    print("\n  Если извлекать номер из строки (снимает KZ и прочий мусор вокруг):")
+    print("\n  Правило сервиса: извлечь номер из строки (снимает KZ и прочий мусор):")
     ok_pull = stats["извлечение: верно"]
     bad_pull = stats["извлечение: НЕВЕРНЫЙ номер"]
     print(f"    верно:                  {ok_pull:5d}  ({100 * ok_pull / n:5.1f}%)"
@@ -258,6 +306,21 @@ def evaluate(root, split, limit, report_dir, ocr_mode):
     print(f"    НЕВЕРНЫЙ номер:         {bad_pull:5d}  ({100 * bad_pull / n:5.1f}%)"
           "   <- это опаснее пропуска: ОСРМ искала бы другую машину")
     for example in wrong_pulls:
+        print(f"      {example}")
+
+    print("\n  Ещё не в сервисе: починить букву, прочитанную как цифру (106B0A11 -> 106BOA11):")
+    for certainty in ("однозначно", "догадка"):
+        ok = stats[f"буквы {certainty}: верно"]
+        bad = stats[f"буквы {certainty}: НЕВЕРНО"]
+        if not (ok or bad):
+            continue
+        share = 100 * bad / max(ok + bad, 1)
+        print(f"    {certainty:11s} +{ok:4d} верно, {bad:4d} НЕВЕРНО "
+              f"({share:.0f}% из добавленных были бы чужой машиной)")
+    if not any(stats[f"буквы {c}: {h}"] for c in ("однозначно", "догадка")
+               for h in ("верно", "НЕВЕРНО")):
+        print("    ни одного случая — правило ничего не изменило бы")
+    for example in wrong_repairs:
         print(f"      {example}")
 
     print("\n  По форматам номера:")
