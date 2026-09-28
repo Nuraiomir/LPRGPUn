@@ -13,11 +13,14 @@ Run:
     python3 tests/test_lpr_recognizer.py
 """
 
+import random
 import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "app"))
 
-from lpr_recognizer import LPRRecognizer  # noqa: E402
+from lpr_recognizer import (  # noqa: E402
+    LPRRecognizer, clean_text, extract_plate, valid_kz_plate,
+)
 
 
 class FakeWorkers:
@@ -372,6 +375,49 @@ def test_junk_detections_are_not_sent_to_ocr():
     print("[OK] badge-sized detections are skipped, plate-sized ones pass at any frame size")
 
 
+
+def test_plate_is_pulled_out_of_a_reading_that_includes_the_kz_block():
+    """Readings from the labelled AUTO.RIA KZ crops. The plate is printed next
+    to a "KZ" block, so OCR returns it as part of the text."""
+    cases = {
+        "KZ001AP06": "",                        # old layout, 2 letters: still rejected
+        "KZ545BDR05": "545BDR05",
+        "Z001BUZ10": "001BUZ10",
+        "K2049BXS02": "049BXS02",               # the Z of KZ read as a 2
+        "545BDR05": "545BDR05",                 # already clean: unchanged
+        "MITSUBISHI": "",
+        "830BX": "",                            # a cut-off reading stays rejected
+        "": "",
+    }
+    for text, expected in cases.items():
+        assert extract_plate(clean_text(text)) == expected, (text, extract_plate(clean_text(text)))
+
+    # Two plates in one reading: refuse rather than guess which car it is.
+    assert extract_plate("999XYZ07545BDR05") == ""
+    print("[OK] the plate is pulled out of a KZ-prefixed reading; two plates are refused")
+
+
+def test_extraction_never_changes_a_reading_that_was_already_accepted():
+    """The safety property: every string the old rule accepted keeps its value,
+    so no plate confirmed before can be confirmed differently now."""
+    rng = random.Random(7)
+    digits, letters = "0123456789", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    for _ in range(3000):
+        plate = ("".join(rng.choice(digits) for _ in range(3))
+                 + "".join(rng.choice(letters) for _ in range(3))
+                 + "".join(rng.choice(digits) for _ in range(2)))
+        assert valid_kz_plate(plate)
+        assert extract_plate(plate) == plate, plate
+    print("[OK] a reading that was valid before keeps exactly the same plate")
+
+
+def test_kz_prefixed_reading_now_confirms_the_plate():
+    rec = LPRRecognizer(plate_hold_sec=0)
+    for _ in range(2):
+        rec._handle_normal_result({"text": "KZ545BDR05", "conf": 0.93}, 0.0)
+    assert rec.confirmed_plate == "545BDR05", rec.confirmed_plate
+    print("[OK] a plate read together with the KZ block is confirmed, not dropped")
+
 if __name__ == "__main__":
     test_video2_catches_short_lived_square_plate_979CBB02()
     test_single_strong_read_confirms_immediately()
@@ -389,4 +435,7 @@ if __name__ == "__main__":
     test_wrong_square_plates_from_the_hard_conditions_run()
     test_square_plate_needs_its_rows_read_in_one_frame()
     test_junk_detections_are_not_sent_to_ocr()
+    test_plate_is_pulled_out_of_a_reading_that_includes_the_kz_block()
+    test_extraction_never_changes_a_reading_that_was_already_accepted()
+    test_kz_prefixed_reading_now_confirms_the_plate()
     print("\nAll tests passed.")
