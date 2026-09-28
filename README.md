@@ -11,6 +11,46 @@ returns customer data.
 - Single-row and two-row (square) plates
 - Temporal voting across frames and automatic switching between vehicles
 
+## Quick start
+
+Everything below is run from the repository root on the GPU host. Each section
+further down explains the same steps in more detail.
+
+```bash
+cd ~/nurai_gpu
+
+# 1. Once: tell the server where the environment and the model are
+cp config/gpu_env.example.py config/gpu_env.py
+
+# 2. Once: an access key and a certificate. The key is compared in constant
+#    time and never leaves this file; the certificate is what lets a browser
+#    give the page access to the camera. Neither is committed (.gitignore).
+mkdir -p config
+python3 -c 'import secrets; print(secrets.token_urlsafe(32))' > config/api_keys.txt
+openssl req -x509 -newkey rsa:2048 -nodes -days 365 \
+    -subj "/CN=10.26.13.12" -keyout config/server.key -out config/server.pem
+
+# 3. Start the service (loading the GPU workers takes a few seconds)
+.venv_gpu/bin/python app/lpr_api_server.py \
+    --cert config/server.pem --key config/server.key \
+    --api-keys-file config/api_keys.txt
+```
+
+Then, with the key from `config/api_keys.txt`:
+
+| What | How |
+|---|---|
+| Scan with a phone or laptop camera | open `https://<host>:8765/demo`, paste the key, press "Начать сканирование" |
+| Check the service is alive | `curl -sk https://127.0.0.1:8765/` |
+| Send one frame by hand | `curl -sk -X POST --data-binary @tools/sample_frame.jpg -H "Content-Type: image/jpeg" -H "Authorization: Bearer <key>" "https://127.0.0.1:8765/frame?session_id=test"` |
+| Replay a recorded video as a camera | `.venv_gpu/bin/python client/camera_client.py --video videos/<file>.mp4 --server https://127.0.0.1:8765 --api-key <key> --insecure --session-id cam1 --fps 10` |
+| Process a video offline, with an annotated output | `.venv_gpu/bin/python app/lpr_v19_universal.py videos/<file>.mp4` |
+| Run the tests (no GPU needed) | `for t in tests/*.py; do .venv_gpu/bin/python $t \| tail -1; done` |
+| Give integrators something to build against | `python3 tools/mock_lpr_server.py` (no GPU, no dependencies) |
+
+If the server exits with `Address already in use`, an older instance is still
+running: `ss -ltnp | grep 8765`.
+
 ## Project structure
 
 ```text
@@ -335,6 +375,33 @@ plates it returns are made up; no real plate is ever sent out with it.
 request and every error code; `tools/sample_frame.jpg` is a frame to attach
 (it shows an invented plate). Point the `baseUrl` variable at the real service
 when the network access is in place.
+
+## Scanning page for a phone
+
+`web/demo.html` is served by the server itself at `GET /demo`. It opens the
+phone's back camera and scans continuously: a frame is taken, sent to
+`POST /frame`, and the next one is only taken after the answer arrives, so
+requests never queue up. In practice that settles at about 3 frames a second,
+which is what the pipeline sustains.
+
+The page shows what an OCRM screen would show: the confirmed plate over the
+live picture, the detector's box around what it found, and a marker on the
+frame where `changed` is `true` — the moment OCRM would search the bank
+database. When the plate is cleared (`confirmed` back to `false`) the page goes
+back to "scanning", which is what hiding the vehicle card looks like.
+
+A browser only grants a page access to the camera over HTTPS, so the server has
+to run with `--cert` and `--key` (see above) for this to work from a phone.
+`http://localhost` is the one exception, useful for testing on the server
+itself. With a self-signed certificate the browser warns once and the warning
+has to be accepted before the camera can start.
+
+```bash
+.venv_gpu/bin/python app/lpr_api_server.py \
+    --cert config/server.pem --key config/server.key \
+    --api-keys-file config/api_keys.txt
+# then open https://<server address>:8765/demo on the phone
+```
 
 ## Known limitations
 

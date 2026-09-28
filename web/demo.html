@@ -1,411 +1,449 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LPR Camera Demo</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>LPR Camera Demo</title>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 0 20px;
-            background: #f5f5f5;
-        }
+<style>
+    :root {
+        --bg: #f4f4f5;
+        --card: #ffffff;
+        --ink: #18181b;
+        --muted: #71717a;
+        --line: #d4d4d8;
+        --ok: #15803d;
+        --warn: #b45309;
+        --err: #b00020;
+    }
 
-        h1 {
-            margin-bottom: 8px;
-        }
+    * { box-sizing: border-box; }
 
-        .card {
-            background: white;
-            padding: 24px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-        }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 20px 16px 48px;
+        background: var(--bg);
+        color: var(--ink);
+    }
 
-        label {
-            display: block;
-            margin-top: 14px;
-            margin-bottom: 6px;
-            font-weight: bold;
-        }
+    h1 { margin: 0 0 4px; font-size: 22px; }
+    .sub { margin: 0 0 20px; color: var(--muted); font-size: 14px; }
 
-        input[type="text"],
-        input[type="password"] {
-            width: 100%;
-            box-sizing: border-box;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 15px;
-        }
+    .card {
+        background: var(--card);
+        padding: 18px;
+        border-radius: 12px;
+        margin-bottom: 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    }
 
-        input[type="file"] {
-            margin-top: 8px;
-        }
+    label { display: block; margin-bottom: 6px; font-size: 13px; color: var(--muted); }
+    .field { margin-bottom: 14px; }
 
-        button {
-            margin-top: 15px;
-            margin-right: 8px;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 6px;
-            background: #222;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-        }
+    input[type="text"], input[type="password"] {
+        width: 100%;
+        padding: 11px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 16px;            /* 16px keeps iOS from zooming on focus */
+        background: #fff;
+        color: var(--ink);
+    }
 
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+    .remember { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+    .remember input { width: auto; }
 
-        #camera {
-            width: 100%;
-            max-width: 700px;
-            margin-top: 15px;
-            border-radius: 8px;
-            background: #000;
-        }
+    button {
+        padding: 13px 20px;
+        border: none;
+        border-radius: 8px;
+        background: var(--ink);
+        color: #fff;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    button.stop { background: #52525b; }
+    button:disabled { opacity: .45; cursor: not-allowed; }
 
-        #preview {
-            max-width: 100%;
-            max-height: 400px;
-            margin-top: 15px;
-            border-radius: 8px;
-            display: none;
-        }
+    /* Video and the box drawn over it share one stacking box so the
+       overlay lines up with the picture at any screen width. */
+    .viewport {
+        position: relative;
+        margin-top: 4px;
+        border-radius: 10px;
+        overflow: hidden;
+        background: #000;
+        display: none;
+    }
+    .viewport.on { display: block; }
 
-        #status {
-            margin-top: 15px;
-            font-weight: bold;
-        }
+    video { width: 100%; display: block; }
+    #overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 
-        .result {
-            margin-top: 20px;
-            padding: 18px;
-            background: #f0f0f0;
-            border-radius: 8px;
-        }
+    .readout {
+        position: absolute;
+        left: 0; right: 0; bottom: 0;
+        padding: 14px 16px 16px;
+        background: linear-gradient(transparent, rgba(0,0,0,.78));
+        color: #fff;
+        text-align: center;
+    }
+    .readout .label { font-size: 12px; letter-spacing: .12em; opacity: .75; }
+    .readout .plate {
+        font-size: 34px;
+        font-weight: 700;
+        letter-spacing: .09em;
+        line-height: 1.25;
+        font-variant-numeric: tabular-nums;
+        min-height: 44px;
+    }
+    .readout .meta { font-size: 13px; opacity: .85; min-height: 18px; }
+    .readout.searching .plate { font-size: 20px; font-weight: 500; opacity: .8; letter-spacing: normal; }
 
-        .plate {
-            font-size: 32px;
-            font-weight: bold;
-            letter-spacing: 3px;
-            margin: 10px 0;
-        }
+    .badge {
+        display: inline-block;
+        margin-top: 6px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: var(--ok);
+        font-size: 12px;
+        font-weight: 600;
+        opacity: 0;
+        transition: opacity .25s;
+    }
+    .badge.on { opacity: 1; }
 
-        .error {
-            color: #b00020;
-        }
+    #status { margin-top: 14px; font-size: 14px; min-height: 20px; }
+    #status.err { color: var(--err); font-weight: 600; }
+    #status.warn { color: var(--warn); }
 
-        .camera-buttons {
-            margin-top: 5px;
-        }
-    </style>
+    .stats {
+        margin-top: 12px;
+        font-size: 12px;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .note { font-size: 13px; color: var(--muted); line-height: 1.5; }
+    .note code { background: #e4e4e7; padding: 1px 5px; border-radius: 4px; }
+</style>
 </head>
 
 <body>
 
-<h1>LPR Camera Demo</h1>
-<p>Тестовый интерфейс распознавания ГРНЗ</p>
+<h1>Сканирование ГРНЗ</h1>
+<p class="sub">Наведите камеру на номер автомобиля. Кадры отправляются автоматически.</p>
 
 <div class="card">
-
-    <label for="apiKey">API Key</label>
-    <input id="apiKey" type="password" placeholder="Введите API key">
-
-    <label for="sessionId">Session ID</label>
-    <input id="sessionId" type="text" value="web-test">
-
-    <label for="image">Фото автомобиля</label>
-    <input id="image" type="file" accept="image/jpeg,image/png">
-
-    <div class="camera-buttons">
-        <button id="startCamera" type="button">Открыть камеру</button>
-        <button id="capturePhoto" type="button" disabled>Сделать кадр</button>
-        <button id="stopCamera" type="button" disabled>Закрыть камеру</button>
+    <div class="field">
+        <label for="apiKey">Ключ доступа</label>
+        <input id="apiKey" type="password" placeholder="Bearer-ключ сервиса" autocomplete="off">
+        <label class="remember" style="margin-top:8px">
+            <input id="rememberKey" type="checkbox"> запомнить ключ в этом браузере
+        </label>
     </div>
 
-    <video
-        id="camera"
-        autoplay
-        playsinline
-        muted
-        style="display:none;">
-    </video>
+    <div class="field">
+        <label for="sessionId">Session ID</label>
+        <input id="sessionId" type="text" value="web-test" autocomplete="off">
+    </div>
 
-    <canvas id="canvas" style="display:none;"></canvas>
+    <button id="startBtn" type="button">Начать сканирование</button>
+    <button id="stopBtn" type="button" class="stop" disabled>Остановить</button>
 
-    <img id="preview" alt="Preview">
+    <div class="viewport" id="viewport">
+        <video id="camera" autoplay playsinline muted></video>
+        <canvas id="overlay"></canvas>
+        <div class="readout searching" id="readout">
+            <div class="label">ГРНЗ</div>
+            <div class="plate" id="plate">Сканирование…</div>
+            <div class="meta" id="meta"></div>
+            <div class="badge" id="badge">новый номер — запрос в ОСРМ</div>
+        </div>
+    </div>
 
-    <button id="recognize" type="button">Распознать номер</button>
+    <canvas id="grabber" style="display:none"></canvas>
 
     <div id="status"></div>
+    <div class="stats" id="stats"></div>
 </div>
 
-<div class="card" id="resultCard" style="display:none;">
-    <h2>Результат</h2>
-
-    <div class="result">
-        <div>ГРНЗ:</div>
-        <div class="plate" id="plate">-</div>
-
-        <div>Confidence: <span id="confidence">-</span></div>
-        <div>OCR confidence: <span id="ocrConfidence">-</span></div>
-        <div>Raw OCR: <span id="rawText">-</span></div>
-        <div>Тип номера: <span id="plateType">-</span></div>
-        <div>Подтвержден: <span id="confirmed">-</span></div>
-        <div>Время обработки: <span id="processingTime">-</span> ms</div>
-    </div>
+<div class="card note">
+    Страница отправляет кадры на <code>POST /frame</code> того же сервера, по одному за раз:
+    следующий кадр уходит только после ответа на предыдущий, поэтому очередь запросов не растёт.
+    Поиск в базе ОСРМ выполняется, когда в ответе приходит <code>changed: true</code>.
+    Когда номер перестаёт читаться, сервис через 2 секунды его сбрасывает
+    (<code>confirmed: false</code>) — карточку машины в этот момент надо скрывать.
 </div>
 
 <script>
-const imageInput = document.getElementById("image");
-const preview = document.getElementById("preview");
+"use strict";
 
-const camera = document.getElementById("camera");
-const canvas = document.getElementById("canvas");
+// One frame at a time. The next frame is sent only after the previous response,
+// and never sooner than MIN_INTERVAL_MS after the previous send, so the server
+// is not flooded and no queue of stale frames builds up.
+const MIN_INTERVAL_MS = 350;
+const MAX_FRAME_WIDTH = 1280;
+const JPEG_QUALITY = 0.8;
+const MAX_CONSECUTIVE_FAILURES = 10;
 
-const startCameraButton = document.getElementById("startCamera");
-const capturePhotoButton = document.getElementById("capturePhoto");
-const stopCameraButton = document.getElementById("stopCamera");
+const els = {
+    apiKey: document.getElementById("apiKey"),
+    rememberKey: document.getElementById("rememberKey"),
+    sessionId: document.getElementById("sessionId"),
+    startBtn: document.getElementById("startBtn"),
+    stopBtn: document.getElementById("stopBtn"),
+    viewport: document.getElementById("viewport"),
+    camera: document.getElementById("camera"),
+    overlay: document.getElementById("overlay"),
+    grabber: document.getElementById("grabber"),
+    readout: document.getElementById("readout"),
+    plate: document.getElementById("plate"),
+    meta: document.getElementById("meta"),
+    badge: document.getElementById("badge"),
+    status: document.getElementById("status"),
+    stats: document.getElementById("stats"),
+};
 
-const recognizeButton = document.getElementById("recognize");
-const status = document.getElementById("status");
-const resultCard = document.getElementById("resultCard");
+let stream = null;
+let scanning = false;
+let failures = 0;
+let badgeTimer = null;
+const sent = { frames: 0, errors: 0, serverMs: [], startedAt: 0 };
 
-let cameraStream = null;
-let capturedBlob = null;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-function setStatus(message, error = false) {
-    status.textContent = message;
-    status.className = error ? "error" : "";
+function setStatus(text, kind) {
+    els.status.textContent = text;
+    els.status.className = kind || "";
 }
 
-function showPreview(blob) {
-    if (!blob) {
-        preview.style.display = "none";
-        preview.removeAttribute("src");
-        return;
-    }
-
-    if (preview.src && preview.src.startsWith("blob:")) {
-        URL.revokeObjectURL(preview.src);
-    }
-
-    preview.src = URL.createObjectURL(blob);
-    preview.style.display = "block";
-}
-
-async function startCamera() {
+/* The key is only kept if the box is ticked; storage can throw in private mode. */
+function loadKey() {
     try {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            throw new Error("Браузер не поддерживает доступ к камере");
-        }
+        const saved = localStorage.getItem("lpr_api_key");
+        if (saved) { els.apiKey.value = saved; els.rememberKey.checked = true; }
+    } catch (e) { /* storage unavailable */ }
+}
+function saveKey() {
+    try {
+        if (els.rememberKey.checked) localStorage.setItem("lpr_api_key", els.apiKey.value.trim());
+        else localStorage.removeItem("lpr_api_key");
+    } catch (e) { /* storage unavailable */ }
+}
 
-        setStatus("Запрашиваем доступ к камере...");
+function showPlate(data) {
+    const plate = data.plate || "";
+    if (plate && data.confirmed) {
+        els.readout.classList.remove("searching");
+        els.plate.textContent = plate;
+        const parts = [];
+        if (data.ocr_confidence != null) parts.push("OCR " + Number(data.ocr_confidence).toFixed(2));
+        if (data.plate_type) parts.push(data.plate_type === "square" ? "квадратный" : "обычный");
+        els.meta.textContent = parts.join("   ");
+    } else {
+        // Cleared or not confirmed yet: OCRM would hide the vehicle card here.
+        els.readout.classList.add("searching");
+        els.plate.textContent = "Сканирование…";
+        els.meta.textContent = data.raw_text ? "читается: " + data.raw_text : "";
+    }
 
-        cameraStream = await navigator.mediaDevices.getUserMedia({
-            video: {
-                facingMode: {
-                    ideal: "environment"
-                },
-                width: {
-                    ideal: 1280
-                },
-                height: {
-                    ideal: 720
-                }
-            },
-            audio: false
+    if (data.changed) {
+        els.badge.classList.add("on");
+        clearTimeout(badgeTimer);
+        badgeTimer = setTimeout(() => els.badge.classList.remove("on"), 2500);
+    }
+}
+
+/* Draws the detector's box over the video. bbox is in the coordinates of the
+   frame we sent, so it is scaled by the ratio between the displayed picture
+   and that frame. */
+function drawBox(bbox, frameW, frameH) {
+    const c = els.overlay;
+    const w = els.camera.clientWidth, h = els.camera.clientHeight;
+    if (!w || !h) return;
+    if (c.width !== w || c.height !== h) { c.width = w; c.height = h; }
+
+    const ctx = c.getContext("2d");
+    ctx.clearRect(0, 0, w, h);
+    if (!bbox || bbox.length < 4 || !frameW || !frameH) return;
+
+    const k = w / frameW;
+    const [x1, y1, x2, y2] = bbox;
+    ctx.strokeStyle = "#22c55e";
+    ctx.lineWidth = Math.max(2, Math.round(w / 220));
+    ctx.strokeRect(x1 * k, y1 * k, (x2 - x1) * k, (y2 - y1) * k);
+}
+
+function grabFrame() {
+    const video = els.camera;
+    if (!video.videoWidth || !video.videoHeight) return null;
+
+    const scale = Math.min(1, MAX_FRAME_WIDTH / video.videoWidth);
+    const canvas = els.grabber;
+    canvas.width = Math.round(video.videoWidth * scale);
+    canvas.height = Math.round(video.videoHeight * scale);
+    canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+    return canvas;
+}
+
+function toBlob(canvas) {
+    return new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", JPEG_QUALITY));
+}
+
+function updateStats() {
+    const secs = (performance.now() - sent.startedAt) / 1000;
+    const fps = secs > 0 ? sent.frames / secs : 0;
+    const times = sent.serverMs;
+    const avg = times.length ? times.reduce((a, b) => a + b, 0) / times.length : 0;
+    els.stats.textContent =
+        `кадров ${sent.frames}   ${fps.toFixed(1)}/с   сервер ${avg.toFixed(0)} мс` +
+        (sent.errors ? `   ошибок ${sent.errors}` : "");
+}
+
+/* Returns "ok" | "wait" (nothing to send yet) | "retry" (failed) | "stop" */
+async function sendOneFrame(apiKey, sessionId) {
+    const canvas = grabFrame();
+    if (!canvas) return "wait";                 // camera not warmed up yet
+
+    const blob = await toBlob(canvas);
+    if (!blob) return "wait";
+
+    let response;
+    try {
+        response = await fetch("/frame?session_id=" + encodeURIComponent(sessionId), {
+            method: "POST",
+            headers: { "Content-Type": "image/jpeg", "Authorization": "Bearer " + apiKey },
+            body: blob,
         });
-
-        camera.srcObject = cameraStream;
-        camera.style.display = "block";
-
-        startCameraButton.disabled = true;
-        capturePhotoButton.disabled = false;
-        stopCameraButton.disabled = false;
-
-        setStatus("Камера включена. Наведите её на ГРНЗ.");
-    } catch (error) {
-        setStatus("Не удалось открыть камеру: " + error.message, true);
+    } catch (e) {
+        setStatus("Нет связи с сервером, повтор…", "warn");
+        return "retry";
     }
+
+    let data = {};
+    try { data = await response.json(); } catch (e) { /* non-JSON error page */ }
+
+    if (response.status === 401 || response.status === 403) {
+        setStatus("Неверный ключ доступа", "err");
+        return "stop";
+    }
+    if (response.status === 400 && data.error_code === "bad_request") {
+        setStatus("Сервер отклонил запрос: " + (data.error || "bad_request"), "err");
+        return "stop";
+    }
+    if (!response.ok) {
+        // 503 while a worker restarts, 413, a bad frame: skip it and keep going.
+        setStatus("Сервер: " + (data.error_code || ("HTTP " + response.status)) + ", продолжаем", "warn");
+        return "retry";
+    }
+
+    sent.frames += 1;
+    if (data.processing_time_ms != null) {
+        sent.serverMs.push(data.processing_time_ms);
+        if (sent.serverMs.length > 50) sent.serverMs.shift();
+    }
+    showPlate(data);
+    drawBox(data.bbox, canvas.width, canvas.height);
+    updateStats();
+    setStatus("Сканирование идёт");
+    return "ok";
 }
 
-function stopCamera() {
-    if (cameraStream) {
-        for (const track of cameraStream.getTracks()) {
-            track.stop();
+async function scanLoop(apiKey, sessionId) {
+    while (scanning) {
+        const started = performance.now();
+        let outcome;
+        try {
+            outcome = await sendOneFrame(apiKey, sessionId);
+        } catch (e) {
+            outcome = "retry";
         }
 
-        cameraStream = null;
-    }
-
-    camera.srcObject = null;
-    camera.style.display = "none";
-
-    startCameraButton.disabled = false;
-    capturePhotoButton.disabled = true;
-    stopCameraButton.disabled = true;
-
-    setStatus("Камера выключена");
-}
-
-function capturePhoto() {
-    if (!cameraStream || !camera.videoWidth || !camera.videoHeight) {
-        setStatus("Камера ещё не готова", true);
-        return;
-    }
-
-    const maxWidth = 1280;
-    const scale = Math.min(1, maxWidth / camera.videoWidth);
-
-    canvas.width = Math.round(camera.videoWidth * scale);
-    canvas.height = Math.round(camera.videoHeight * scale);
-
-    const context = canvas.getContext("2d");
-
-    context.drawImage(
-        camera,
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
-
-    canvas.toBlob(
-        (blob) => {
-            if (!blob) {
-                setStatus("Не удалось создать кадр", true);
+        if (outcome === "stop") { stopScanning(); return; }
+        if (outcome === "retry") {
+            sent.errors += 1;
+            failures += 1;
+            updateStats();
+            if (failures >= MAX_CONSECUTIVE_FAILURES) {
+                setStatus("Сервер не отвечает, сканирование остановлено", "err");
+                stopScanning();
                 return;
             }
-
-            capturedBlob = blob;
-            imageInput.value = "";
-
-            showPreview(blob);
-
-            setStatus(
-                "Кадр получен. Теперь нажмите «Распознать номер»."
-            );
-        },
-        "image/jpeg",
-        0.85
-    );
-}
-
-imageInput.addEventListener("change", () => {
-    const file = imageInput.files[0];
-
-    capturedBlob = null;
-
-    if (!file) {
-        showPreview(null);
-        return;
-    }
-
-    showPreview(file);
-    setStatus("Фото выбрано");
-});
-
-startCameraButton.addEventListener("click", startCamera);
-
-capturePhotoButton.addEventListener("click", capturePhoto);
-
-stopCameraButton.addEventListener("click", stopCamera);
-
-recognizeButton.addEventListener("click", async () => {
-    const apiKey = document.getElementById("apiKey").value.trim();
-    const sessionId = document.getElementById("sessionId").value.trim();
-
-    const file = capturedBlob || imageInput.files[0];
-
-    if (!apiKey) {
-        setStatus("Введите API key", true);
-        return;
-    }
-
-    if (!sessionId) {
-        setStatus("Введите session ID", true);
-        return;
-    }
-
-    if (!file) {
-        setStatus("Сначала выберите фото или сделайте кадр", true);
-        return;
-    }
-
-    recognizeButton.disabled = true;
-    setStatus("Распознавание...");
-    resultCard.style.display = "none";
-
-    try {
-        const response = await fetch(
-            "/frame?session_id=" + encodeURIComponent(sessionId),
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": file.type || "image/jpeg",
-                    "Authorization": "Bearer " + apiKey
-                },
-                body: file
-            }
-        );
-
-        const data = await response.json();
-
-        if (!response.ok || !data.ok) {
-            throw new Error(
-                data.error || ("HTTP " + response.status)
-            );
+        } else if (outcome === "ok") {
+            failures = 0;
         }
 
-        document.getElementById("plate").textContent =
-            data.plate || "Не распознано";
+        const left = MIN_INTERVAL_MS - (performance.now() - started);
+        if (left > 0) await sleep(left);
+    }
+}
 
-        document.getElementById("confidence").textContent =
-            data.confidence != null
-                ? Number(data.confidence).toFixed(3)
-                : "-";
+async function startScanning() {
+    const apiKey = els.apiKey.value.trim();
+    const sessionId = els.sessionId.value.trim();
 
-        document.getElementById("ocrConfidence").textContent =
-            data.ocr_confidence != null
-                ? Number(data.ocr_confidence).toFixed(3)
-                : "-";
+    if (!sessionId) { setStatus("Укажите session ID", "err"); return; }
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setStatus("Браузер не даёт доступ к камере. Нужен HTTPS.", "err");
+        return;
+    }
 
-        document.getElementById("rawText").textContent =
-            data.raw_text || "-";
+    els.startBtn.disabled = true;
+    setStatus("Запрашиваем камеру…");
 
-        document.getElementById("plateType").textContent =
-            data.plate_type || "-";
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
+            audio: false,
+        });
+    } catch (e) {
+        setStatus("Камера недоступна: " + e.message, "err");
+        els.startBtn.disabled = false;
+        return;
+    }
 
-        document.getElementById("confirmed").textContent =
-            data.confirmed ? "Да" : "Нет";
+    saveKey();
+    els.camera.srcObject = stream;
+    els.viewport.classList.add("on");
+    els.stopBtn.disabled = false;
 
-        document.getElementById("processingTime").textContent =
-            data.processing_time_ms != null
-                ? data.processing_time_ms
-                : "-";
+    scanning = true;
+    failures = 0;
+    sent.frames = 0; sent.errors = 0; sent.serverMs = []; sent.startedAt = performance.now();
+    showPlate({});
+    setStatus("Сканирование идёт");
+    scanLoop(apiKey, sessionId);
+}
 
-        resultCard.style.display = "block";
-        setStatus("Готово");
+function stopScanning() {
+    scanning = false;
+    if (stream) {
+        for (const track of stream.getTracks()) track.stop();
+        stream = null;
+    }
+    els.camera.srcObject = null;
+    els.viewport.classList.remove("on");
+    els.startBtn.disabled = false;
+    els.stopBtn.disabled = true;
+    if (!els.status.classList.contains("err")) setStatus("Сканирование остановлено");
+}
 
-    } catch (error) {
-        setStatus("Ошибка: " + error.message, true);
-    } finally {
-        recognizeButton.disabled = false;
+els.startBtn.addEventListener("click", startScanning);
+els.stopBtn.addEventListener("click", stopScanning);
+window.addEventListener("beforeunload", stopScanning);
+
+// A backgrounded tab throttles timers and the camera; stop rather than pile up.
+document.addEventListener("visibilitychange", () => {
+    if (document.hidden && scanning) {
+        stopScanning();
+        setStatus("Сканирование остановлено: страница ушла в фон");
     }
 });
 
-window.addEventListener("beforeunload", () => {
-    stopCamera();
-});
+loadKey();
 </script>
 
 </body>
