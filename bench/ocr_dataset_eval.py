@@ -40,58 +40,17 @@ import cv2
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "app"))
+sys.path.insert(0, str(ROOT / "bench"))
 # extract_plate is imported, not copied: the benchmark has to measure the rule
 # the service actually runs. A second copy here would keep reporting the old
 # number after the pipeline changed, which is exactly the mistake this file is
 # meant to catch.
 from lpr_recognizer import clean_text, extract_plate, valid_kz_plate  # noqa: E402
+from letter_repair import repair_letter_slots  # noqa: E402
 
 IMAGE_SUFFIXES = (".png", ".jpg", ".jpeg", ".bmp")
 NEW_KZ = re.compile(r"\d{3}[A-Z]{3}\d{2}")     # 123ABC02, what the service confirms
 OLD_KZ = re.compile(r"\d{3}[A-Z]{2}\d{2}")     # 249AS16, the pre-2012 layout
-
-# Not yet in the pipeline, measured here first: a reading where a letter slot
-# came back as a digit (106BOA11 read as 106B0A11). Such a reading is rejected
-# today, so repairing it can only add plates -- but 0 could be O, Q or D, and a
-# wrong guess sends OCRM looking for a different car. The two cases are counted
-# apart so the risk is visible before any of this reaches the service.
-PLATE_LEN = 8
-LETTER_SLOTS = (3, 4, 5)
-DIGIT_TO_LETTER = {"0": ("O", "Q", "D"), "1": ("I",), "2": ("Z",), "4": ("A",),
-                   "5": ("S",), "6": ("G",), "7": ("T",), "8": ("B",)}
-
-
-def repair_letter_slots(text):
-    """(plate, certainty) for a reading whose letter slots hold digits.
-
-    Scans every 8-character window the way extract_plate does and answers only
-    when exactly one candidate comes out. certainty is "однозначно" when every
-    repaired digit maps to a single letter, "догадка" when at least one digit
-    is ambiguous. ("", "") means nothing fits.
-    """
-    found = {}
-    for start in range(len(text) - PLATE_LEN + 1):
-        window = text[start:start + PLATE_LEN]
-        if not (window[:3].isdigit() and window[6:].isdigit()):
-            continue
-        if all(window[i].isalpha() for i in LETTER_SLOTS):
-            continue          # already a plate; extract_plate handles this one
-        chars, guessed, fits = list(window), False, True
-        for i in LETTER_SLOTS:
-            if window[i].isalpha():
-                continue
-            options = DIGIT_TO_LETTER.get(window[i])
-            if not options:
-                fits = False
-                break
-            chars[i] = options[0]
-            guessed = guessed or len(options) > 1
-        if fits:
-            found["".join(chars)] = "догадка" if guessed else "однозначно"
-    if len(found) != 1:
-        return "", ""
-    return next(iter(found.items()))
-
 
 def plate_format(text):
     if NEW_KZ.fullmatch(text):

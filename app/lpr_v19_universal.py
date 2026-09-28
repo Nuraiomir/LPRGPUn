@@ -22,7 +22,7 @@ from lpr_recognizer import (  # noqa: E402
     LPRRecognizer,
     OCR_EVERY_N_DETECTIONS, SQUARE_ASPECT_MAX, MIN_SQUARE_W, MIN_SQUARE_H,
     MIN_FINAL_WEIGHT,
-    valid_kz_plate, clean_text, normalize_top, normalize_bottom,
+    valid_kz_plate, clean_text, extract_plate, normalize_top, normalize_bottom,
     add_vote, aggregate_all, square_candidate, looks_like_plate,
 )
 
@@ -448,7 +448,10 @@ def main():
                     f"RAW={raw_text!r} conf={raw_conf:.3f}",
                     flush=True
                 )
-                text = clean_text(raw_text)
+                # Same rule as the server's LPRRecognizer._handle_normal_result:
+                # a plate printed with the KZ block comes back as "KZ545BDR05",
+                # and dropping the whole reading over it loses a correct read.
+                text = extract_plate(clean_text(raw_text))
                 conf = raw_conf
                 if valid_kz_plate(text):
                     normal_readings.append({
