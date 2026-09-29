@@ -115,8 +115,21 @@ def extract_plate(text):
 
     For a string that is already exactly a plate this returns that same plate,
     so no reading that was accepted before can change its value.
+
+    Nothing outside the plate may be a digit. The printed KZ block is letters,
+    so "KZ545BDR05" still yields its plate, while a stray digit means OCR
+    returned more digits than a plate has: on real footage "822AKH02" came back
+    as "822AKH102", and the window "822AKH10" is a perfectly shaped plate of a
+    different car. That reading was confirmed before this check existed.
     """
-    found = {m.group(1) for m in PLATE_INSIDE.finditer(text)}
+    found = set()
+    for m in PLATE_INSIDE.finditer(text):
+        plate = m.group(1)
+        left = text[:m.start()]
+        right = text[m.start() + len(plate):]
+        if (left and left[-1].isdigit()) or (right and right[0].isdigit()):
+            continue
+        found.add(plate)
     return found.pop() if len(found) == 1 else ""
 
 

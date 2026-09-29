@@ -14,6 +14,7 @@ Run:
 """
 
 import random
+import re
 import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "app"))
@@ -383,7 +384,7 @@ def test_plate_is_pulled_out_of_a_reading_that_includes_the_kz_block():
         "KZ001AP06": "",                        # old layout, 2 letters: still rejected
         "KZ545BDR05": "545BDR05",
         "Z001BUZ10": "001BUZ10",
-        "K2049BXS02": "049BXS02",               # the Z of KZ read as a 2
+        "K2049BXS02": "",                       # a digit outside the plate: see below
         "545BDR05": "545BDR05",                 # already clean: unchanged
         "MITSUBISHI": "",
         "830BX": "",                            # a cut-off reading stays rejected
@@ -395,6 +396,32 @@ def test_plate_is_pulled_out_of_a_reading_that_includes_the_kz_block():
     # Two plates in one reading: refuse rather than guess which car it is.
     assert extract_plate("999XYZ07545BDR05") == ""
     print("[OK] the plate is pulled out of a KZ-prefixed reading; two plates are refused")
+
+
+def test_a_stray_digit_around_the_plate_is_refused():
+    """The regression this check exists for.
+
+    On videos/20260908_150800.mp4 the plate 822AKH02 came back as "822AKH102".
+    The window "822AKH10" is a perfectly shaped plate of a different car, it
+    collected votes, and the run confirmed it: a vehicle that was never there.
+    An extra digit means OCR returned more digits than a plate has, so the
+    window it lands on is shifted and cannot be trusted. Letters outside the
+    plate are the printed KZ block and stay allowed.
+    """
+    refused = {
+        "822AKH102": "822AKH10",     # the confirmed wrong plate
+        "2241ZVZ05": "241ZVZ05",     # same shape, caught before it confirmed
+        "776AFC119": "776AFC11",
+    }
+    for text, would_have_been in refused.items():
+        assert extract_plate(text) == "", (text, extract_plate(text))
+        assert re.fullmatch(r"\d{3}[A-Z]{3}\d{2}", would_have_been), would_have_been
+
+    # Letters around the plate are the KZ block and must still work.
+    for text, expected in {"KZ545BDR05": "545BDR05", "545BDR05KZ": "545BDR05",
+                           "Z001BUZ10": "001BUZ10"}.items():
+        assert extract_plate(text) == expected, (text, extract_plate(text))
+    print("[OK] a stray digit around the plate is refused, the KZ block is not")
 
 
 def test_extraction_never_changes_a_reading_that_was_already_accepted():
@@ -438,4 +465,5 @@ if __name__ == "__main__":
     test_plate_is_pulled_out_of_a_reading_that_includes_the_kz_block()
     test_extraction_never_changes_a_reading_that_was_already_accepted()
     test_kz_prefixed_reading_now_confirms_the_plate()
+    test_a_stray_digit_around_the_plate_is_refused()
     print("\nAll tests passed.")
