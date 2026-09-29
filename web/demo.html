@@ -102,6 +102,60 @@
     .readout .meta { font-size: 13px; opacity: .85; min-height: 18px; }
     .readout.searching .plate { font-size: 20px; font-weight: 500; opacity: .8; letter-spacing: normal; }
 
+
+    /* ---- OCRM side of the scenario ---------------------------------- */
+    .ocrm { border-left: 4px solid var(--ink); }
+    .ocrm-head {
+        display: flex; align-items: flex-start; justify-content: space-between;
+        gap: 12px; margin-bottom: 4px;
+    }
+    .ocrm-label { font-size: 12px; letter-spacing: .1em; opacity: .6; text-transform: uppercase; }
+    .ocrm-plate {
+        font-size: 26px; font-weight: 700; letter-spacing: .07em;
+        font-variant-numeric: tabular-nums;
+    }
+    .ocrm-state {
+        font-size: 13px; padding: 4px 10px; border-radius: 999px;
+        background: #e4e4e7; white-space: nowrap;
+    }
+    .ocrm-state.found { background: #dcfce7; color: #14532d; }
+    .ocrm-state.missing { background: #fef3c7; color: #713f12; }
+
+    .rows { margin: 10px 0 14px; }
+    .rows section { padding: 10px 0; border-top: 1px solid #e4e4e7; }
+    .rows h4 {
+        margin: 0 0 6px; font-size: 12px; letter-spacing: .08em;
+        text-transform: uppercase; opacity: .55; font-weight: 600;
+    }
+    .rows dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; margin: 0; }
+    .rows dt { opacity: .6; }
+    .rows dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+    .rows dd.warn { color: #b45309; font-weight: 600; }
+
+    button.visit { width: 100%; background: #15803d; }
+    .visit-done {
+        margin-top: 10px; padding: 10px 12px; border-radius: 8px;
+        background: #dcfce7; color: #14532d; font-size: 14px;
+    }
+
+    /* A plate that is not in the database is a normal outcome, so it is stated
+       plainly rather than dressed as an error. */
+    .missing-title { margin: 12px 0 6px; font-size: 17px; font-weight: 600; }
+    .missing-note { margin: 0; opacity: .7; font-size: 14px; }
+
+    .testdata {
+        margin: 14px 0 0; padding-top: 10px; border-top: 1px solid #e4e4e7;
+        font-size: 12px; opacity: .6;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .ocrm-state { background: #3f3f46; }
+        .ocrm-state.found { background: #14532d; color: #dcfce7; }
+        .ocrm-state.missing { background: #713f12; color: #fef3c7; }
+        .rows section, .testdata { border-color: #3f3f46; }
+        .visit-done { background: #14532d; color: #dcfce7; }
+    }
+
     .badge {
         display: inline-block;
         margin-top: 6px;
@@ -168,6 +222,34 @@
 
     <div id="status"></div>
     <div class="stats" id="stats"></div>
+</div>
+
+<!-- Everything below the camera is the OCRM side of the scenario. It appears
+     only once a plate is confirmed, and it has exactly two shapes: the vehicle
+     card, or the statement that the plate is not in the database. The second is
+     NOT a recognition failure and must never look like one. -->
+<div class="card ocrm" id="ocrmCard" hidden>
+    <div class="ocrm-head">
+        <div>
+            <div class="ocrm-label">Поиск в ОСРМ</div>
+            <div class="ocrm-plate" id="ocrmPlate">—</div>
+        </div>
+        <div class="ocrm-state" id="ocrmState">поиск…</div>
+    </div>
+
+    <div id="ocrmFound" hidden>
+        <div class="rows" id="ocrmRows"></div>
+        <button id="visitBtn" type="button" class="visit">Создать выезд</button>
+        <div class="visit-done" id="visitDone" hidden></div>
+    </div>
+
+    <div id="ocrmMissing" hidden>
+        <p class="missing-title">Номер распознан, но автомобиль не найден в базе ОСРМ.</p>
+        <p class="missing-note">Распознавание отработало верно. Это ответ базы, а не ошибка чтения номера.</p>
+    </div>
+
+    <p class="testdata">Демонстрационные данные. Это не база ОСРМ банка: заёмщики,
+    кредиты и автомобили здесь вымышленные.</p>
 </div>
 
 <div class="card note">
@@ -242,10 +324,20 @@ const els = {
     badge: document.getElementById("badge"),
     status: document.getElementById("status"),
     stats: document.getElementById("stats"),
+    ocrmCard: document.getElementById("ocrmCard"),
+    ocrmPlate: document.getElementById("ocrmPlate"),
+    ocrmState: document.getElementById("ocrmState"),
+    ocrmFound: document.getElementById("ocrmFound"),
+    ocrmRows: document.getElementById("ocrmRows"),
+    ocrmMissing: document.getElementById("ocrmMissing"),
+    visitBtn: document.getElementById("visitBtn"),
+    visitDone: document.getElementById("visitDone"),
 };
 
 let stream = null;
 let scanning = false;
+let apiKeyInUse = "";      // kept so the OCRM calls can authenticate too
+let ocrmPlate = "";        // the plate the card on screen belongs to
 let failures = 0;
 let badgeTimer = null;
 const sent = { frames: 0, errors: 0, serverMs: [], startedAt: 0 };
@@ -269,6 +361,127 @@ function saveKey() {
         if (els.rememberKey.checked) localStorage.setItem("lpr_api_key", els.apiKey.value.trim());
         else localStorage.removeItem("lpr_api_key");
     } catch (e) { /* storage unavailable */ }
+}
+
+
+/* ---- OCRM side of the scenario -------------------------------------------
+   The search runs when the service reports changed: true, which is the moment
+   a new vehicle is confirmed. Holding the same plate does not search again.
+
+   Two outcomes, and keeping them apart is the point of the whole screen: the
+   vehicle card, or a plain statement that this plate is not in the database.
+   The second is not a recognition failure and is never shown as one. */
+
+const OCRM_SECTIONS = [
+    ["Заёмщик", "borrower", [["Имя", "name"], ["Телефон", "phone"]]],
+    ["Кредит", "credit", [["Номер", "number"], ["Сумма", "amount"],
+                          ["Просрочка, дней", "overdue_days"], ["Статус", "status"]]],
+    ["Автомобиль", "vehicle", [["Марка", "make"], ["Модель", "model"],
+                               ["Год", "year"], ["Цвет", "color"], ["VIN", "vin"]]],
+    ["Залог", "collateral", [["Номер", "number"], ["Оценка", "value"], ["Статус", "status"]]],
+    ["Подразделение", "organization", [["Филиал", "branch"], ["Ответственный", "manager"]]],
+];
+
+function hideOcrm() {
+    ocrmPlate = "";
+    els.ocrmCard.hidden = true;
+    els.visitDone.hidden = true;
+    els.visitBtn.disabled = false;
+    els.visitBtn.textContent = "Создать выезд";
+}
+
+function renderVehicle(record) {
+    els.ocrmRows.textContent = "";
+    for (const [title, key, fields] of OCRM_SECTIONS) {
+        const block = record[key];
+        if (!block) continue;
+        const section = document.createElement("section");
+        const h = document.createElement("h4");
+        h.textContent = title;
+        section.appendChild(h);
+        const dl = document.createElement("dl");
+        for (const [label, field] of fields) {
+            if (block[field] === undefined || block[field] === null || block[field] === "") continue;
+            const dt = document.createElement("dt");
+            dt.textContent = label;
+            const dd = document.createElement("dd");
+            dd.textContent = String(block[field]);
+            // Overdue days and an overdue status are the reason a field visit
+            // happens at all, so they are the one thing the card highlights.
+            if ((field === "overdue_days" && Number(block[field]) > 0)
+                || (field === "status" && String(block[field]).startsWith("просроч"))) {
+                dd.className = "warn";
+            }
+            dl.append(dt, dd);
+        }
+        section.appendChild(dl);
+        els.ocrmRows.appendChild(section);
+    }
+}
+
+async function searchOcrm(plate) {
+    ocrmPlate = plate;
+    els.ocrmCard.hidden = false;
+    els.ocrmPlate.textContent = plate;
+    els.ocrmFound.hidden = true;
+    els.ocrmMissing.hidden = true;
+    els.visitDone.hidden = true;
+    els.visitBtn.disabled = false;
+    els.visitBtn.textContent = "Создать выезд";
+    els.ocrmState.className = "ocrm-state";
+    els.ocrmState.textContent = "поиск…";
+
+    let data;
+    try {
+        const response = await fetch("/vehicle?plate=" + encodeURIComponent(plate), {
+            headers: { "Authorization": "Bearer " + apiKeyInUse },
+        });
+        data = await response.json();
+        if (!response.ok) throw new Error(data.error || response.status);
+    } catch (e) {
+        els.ocrmState.textContent = "база недоступна";
+        els.ocrmMissing.hidden = false;
+        return;
+    }
+    if (ocrmPlate !== plate) return;          // another car arrived meanwhile
+
+    if (data.found) {
+        els.ocrmState.className = "ocrm-state found";
+        els.ocrmState.textContent = "найден";
+        renderVehicle(data);
+        els.ocrmFound.hidden = false;
+    } else {
+        els.ocrmState.className = "ocrm-state missing";
+        els.ocrmState.textContent = data.database === "not_configured"
+            ? "база не настроена" : "в базе нет";
+        els.ocrmMissing.hidden = false;
+    }
+}
+
+async function createVisit() {
+    if (!ocrmPlate) return;
+    els.visitBtn.disabled = true;
+    els.visitBtn.textContent = "Создаём…";
+    try {
+        const response = await fetch("/visit", {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + apiKeyInUse,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ plate: ocrmPlate, note: "создано со страницы сканирования" }),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || response.status);
+        els.visitDone.textContent = "Выезд создан: " + data.visit_id;
+        els.visitDone.hidden = false;
+        els.visitBtn.textContent = "Выезд создан";
+    } catch (e) {
+        els.visitDone.textContent = "Не удалось создать выезд: " + e.message;
+        els.visitDone.hidden = false;
+        els.visitBtn.disabled = false;
+        els.visitBtn.textContent = "Создать выезд";
+    }
 }
 
 function showPlate(data, aim) {
@@ -424,6 +637,15 @@ async function sendOneFrame(apiKey, sessionId) {
     }
     const aim = drawOverlay(data.bbox, canvas.width);
     showPlate(data, aim);
+
+    // changed: true is the moment a new vehicle is confirmed, and the only
+    // moment OCRM is searched. confirmed: false means the service let the
+    // plate go, so the card must come off the screen with it.
+    if (data.changed && data.plate) {
+        searchOcrm(data.plate);
+    } else if (!data.confirmed && ocrmPlate) {
+        hideOcrm();
+    }
     updateStats();
     setStatus("Сканирование идёт");
     return "ok";
@@ -483,6 +705,8 @@ async function startScanning() {
     }
 
     saveKey();
+    apiKeyInUse = apiKey;
+    hideOcrm();
     els.camera.srcObject = stream;
     els.viewport.classList.add("on");
     els.stopBtn.disabled = false;
@@ -508,6 +732,7 @@ function stopScanning() {
     if (!els.status.classList.contains("err")) setStatus("Сканирование остановлено");
 }
 
+els.visitBtn.addEventListener("click", createVisit);
 els.startBtn.addEventListener("click", startScanning);
 els.stopBtn.addEventListener("click", stopScanning);
 window.addEventListener("beforeunload", stopScanning);

@@ -595,6 +595,115 @@
           }
         }
       ]
+    },
+    {
+      "name": "Vehicle found in the test database",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/vehicle?plate=545BDR05",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "vehicle"
+          ],
+          "query": [
+            {
+              "key": "plate",
+              "value": "545BDR05"
+            }
+          ]
+        },
+        "description": "A plate that is in config/test_ocrm.json: found true, with the borrower, credit, vehicle, collateral and organization. Invented records, not the bank's OCRM."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200', () => pm.response.to.have.status(200));",
+              "pm.test('found', () => pm.expect(pm.response.json().found).to.eql(true));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vehicle NOT in the database",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/vehicle?plate=231BED02",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "vehicle"
+          ],
+          "query": [
+            {
+              "key": "plate",
+              "value": "231BED02"
+            }
+          ]
+        },
+        "description": "A plate the recogniser reads correctly but that is not in the database. This is 200 with found false, NOT 404 and NOT an OCR failure: the screen must say the plate was recognised and is not in OCRM."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200, not 404', () => pm.response.to.have.status(200));",
+              "pm.test('found false', () => pm.expect(pm.response.json().found).to.eql(false));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create a field visit",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"plate\": \"545BDR05\",\n  \"note\": \"выезд из Postman\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/visit",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "visit"
+          ],
+          "query": []
+        },
+        "description": "Creates a field visit for a confirmed plate and returns its id."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('201', () => pm.response.to.have.status(201));",
+              "pm.test('visit_id', () => pm.expect(pm.response.json().visit_id).to.be.a('string'));"
+            ]
+          }
+        }
+      ]
     }
   ],
   "auth": {

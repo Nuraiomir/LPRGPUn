@@ -1,0 +1,74 @@
+{
+  "_comment": "INVENTED TEST DATA. Not the bank's OCRM, not real borrowers, not real credits, not real vehicles. It exists so the demo can show the whole scenario: a confirmed plate, the card that follows, and the plain answer when a plate is not in the database. Plates are taken from our own test footage on purpose, and several plates that appear in that footage are deliberately left out so the not-found path can be shown with a real car.",
+  "vehicles": [
+    {
+      "plate": "545BDR05",
+      "borrower": {"name": "Тестов Тест Тестович", "phone": "+7 700 000-00-01"},
+      "credit": {"number": "KZ-TEST-0001", "amount": "6 400 000 ₸", "overdue_days": 0, "status": "действующий"},
+      "vehicle": {"make": "Toyota", "model": "Camry", "year": 2019, "color": "белый", "vin": "TEST****0001"},
+      "collateral": {"number": "ZL-TEST-0001", "value": "7 100 000 ₸", "status": "в залоге"},
+      "organization": {"branch": "Тестовый филиал, Алматы", "manager": "Тестовый сотрудник А."}
+    },
+    {
+      "plate": "633BBT02",
+      "borrower": {"name": "Демонов Демо Демович", "phone": "+7 700 000-00-02"},
+      "credit": {"number": "KZ-TEST-0002", "amount": "3 900 000 ₸", "overdue_days": 12, "status": "просрочка"},
+      "vehicle": {"make": "Hyundai", "model": "Accent", "year": 2021, "color": "серый", "vin": "TEST****0002"},
+      "collateral": {"number": "ZL-TEST-0002", "value": "4 500 000 ₸", "status": "в залоге"},
+      "organization": {"branch": "Тестовый филиал, Астана", "manager": "Тестовый сотрудник Б."}
+    },
+    {
+      "plate": "694BPT05",
+      "borrower": {"name": "Примеров Пример Примерович", "phone": "+7 700 000-00-03"},
+      "credit": {"number": "KZ-TEST-0003", "amount": "11 200 000 ₸", "overdue_days": 45, "status": "просрочка"},
+      "vehicle": {"make": "Kia", "model": "Sportage", "year": 2020, "color": "чёрный", "vin": "TEST****0003"},
+      "collateral": {"number": "ZL-TEST-0003", "value": "12 000 000 ₸", "status": "в залоге"},
+      "organization": {"branch": "Тестовый филиал, Алматы", "manager": "Тестовый сотрудник А."}
+    },
+    {
+      "plate": "822AKH02",
+      "borrower": {"name": "Образцов Образец Образцович", "phone": "+7 700 000-00-04"},
+      "credit": {"number": "KZ-TEST-0004", "amount": "2 300 000 ₸", "overdue_days": 0, "status": "действующий"},
+      "vehicle": {"make": "Chevrolet", "model": "Cobalt", "year": 2018, "color": "синий", "vin": "TEST****0004"},
+      "collateral": {"number": "ZL-TEST-0004", "value": "2 800 000 ₸", "status": "в залоге"},
+      "organization": {"branch": "Тестовый филиал, Астана", "manager": "Тестовый сотрудник В."}
+    },
+    {
+      "plate": "049BXS02",
+      "borrower": {"name": "Макетов Макет Макетович", "phone": "+7 700 000-00-05"},
+      "credit": {"number": "KZ-TEST-0005", "amount": "8 750 000 ₸", "overdue_days": 3, "status": "действующий"},
+      "vehicle": {"make": "Volkswagen", "model": "Polo", "year": 2022, "color": "красный", "vin": "TEST****0005"},
+      "collateral": {"number": "ZL-TEST-0005", "value": "9 300 000 ₸", "status": "в залоге"},
+      "organization": {"branch": "Тестовый филиал, Шымкент", "manager": "Тестовый сотрудник Г."}
+    },
+    {
+      "plate": "979CBB02",
+      "borrower": {"name": "Пробников Пробник Пробникович", "phone": "+7 700 000-00-06"},
+      "credit": {"number": "KZ-TEST-0006", "amount": "5 100 000 ₸", "overdue_days": 0, "status": "действующий"},
+      "vehicle": {"make": "Lada", "model": "Vesta", "year": 2021, "color": "белый", "vin": "TEST****0006"},
+      "collateral": {"number": "ZL-TEST-0006", "value": "5 400 000 ₸", "status": "в залоге"},
+      "organization": {"branch": "Тестовый филиал, Астана", "manager": "Тестовый сотрудник Б."}
+    },
+    {
+      "plate": "588BBY02",
+      "borrower": {"name": "Стендов Стенд Стендович", "phone": "+7 700 000-00-07"},
+      "credit": {"number": "KZ-TEST-0007", "amount": "14 600 000 ₸", "overdue_days": 91, "status": "просрочка"},
+      "vehicle": {"make": "Toyota", "model": "Land Cruiser Prado", "year": 2017, "color": "серебристый", "vin": "TEST****0007"},
+      "collateral": {"number": "ZL-TEST-0007", "value": "15 900 000 ₸", "status": "в залоге"},
+      "organization": {"branch": "Тестовый филиал, Алматы", "manager": "Тестовый сотрудник Д."}
+    },
+    {
+      "plate": "763BAQ02",
+      "borrower": {"name": "Черновиков Черновик Черновикович", "phone": "+7 700 000-00-08"},
+      "credit": {"number": "KZ-TEST-0008", "amount": "4 050 000 ₸", "overdue_days": 0, "status": "действующий"},
+      "vehicle": {"make": "Nissan", "model": "Qashqai", "year": 2019, "color": "коричневый", "vin": "TEST****0008"},
+      "collateral": {"number": "ZL-TEST-0008", "value": "4 700 000 ₸", "status": "в залоге"},
+      "organization": {"branch": "Тестовый филиал, Шымкент", "manager": "Тестовый сотрудник Г."}
+    }
+  ],
+  "_not_in_database_on_purpose": [
+    "502ARV02", "205BBG05", "221ZVZ05", "202NYM02", "669BKH02", "820BAQ02",
+    "095HOT05", "776AEG19", "478UWA02", "136JDB02", "312BBI02", "801AUI02",
+    "432BTY02", "507AJR02", "830BXU02", "231BED02"
+  ]
+}

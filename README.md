@@ -209,6 +209,39 @@ Errors return `{"ok": false, "error": "...", "error_code": "..."}`:
 | 503 | worker_unavailable | a GPU worker timed out or crashed; it is restarted automatically |
 | 500 | internal_error | anything else |
 
+### Vehicle lookup and field visit
+
+Two endpoints complete the scenario after a plate is confirmed. Both need the
+same access key.
+
+```text
+GET  /vehicle?plate=502ARV02
+POST /visit          {"plate": "502ARV02", "note": "..."}
+```
+
+`GET /vehicle` answers `200` either way:
+
+```json
+{"ok": true, "found": true,  "plate": "545BDR05", "borrower": {...}, "credit": {...},
+ "vehicle": {...}, "collateral": {...}, "organization": {...}, "database": "test"}
+{"ok": true, "found": false, "plate": "231BED02", "database": "test"}
+```
+
+A plate that is not in the database is **not** an error and not a recognition
+failure, so it is `found: false` with status 200 rather than a 404. The screen
+must say the plate was recognised and simply is not in OCRM. `database` is
+`not_configured` when no test file was loaded.
+
+`POST /visit` answers `201` with a `visit_id`. Visits are kept in memory for the
+life of the process.
+
+**The vehicle data is invented.** `config/test_ocrm.json` holds made-up
+borrowers, credits and vehicles so the whole scenario can be shown end to end;
+it is not the bank's OCRM and must never be presented as an integration with
+it. Plates are taken from our own test footage, and several plates that appear
+in that footage are left out on purpose so the not-found path can be
+demonstrated with a real car. Point `--test-ocrm` at another file to change it.
+
 `GET /` is a health check: session count, OCR mode, worker restarts.
 
 Optional query parameters: `profile=1` adds a per-stage timing breakdown,
@@ -445,7 +478,9 @@ has to be accepted before the camera can start.
 
 ## Known limitations
 
-- Not yet tested with a real phone camera over the network.
+- Tested with a computer's own camera (362 frames, 2.8/s, 30 ms per frame
+  on the server). Not yet tested from a phone over the network.
+- The vehicle lookup is a JSON file of invented records, not the bank's OCRM.
 - No rate limiting on the HTTP server. Access keys and TLS are in place;
   see "Access keys and TLS".
 - One plate per frame: the detector returns only the most confident box.

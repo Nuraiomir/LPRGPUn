@@ -64,6 +64,7 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from gpu_workers_client import WorkerError, WorkerStartupError, Workers  # noqa: E402
+import ocrm_stub  # noqa: E402
 from lpr_recognizer import PLATE_HOLD_SEC, LPRRecognizer  # noqa: E402
 
 
@@ -74,6 +75,8 @@ SESSION_TTL_SEC = 30 * 60
 MAX_SESSIONS = 1000
 SOCKET_TIMEOUT_SEC = 30
 SESSION_ID_RE = re.compile(r"[A-Za-z0-9._:@-]{1,128}")
+# The only plate shape the service confirms, so the only one worth looking up.
+PLATE_RE = re.compile(r"\d{3}[A-Z]{3}\d{2}")
 
 _PROFILE_MS_FIELDS = ("yolo_ms", "ocr_total_ms", "ocr_square_ms", "ocr_normal_ms",
                       "ocr_fallback_ms", "crop_ms", "voting_ms", "total_ms")
@@ -188,8 +191,26 @@ class Handler(BaseHTTPRequestHandler):
             self.wfile.write(body)
             return
 
+        if parsed.path == "/vehicle":
+            if not check_key(self.headers.get("Authorization")):
+                self._send_error(401, "unauthorized",
+                                 "send Authorization: Bearer <key>")
+                return
+            plate = (parse_qs(parsed.query).get("plate") or [""])[0]
+            if not PLATE_RE.fullmatch(plate.upper()):
+                self._send_error(400, "bad_request",
+                                 "plate must be 3 digits, 3 letters, 2 digits")
+                return
+            # A plate that is not in the database is a normal answer, not an
+            # error: the recognition succeeded. The caller must say so in those
+            # words rather than showing a failure.
+            answer = ocrm_stub.lookup(plate)
+            answer["ok"] = True
+            self._send_json(answer)
+            return
+
         if parsed.path != "/":
-            self._send_error(404, "not_found", "Use GET / or GET /demo")
+            self._send_error(404, "not_found", "Use GET /, /demo or /vehicle")
             return
 
         self._send_json({
@@ -223,8 +244,32 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         parsed = urlparse(self.path)
+
+        if parsed.path == "/visit":
+            if not check_key(self.headers.get("Authorization")):
+                self._send_error(401, "unauthorized",
+                                 "send Authorization: Bearer <key>")
+                return
+            try:
+                length = int(self.headers.get("Content-Length") or 0)
+                if length <= 0 or length > 64 * 1024:
+                    raise ValueError
+                payload = json.loads(self.rfile.read(length))
+            except (ValueError, json.JSONDecodeError):
+                self._send_error(400, "bad_request", "send a small JSON body")
+                return
+            plate = str(payload.get("plate", "")).upper()
+            if not PLATE_RE.fullmatch(plate):
+                self._send_error(400, "bad_request",
+                                 "plate must be 3 digits, 3 letters, 2 digits")
+                return
+            visit = ocrm_stub.create_visit(plate, payload.get("note", ""))
+            visit["ok"] = True
+            self._send_json(visit, 201)
+            return
+
         if parsed.path != "/frame":
-            self._send_error(404, "not_found", "Use POST /frame")
+            self._send_error(404, "not_found", "Use POST /frame or POST /visit")
             return
 
         if not check_key(self.headers.get("Authorization")):
@@ -310,7 +355,8 @@ def load_api_keys(path=None):
 
 def main(project_root, yolo_python, ocr_python, onnx_model,
          yolo_cuda_ld_path, ocr_cuda_ld_path, ocr_variant_mode="full", port=None,
-         plate_hold_sec=PLATE_HOLD_SEC, api_keys=None, certfile=None, keyfile=None):
+         plate_hold_sec=PLATE_HOLD_SEC, api_keys=None, certfile=None, keyfile=None,
+         ocrm_file=None):
     global WORKERS, PORT, SESSIONS, API_KEYS
     if port is not None:
         PORT = port
@@ -339,6 +385,12 @@ def main(project_root, yolo_python, ocr_python, onnx_model,
     print(f"YOLO on CUDA:     {'CUDAExecutionProvider' in providers}")
     print(f"OCR device:       {WORKERS.ocr_info.get('device')}")
     print(f"OCR backend:      {WORKERS.ocr_info.get('backend')}")
+    loaded = ocrm_stub.load(ocrm_file)
+    if loaded:
+        print(f"Test OCRM:        {loaded} vehicles (INVENTED test data, not the bank's)")
+    else:
+        print("Test OCRM:        no file, /vehicle will answer database: not_configured")
+
     scheme = "https" if certfile else "http"
     print("=" * 70)
     print(f"READY: {scheme}://{HOST}:{PORT}/frame?session_id=<id>")
@@ -372,6 +424,9 @@ if __name__ == "__main__":
     parser.add_argument("--api-keys-file",
                         help="file with access keys, one per line; "
                              "keys can also come from LPR_API_KEYS")
+    parser.add_argument("--test-ocrm", dest="test_ocrm",
+                        help="JSON of invented vehicles for GET /vehicle "
+                             "(default config/test_ocrm.json)")
     parser.add_argument("--cert", help="TLS certificate (PEM) to serve HTTPS")
     parser.add_argument("--key", help="private key for --cert")
     args = parser.parse_args()
@@ -395,4 +450,5 @@ if __name__ == "__main__":
          plate_hold_sec=args.plate_hold_sec,
          api_keys=load_api_keys(args.api_keys_file),
          certfile=args.cert,
-         keyfile=args.key)
+         keyfile=args.key,
+         ocrm_file=args.test_ocrm)
