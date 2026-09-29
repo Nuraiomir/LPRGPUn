@@ -490,6 +490,54 @@ has to be accepted before the camera can start.
 # then open https://<server address>:8765/demo on the phone
 ```
 
+## Before a demo
+
+```bash
+.venv_gpu/bin/python tools/preflight.py            # minutes, no video
+.venv_gpu/bin/python tools/preflight.py --videos   # adds the four-video run
+```
+
+It starts the service on a spare port with the real keys and certificate and
+puts the whole scenario through it: the tests, the service starting, the page
+being served with the aiming guide and the OCRM card in it, the key being
+required, a frame recognised, a plate found, a plate NOT found answering 200
+rather than an error, a visit created, and the Postman collection still valid
+and still carrying a key. One line per check, and a list of what failed.
+
+### What to show, in order
+
+1. **Start the service.** The banner says it plainly: TLS on, access keys
+   loaded, YOLO on CUDA, OCR device GPU, and how many test vehicles. It is the
+   shortest proof that the parts are real.
+2. **Open `https://localhost:8765/demo` and scan a plate.** A plate on a phone
+   screen held up to the camera works. The brackets guide the aim, the hint
+   asks for closer, the box turns green, the plate appears, the card follows.
+3. **Scan a plate that is not in the database** (`231BED02`, `502ARV02`). The
+   screen says the plate was recognised and is not in OCRM. Say out loud that
+   this is not a recognition failure: it is the answer, and the two are kept
+   apart everywhere, down to the 200 rather than a 404.
+4. **Create the field visit.** It comes back with an id.
+5. **Show the numbers**, not a claim: 25 vehicles of 28 on our own footage with
+   no false plate, precision 1.000, recall 0.893, F1 0.943, and 95.4% on the
+   labelled dataset. Say the sample is 28 vehicles.
+
+Two things to say before being asked: the vehicle data is invented, and this
+has not been tested from a phone over the network because the port is closed.
+
+### If the camera will not start
+
+A browser only grants camera access over HTTPS, and a self-signed certificate
+has to be accepted once in that browser. Failing that, Chromium can play a
+video file in place of a camera, which demonstrates the whole flow with real
+plates:
+
+```bash
+ffmpeg -i videos/20260923_152319.mp4 -t 12 -vf scale=720:-2 -pix_fmt yuv420p /tmp/fakecam.y4m
+chromium --use-fake-ui-for-media-stream \
+         --use-file-for-fake-video-capture=/tmp/fakecam.y4m \
+         --ignore-certificate-errors "https://localhost:8765/demo"
+```
+
 ## Known limitations
 
 - Tested with a computer's own camera (362 frames, 2.8/s, 30 ms per frame
