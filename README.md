@@ -529,14 +529,38 @@ has not been tested from a phone over the network because the port is closed.
 A browser only grants camera access over HTTPS, and a self-signed certificate
 has to be accepted once in that browser. Failing that, Chromium can play a
 video file in place of a camera, which demonstrates the whole flow with real
-plates:
+plates. Chromium wants that file as Y4M, and `ffmpeg` is not installed on this
+box, so `tools/make_demo_clip.py` writes it with OpenCV instead:
 
 ```bash
-ffmpeg -i videos/20260923_152319.mp4 -t 12 -vf scale=720:-2 -pix_fmt yuv420p /tmp/fakecam.y4m
+.venv_gpu/bin/python tools/make_demo_clip.py videos/20260923_152319.mp4 \
+    --y4m /tmp/fakecam.y4m --seconds 12 --width 720
+
 chromium --use-fake-ui-for-media-stream \
+         --use-fake-device-for-media-stream \
          --use-file-for-fake-video-capture=/tmp/fakecam.y4m \
          --ignore-certificate-errors "https://localhost:8765/demo"
 ```
+
+All three flags are needed. Without `--use-fake-device-for-media-stream` the
+page gets "Requested device not found" and the picture stays black. Y4M is
+uncompressed — about 10 MB per second at 720 wide — so keep `--seconds` small.
+
+### Watching a run's result video
+
+A run writes `result_*.mp4` with the mp4v codec, which no browser plays, and a
+minute of it is hundreds of megabytes. The same tool re-encodes a piece of it
+into something the browser opens:
+
+```bash
+.venv_gpu/bin/python tools/make_demo_clip.py \
+    runs/real_video_v18_20260923_152319/result_vehicle_switch_GPU.mp4 \
+    --out ~/demo_parking.mp4 --seconds 60 --width 720
+```
+
+H.264 is tried first; this box has no H.264 encoder but does have VP9, so the
+file usually comes out as `.webm` — the tool prints the name it actually wrote.
+Drag that file into a Chromium window to watch it.
 
 ## Known limitations
 
