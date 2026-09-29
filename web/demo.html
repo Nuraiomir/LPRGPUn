@@ -194,15 +194,31 @@ const MAX_CONSECUTIVE_FAILURES = 10;
 // the recogniser confuses. Almost everything we lose is a crop that arrived too
 // small, so the page asks the operator to come closer.
 //
-// GUIDE_WIDTH_FRAC and GUIDE_ASPECT only shape the bracket the operator aims
-// into. AIM_MIN_FILL decides when the hint says "closer", and it is expressed
-// against the guide rather than the frame so there is one number to justify
-// instead of two. It is provisional: the plate width at which reading becomes
-// reliable has not been measured yet, and doing that needs crop sizes logged
-// from real phone use, which is still blocked on network access.
-const GUIDE_WIDTH_FRAC = 0.62;
+// The two numbers below now come from bench/crop_size.py over 468 readings on
+// those videos, grouped by how much of the frame width the plate took:
+//
+//     up to 15%   almost nothing reads
+//     15-20%      41%
+//     20-27%      60%
+//     27-35%      75%
+//     35-50%      81%      <- the working zone
+//     above 50%   68%
+//
+// So the guide is sized for a plate filling about 42% of the frame, and the
+// hint asks for more while it is under 27%. Above 50% the drop is not a reason
+// to tell the operator to step back: counting only genuine one-row plates it
+// shrinks to 90% against 84.5%, around one standard error, so there is no
+// evidence for a penalty for being close.
+//
+// Honest limit, worth keeping in mind before this is quoted anywhere: counting
+// only one-row plates, the success rate barely moves with width at all. Part of
+// what the raw curve calls "too small" is really "the detector's box came out
+// too tall", which happens at distance because its margin is then a large share
+// of the crop. Both are fixed by the same thing the page asks for, so the guide
+// stands either way, but width is not proven to be the cause on its own.
+const GUIDE_WIDTH_FRAC = 0.42;
 const GUIDE_ASPECT = 4.6;          // a one-row Kazakh plate is roughly 4.6:1
-const AIM_MIN_FILL = 0.55;
+const AIM_MIN_FILL = 0.64;         // 0.27 of the frame / 0.42 guide
 
 const AIM_HINTS = {
     none: "Наведите камеру на номер",

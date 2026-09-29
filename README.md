@@ -409,9 +409,22 @@ brackets is recognised exactly as before. Cropping to the guide on the phone
 would cut both traffic and server work, and it can also cut a plate in half, so
 it stays out until it is measured.
 
-`AIM_MIN_FILL` in the page decides when the hint says "come closer". It is
-provisional: the plate width at which reading becomes reliable has not been
-measured, and measuring it needs crop sizes logged from real phone use.
+The two numbers behind it are measured, not guessed. `bench/crop_size.py` over
+468 readings on those videos, grouped by the share of the frame width the plate
+took: almost nothing reads up to 15%, 41% at 15-20%, 60% at 20-27%, 75% at
+27-35%, 81% at 35-50%, 68% above that. The guide is therefore sized for a plate
+filling about 42% of the frame, and the hint asks for more below 27%.
+
+The drop above 50% is not a reason to tell the operator to step back. Counting
+only genuine one-row plates it shrinks to 90% against 84.5%, about one standard
+error.
+
+One limit worth stating before this is quoted: counting only one-row plates,
+the success rate barely moves with width at all. Part of what the raw curve
+calls "too small" is really "the detector's box came out too tall", which
+happens at distance because its margin is then a large share of the crop. Both
+are fixed by the operator coming closer, so the guide stands either way, but
+width alone is not proven to be the cause.
 
 A browser only grants a page access to the camera over HTTPS, so the server has
 to run with `--cert` and `--key` (see above) for this to work from a phone.

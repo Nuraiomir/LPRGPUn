@@ -442,10 +442,15 @@ def main():
             if mode == "normal":
                 raw_text = str(payload.get("text", ""))
                 raw_conf = float(payload.get("conf", 0.0))
-                # Diagnostic only: expose what PP-OCRv5 actually returned.
+                # Diagnostic only: expose what PP-OCRv5 actually returned, and
+                # how big the crop was. The crop size is what decides whether a
+                # reading succeeds at all, and bench/crop_size.py turns these
+                # numbers into the width at which reading becomes reliable.
+                # Appended after conf so older log parsers still match.
                 print(
                     f"[NORMAL OCR RAW] t={t:5.2f}s "
-                    f"RAW={raw_text!r} conf={raw_conf:.3f}",
+                    f"RAW={raw_text!r} conf={raw_conf:.3f} "
+                    f"w={det[2] - det[0]} h={det[3] - det[1]}",
                     flush=True
                 )
                 # Same rule as the server's LPRRecognizer._handle_normal_result:
