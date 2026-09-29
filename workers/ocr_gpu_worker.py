@@ -23,6 +23,7 @@ Protocol (multiprocessing.connection, authkey-secured):
     -> or {"type":"error","jid":...,"fid":...,"error":repr(exc),"traceback":str}
   recv {"type":"stop"} -> exits cleanly
 """
+import os
 import sys
 import time
 import traceback
@@ -55,12 +56,21 @@ try:
         "paddle": paddle.__version__,
     })
 
-    ocr = create_predictor("en_PP-OCRv5_mobile_rec", device="gpu:0")
+    # The model name is an environment variable so another recogniser can be
+    # measured against the same benchmark without editing code, and so a
+    # failed experiment is undone by unsetting one variable rather than by a
+    # revert. PP-OCRv6 is the reason it exists: its tiny recogniser claims the
+    # same accuracy several times faster on CPU, which is worth a run on
+    # bench/ocr_dataset_eval.py before it is believed. Whether PaddleX knows a
+    # given name depends on its version, and an unknown one fails here, at
+    # startup, where the message is plain.
+    OCR_MODEL = os.environ.get("LPR_OCR_MODEL", "en_PP-OCRv5_mobile_rec")
+    ocr = create_predictor(OCR_MODEL, device="gpu:0")
 
     conn.send({
         "type": "ready",
         "device": "GPU",
-        "backend": "PaddleX en_PP-OCRv5_mobile_rec",
+        "backend": f"PaddleX {OCR_MODEL}",
         "paddle": paddle.__version__,
     })
 except Exception as e:
