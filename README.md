@@ -203,6 +203,7 @@ Errors return `{"ok": false, "error": "...", "error_code": "..."}`:
 |---|---|---|
 | 400 | bad_request | missing or invalid Content-Length, session_id or `t` |
 | 400 | decode_failed | body is not a decodable image |
+| 401 | unauthorized | missing or wrong access key |
 | 404 | not_found | any path other than /frame |
 | 413 | payload_too_large | body over 10 MB |
 | 503 | worker_unavailable | a GPU worker timed out or crashed; it is restarted automatically |
@@ -373,8 +374,11 @@ plates it returns are made up; no real plate is ever sent out with it.
 
 `tools/LPR_API.postman_collection.json` imports into Postman and covers every
 request and every error code; `tools/sample_frame.jpg` is a frame to attach
-(it shows an invented plate). Point the `baseUrl` variable at the real service
-when the network access is in place.
+(it shows an invented plate). Two variables: point `baseUrl` at the real
+service when the network access is in place, and put one line from
+`config/api_keys.txt` in `apiKey`. The collection sends that key as a bearer
+token on every request, which the mock server ignores and the real service
+requires.
 
 ## Scanning page for a phone
 
@@ -442,7 +446,8 @@ has to be accepted before the camera can start.
 ## Known limitations
 
 - Not yet tested with a real phone camera over the network.
-- No authentication, rate limiting or TLS on the HTTP server.
+- No rate limiting on the HTTP server. Access keys and TLS are in place;
+  see "Access keys and TLS".
 - One plate per frame: the detector returns only the most confident box.
 - `OCR_EVERY_N_DETECTIONS = 3` was tuned for 60 fps video; a live camera
   sending fewer frames may need a lower value.
