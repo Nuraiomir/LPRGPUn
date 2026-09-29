@@ -390,6 +390,29 @@ frame where `changed` is `true` — the moment OCRM would search the bank
 database. When the plate is cleared (`confirmed` back to `false`) the page goes
 back to "scanning", which is what hiding the vehicle card looks like.
 
+### Aiming guide
+
+The page draws plate-shaped brackets in the middle of the picture and tells the
+operator what to change: "point the camera at the plate" when nothing is
+detected, "come closer" while the plate is smaller than the brackets ask for,
+"hold steady" once it fills them. The brackets follow the detector's box, white
+to amber to green.
+
+This exists because of a measurement, not a hunch. `bench/field_misses.py` over
+our four videos found 218 failed readings, of which 94 were fragments and 111
+had characters lost or doubled, against 6 from a letter the recogniser
+confuses. Almost everything we lose is a crop that arrived too small, and the
+one thing the operator can change about that is the distance.
+
+The guide is only a hint. The whole frame is still sent, so a plate outside the
+brackets is recognised exactly as before. Cropping to the guide on the phone
+would cut both traffic and server work, and it can also cut a plate in half, so
+it stays out until it is measured.
+
+`AIM_MIN_FILL` in the page decides when the hint says "come closer". It is
+provisional: the plate width at which reading becomes reliable has not been
+measured, and measuring it needs crop sizes logged from real phone use.
+
 A browser only grants a page access to the camera over HTTPS, so the server has
 to run with `--cert` and `--key` (see above) for this to work from a phone.
 `http://localhost` is the one exception, useful for testing on the server

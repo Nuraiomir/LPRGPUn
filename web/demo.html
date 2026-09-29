@@ -189,6 +189,27 @@ const MAX_FRAME_WIDTH = 1280;
 const JPEG_QUALITY = 0.8;
 const MAX_CONSECUTIVE_FAILURES = 10;
 
+// Aiming guide. Measured on our four videos: of 218 failed readings, 94 were
+// fragments and 111 had characters lost or doubled, while only 6 were a letter
+// the recogniser confuses. Almost everything we lose is a crop that arrived too
+// small, so the page asks the operator to come closer.
+//
+// GUIDE_WIDTH_FRAC and GUIDE_ASPECT only shape the bracket the operator aims
+// into. AIM_MIN_FILL decides when the hint says "closer", and it is expressed
+// against the guide rather than the frame so there is one number to justify
+// instead of two. It is provisional: the plate width at which reading becomes
+// reliable has not been measured yet, and doing that needs crop sizes logged
+// from real phone use, which is still blocked on network access.
+const GUIDE_WIDTH_FRAC = 0.62;
+const GUIDE_ASPECT = 4.6;          // a one-row Kazakh plate is roughly 4.6:1
+const AIM_MIN_FILL = 0.55;
+
+const AIM_HINTS = {
+    none: "Наведите камеру на номер",
+    small: "Поднесите камеру ближе",
+    ok: "Держите ровно",
+};
+
 const els = {
     apiKey: document.getElementById("apiKey"),
     rememberKey: document.getElementById("rememberKey"),
@@ -234,7 +255,7 @@ function saveKey() {
     } catch (e) { /* storage unavailable */ }
 }
 
-function showPlate(data) {
+function showPlate(data, aim) {
     const plate = data.plate || "";
     if (plate && data.confirmed) {
         els.readout.classList.remove("searching");
@@ -246,7 +267,9 @@ function showPlate(data) {
     } else {
         // Cleared or not confirmed yet: OCRM would hide the vehicle card here.
         els.readout.classList.add("searching");
-        els.plate.textContent = "Сканирование…";
+        // The aiming hint replaces the idle text: it tells the operator what
+        // to change instead of only saying that nothing was found yet.
+        els.plate.textContent = AIM_HINTS[aim] || "Сканирование…";
         els.meta.textContent = data.raw_text ? "читается: " + data.raw_text : "";
     }
 
@@ -257,24 +280,62 @@ function showPlate(data) {
     }
 }
 
-/* Draws the detector's box over the video. bbox is in the coordinates of the
-   frame we sent, so it is scaled by the ratio between the displayed picture
-   and that frame. */
-function drawBox(bbox, frameW, frameH) {
+/* Draws the aiming guide and the detector's box, and returns how the aim looks:
+   "none" when nothing is detected, "small" when the plate is smaller than the
+   guide asks for, "ok" otherwise.
+
+   bbox comes in the coordinates of the frame we sent, so it is scaled by the
+   ratio between the displayed picture and that frame.
+
+   The guide is a hint and nothing more. The whole frame is still sent, so a
+   plate outside the brackets is recognised exactly as before. Cropping to the
+   guide on the phone would cut the traffic and the server's work, but it can
+   also cut a plate in half, so it stays out until it is measured. */
+function drawOverlay(bbox, frameW) {
     const c = els.overlay;
     const w = els.camera.clientWidth, h = els.camera.clientHeight;
-    if (!w || !h) return;
+    if (!w || !h) return "none";
     if (c.width !== w || c.height !== h) { c.width = w; c.height = h; }
 
     const ctx = c.getContext("2d");
     ctx.clearRect(0, 0, w, h);
-    if (!bbox || bbox.length < 4 || !frameW || !frameH) return;
 
-    const k = w / frameW;
-    const [x1, y1, x2, y2] = bbox;
-    ctx.strokeStyle = "#22c55e";
-    ctx.lineWidth = Math.max(2, Math.round(w / 220));
-    ctx.strokeRect(x1 * k, y1 * k, (x2 - x1) * k, (y2 - y1) * k);
+    const gw = w * GUIDE_WIDTH_FRAC;
+    const gh = gw / GUIDE_ASPECT;
+    const gx = (w - gw) / 2, gy = (h - gh) / 2;
+
+    let aim = "none", box = null;
+    if (bbox && bbox.length >= 4 && frameW) {
+        const k = w / frameW;
+        box = [bbox[0] * k, bbox[1] * k, bbox[2] * k, bbox[3] * k];
+        aim = (box[2] - box[0]) >= gw * AIM_MIN_FILL ? "ok" : "small";
+    }
+
+    const colour = aim === "ok" ? "#22c55e"
+                 : aim === "small" ? "#f59e0b"
+                 : "rgba(255,255,255,.75)";
+    const line = Math.max(2, Math.round(w / 220));
+
+    // Corner brackets rather than a closed rectangle, so no line sits across
+    // the plate the operator is trying to read.
+    const arm = Math.min(gw * 0.16, gh * 0.6);
+    ctx.strokeStyle = colour;
+    ctx.lineWidth = line;
+    for (const [x, y, sx, sy] of [[gx, gy, 1, 1], [gx + gw, gy, -1, 1],
+                                  [gx, gy + gh, 1, -1], [gx + gw, gy + gh, -1, -1]]) {
+        ctx.beginPath();
+        ctx.moveTo(x + arm * sx, y);
+        ctx.lineTo(x, y);
+        ctx.lineTo(x, y + arm * sy);
+        ctx.stroke();
+    }
+
+    if (box) {
+        ctx.strokeStyle = colour;
+        ctx.lineWidth = line;
+        ctx.strokeRect(box[0], box[1], box[2] - box[0], box[3] - box[1]);
+    }
+    return aim;
 }
 
 function grabFrame() {
@@ -345,8 +406,8 @@ async function sendOneFrame(apiKey, sessionId) {
         sent.serverMs.push(data.processing_time_ms);
         if (sent.serverMs.length > 50) sent.serverMs.shift();
     }
-    showPlate(data);
-    drawBox(data.bbox, canvas.width, canvas.height);
+    const aim = drawOverlay(data.bbox, canvas.width);
+    showPlate(data, aim);
     updateStats();
     setStatus("Сканирование идёт");
     return "ok";
@@ -413,7 +474,7 @@ async function startScanning() {
     scanning = true;
     failures = 0;
     sent.frames = 0; sent.errors = 0; sent.serverMs = []; sent.startedAt = performance.now();
-    showPlate({});
+    showPlate({}, drawOverlay(null, 0));
     setStatus("Сканирование идёт");
     scanLoop(apiKey, sessionId);
 }
