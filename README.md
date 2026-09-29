@@ -121,29 +121,19 @@ python3 compare_ab_offline.py <A.json> <B.json>
 The script refuses to compare runs made in the same mode or runs in which OCR
 calls were lost.
 
-### Two switches for measuring, both off by default
+### Trying another recogniser
 
 ```bash
 # Another recogniser, measured on the same benchmark. PaddleX has to know the
 # name; an unknown one fails at worker startup, where the message is plain.
 LPR_OCR_MODEL=PP-OCRv6_tiny_rec .venv_gpu/bin/python bench/ocr_dataset_eval.py \
     ~/datasets_ocr_kz/<dataset> --split val --ocr-mode full
-
-# The offline pipeline without the one-row fallback on square crops.
-LPR_NORMAL_FALLBACK=0 .venv_gpu/bin/python app/lpr_v19_universal.py videos/<name>.mp4
 ```
 
 `LPR_OCR_MODEL` replaces `en_PP-OCRv5_mobile_rec`. It exists so a different
 recogniser can be put through `bench/ocr_dataset_eval.py` without editing code,
 and so a failed experiment is undone by unsetting a variable. The name is
 reported in the worker's `backend` field and in the server's startup banner.
-
-`LPR_NORMAL_FALLBACK=0` turns off the extra read that treats a square crop as a
-one-row plate while a vehicle is confirmed. That fallback exists to catch the
-move to the next car before YOLO's box narrows, but over four videos it
-produced 82 readings and not one valid plate, 15% of every OCR call. Run the
-videos both ways and compare the confirmations: unchanged means it is pure
-cost. The run prints `NORMAL FALLBACK: on` or `OFF` at startup.
 
 ## HTTP server
 

@@ -221,13 +221,6 @@ def main():
     yp = _spawn(YOLO_WORKER, YOLO_PYTHON, CUDA_LIB, (ONNX_MODEL,), yl)
 
     OCR_VARIANT_MODE = os.environ.get("OCR_VARIANT_MODE", "full")
-    # The fallback further down reads a square crop as a one-row plate while a
-    # vehicle is confirmed, so the move to the next car is caught before YOLO's
-    # box narrows. Measured over four videos it produced 82 readings and not one
-    # valid plate, 15% of every OCR call. Run with LPR_NORMAL_FALLBACK=0 and
-    # compare the switch events: unchanged means the fallback is pure cost.
-    NORMAL_FALLBACK = os.environ.get("LPR_NORMAL_FALLBACK", "1") != "0"
-    print(f"NORMAL FALLBACK: {'on' if NORMAL_FALLBACK else 'OFF'}", flush=True)
     print("OCR VARIANT MODE:", OCR_VARIANT_MODE, flush=True)
     op = _spawn(OCR_WORKER, OCR_PYTHON, CUDA_LIB, (OCR_VARIANT_MODE,), ol)
 
@@ -602,17 +595,6 @@ def main():
                     ]
 
                     submit_ocr("square", sq, t, det)
-
-                    # While a vehicle is confirmed, also read this crop as a
-                    # single-row plate: when the camera moves to the next
-                    # car, YOLO's box can stay square for a few frames.
-                    if confirmed_plate and NORMAL_FALLBACK:
-                        print(
-                            f"[NORMAL FALLBACK SUBMIT] t={t:5.2f}s "
-                            f"bbox={w}x{h} aspect={aspect:.2f}",
-                            flush=True
-                        )
-                        submit_ocr("normal", crop, t, det)
 
                     visual_status = "SQUARE OCR: GPU busy / latest"
                 else:
