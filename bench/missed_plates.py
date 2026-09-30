@@ -37,7 +37,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "app"))
-from lpr_recognizer import clean_text, extract_plate  # noqa: E402
+from lpr_recognizer import (clean_text, extract_plate,  # noqa: E402
+                            MIN_TOP_WEIGHT, WINDOW_SEC)
 
 RAW_LINE = re.compile(r"\[NORMAL OCR RAW\]\s+t=\s*([\d.]+)s\s+RAW=(.+?)\s+conf=([\d.]+)")
 
@@ -180,12 +181,41 @@ def main():
         else:
             note = f" (ещё {neighbours} от соседней машины)" if neighbours else ""
             print(f"    OCR отработал {len(inside)} раз{note}, вот что он видел:")
-            for t, txt in inside[:12]:
-                print(f"      {t:6.2f}s  {txt!r}")
-            if len(inside) > 12:
-                print(f"      ... ещё {len(inside) - 12}")
-            print("    Рамка была, но вырез оказался нечитаемым:")
-            print("    это задача расстояния и кадрирования, а не детекции.")
+            for t, txt in inside:
+                mark = " <-- это он" if extract_plate(clean_text(txt)) == plate else ""
+                print(f"      {t:6.2f}s  {txt!r}{mark}")
+
+            # The verdict has to come from the readings, not from the fact that
+            # there were any. An earlier version printed "the crop was
+            # unreadable" whenever OCR had run at all, and said it about a car
+            # whose plate one reading had got exactly right.
+            hits = [(t, txt) for t, txt in inside
+                    if extract_plate(clean_text(txt)) == plate]
+            if not hits:
+                print("    Ни одно чтение не сложилось в этот номер.")
+                print("    Рамка была, но вырез оказался нечитаемым:")
+                print("    это задача расстояния и кадрирования, а не детекции.")
+            else:
+                share = f"{len(hits)} из {len(inside)}"
+                print(f"    Номер прочитан ПРАВИЛЬНО {share}, впервые в "
+                      f"{hits[0][0]:.2f}s.")
+                gaps = [b[0] - a[0] for a, b in zip(hits, hits[1:])]
+                near = [g for g in gaps if g <= WINDOW_SEC]
+                if len(hits) == 1:
+                    print(f"    Но подтверждение требует набрать вес "
+                          f"{MIN_TOP_WEIGHT} за {WINDOW_SEC:.0f} с, а одно "
+                          f"чтение даёт максимум 1.40.")
+                    print("    Одного верного чтения не хватает НИКОГДА, это "
+                          "защита от случайного кадра.")
+                    print("    Нужно второе верное чтение в том же окне: "
+                          "работа над качеством выреза, не над порогом.")
+                elif not near:
+                    print(f"    Верные чтения есть, но между ними больше "
+                          f"{WINDOW_SEC:.0f} с, и голоса не складываются.")
+                else:
+                    print("    Верные чтения складывались в одно окно: если "
+                          "номер всё равно не подтверждён,")
+                    print("    смотри уверенность этих чтений, веса не хватило.")
 
         if not args.no_frames:
             n = dump_frames(video, plate, start, end, args.frames, out_dir)
