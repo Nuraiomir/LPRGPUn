@@ -16,5 +16,9 @@
 onnxruntime-gpu==1.26.0
 paddlepaddle-gpu==3.3.1
 paddlex==3.3.13
-opencv-python
+# headless, not plain opencv-python: the service draws on frames and encodes
+# them but never opens a window, and a server has no display to open one on.
+# Checked against every cv2 call the code makes: 33 of them, all in the
+# standard distribution, none from contrib.
+opencv-python-headless==5.0.0.93
 numpy==2.5.3
