@@ -398,6 +398,7 @@ class LPRRecognizer:
         self.ocr_attempts = 0
 
         self.square_readings = []
+        self.last_box = (0, 0, 0.0)
         self.normal_readings = []
         # Diagnostics only: the row votes behind the last square decision.
         self.last_square_votes = None
@@ -471,6 +472,12 @@ class LPRRecognizer:
             if crop.size != 0 and looks_like_plate(x2 - x1, y2 - y1, frame_bgr.shape[1], frame_bgr.shape[0]):
                 h, w = crop.shape[:2]
                 aspect = w / max(1, h)
+                # Kept for the diagnostics below: which box shape sent
+                # this crop down which path. A single-row plate seen at
+                # an angle has a taller box than its plate, and the
+                # recorded shape is how that is checked rather than
+                # argued about.
+                self.last_box = (w, h, round(aspect, 2))
 
                 if aspect > SQUARE_ASPECT_MAX or w < MIN_SQUARE_W or h < MIN_SQUARE_H:
                     plate_type = "normal"
@@ -554,8 +561,10 @@ class LPRRecognizer:
         text = extract_plate(clean_text(raw_text))
         changed = False
         if valid_kz_plate(text):
+            bw, bh, basp = self.last_box
             self.normal_readings.append({
                 "time": round(t, 2), "plate": text, "confidence": round(raw_conf, 3),
+                "box_w": bw, "box_h": bh, "box_aspect": basp,
             })
             changed = self.consider_plate(text, raw_conf, t, "normal")
         self._trim_history(t)
@@ -570,8 +579,10 @@ class LPRRecognizer:
         top = normalize_top(top_text)
         bottom = normalize_bottom(bottom_text)
 
+        bw, bh, basp = self.last_box
         self.square_readings.append({
             "time": round(t, 2),
+            "box_w": bw, "box_h": bh, "box_aspect": basp,
             "top_raw": top_text, "top": top, "top_conf": round(top_conf, 3),
             "bottom_raw": bottom_text, "bottom": bottom, "bottom_conf": round(bottom_conf, 3),
         })
