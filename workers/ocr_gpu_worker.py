@@ -124,6 +124,38 @@ def _ocr_once(image):
 # unconditionally on every single call.
 OCR_EARLY_EXIT_CONF = 0.92
 
+# A detector box much taller than a plate holds the plate in a band with
+# bodywork above and below it. Measured on 20260923_152319, 163 single-row
+# readings: boxes flatter than 2.0 gave a plate 0 times out of 9, boxes from
+# 3.5 to 4.5 gave one 47 times out of 51. The two cars that video never
+# confirmed sat at 1.8 to 2.1 the whole time they were visible, in boxes
+# 1800 pixels wide. Nothing was too small; the shape was wrong.
+#
+# So for a flat box, one more variant: the middle band, cut to the shape a
+# single-row plate actually has. It is tried LAST and still wins only by
+# being strictly more confident than every other variant, so a band that
+# slices through the characters cannot displace a good full-crop read.
+# LPR_OCR_BAND=0 turns it off, which is how the A/B is run.
+BAND_ENABLED = os.environ.get("LPR_OCR_BAND", "1") != "0"
+BAND_MAX_ASPECT = 3.0      # only boxes flatter than this get a band
+BAND_TARGET_ASPECT = 4.5   # what a single-row plate looks like
+BAND_MIN_HEIGHT = 16       # thinner than this is not worth an OCR call
+
+
+def _band(crop):
+    """The middle band of a too-tall crop, or None when the crop is fine."""
+    if not BAND_ENABLED:
+        return None
+    h, w = crop.shape[:2]
+    if h <= 0 or w / max(1, h) >= BAND_MAX_ASPECT:
+        return None
+    band_h = int(round(w / BAND_TARGET_ASPECT))
+    if band_h < BAND_MIN_HEIGHT or band_h >= h:
+        return None
+    y0 = (h - band_h) // 2
+    return crop[y0:y0 + band_h]
+
+
 # PROFILING ONLY: per-variant timings are appended here by run_ocr and
 # drained by the message loop. Nothing reads this to make a decision --
 # it does not affect which variant wins, the early-exit threshold, or any
@@ -174,9 +206,16 @@ def run_ocr(crop):
             t0 = time.perf_counter()
             enhanced = cv2.detailEnhance(up, sigma_s=10, sigma_r=0.15)
             prep = (time.perf_counter() - t0) * 1000.0
-            _try(enhanced, "enhanced", prep)
+            if _try(enhanced, "enhanced", prep):
+                return best_text, best_conf
         except Exception:
             pass
+
+    t0 = time.perf_counter()
+    band = _band(crop)
+    prep = (time.perf_counter() - t0) * 1000.0
+    if band is not None:
+        _try(band, "band", prep)
 
     return best_text, best_conf
 
