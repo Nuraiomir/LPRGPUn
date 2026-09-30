@@ -452,8 +452,16 @@ to amber to green.
 This exists because of a measurement, not a hunch. `bench/field_misses.py` over
 our four videos found 218 failed readings, of which 94 were fragments and 111
 had characters lost or doubled, against 6 from a letter the recogniser
-confuses. Almost everything we lose is a crop that arrived too small, and the
-one thing the operator can change about that is the distance.
+confuses. So what we lose, we lose to the crop rather than to the recogniser,
+and distance is the one thing about a crop an operator can change.
+
+That is as far as those numbers go. An earlier version of this section read
+"almost everything we lose is a crop that arrived too small", which they do not
+support: "characters lost" is equally the signature of a crop that is the wrong
+shape, and shape had not been measured. It has been since, under "Why a plate
+is lost" below, and for the two cars we lose on `20260923_152319` the answer is
+the shape. The guide still earns its place for genuinely distant plates; it
+would not have saved those two.
 
 The guide is only a hint. The whole frame is still sent, so a plate outside the
 brackets is recognised exactly as before. Cropping to the guide on the phone
@@ -472,10 +480,56 @@ error.
 
 One limit worth stating before this is quoted: counting only one-row plates,
 the success rate barely moves with width at all. Part of what the raw curve
-calls "too small" is really "the detector's box came out too tall", which
-happens at distance because its margin is then a large share of the crop. Both
-are fixed by the operator coming closer, so the guide stands either way, but
-width alone is not proven to be the cause.
+calls "too small" is really "the detector's box came out too tall". That was
+written here as a caveat and has since been measured; see below.
+
+### Why a plate is lost
+
+Every reading now records the box it came from (`box_w`, `box_h`,
+`box_aspect`), and `bench/box_shapes.py` prints them. Over the 163 single-row
+readings of `20260923_152319`, grouped by the shape of that box:
+
+| box width / height | readings | gave a plate |
+|---|---|---|
+| under 2.0 | 9 | 0 |
+| 2.0 to 2.5 | 31 | 14 |
+| 2.5 to 3.0 | 34 | 25 |
+| 3.0 to 3.5 | 20 | 14 |
+| 3.5 to 4.5 | 51 | 47 |
+| over 4.5 | 18 | 16 |
+
+A single-row plate is about 4.5 times wider than it is tall, and readings from
+a box that shape succeed about nine times in ten. The two cars this video never
+confirms, `646BCD02` and `708NIA02`, sat between 1.8 and 2.1 the whole time
+they were visible, in boxes around 1800 pixels wide. Nothing was too small. The
+detector had taken in bodywork above and below the plate, so the plate filled
+under half the crop's height and characters dropped out: `860AXS02` came back
+as `860AX02`, `860XS02`, `1860AX02`. Below 1.8 the crop is routed to the
+two-row reader as well, which splits one row of text in two: `646BCD02` arrives
+there as `646P0` over `BCD/02`.
+
+**Reading the middle band does not fix it, and the attempt is worth recording.**
+The obvious answer is to cut a flat box down to 4.5:1 and read that as one more
+OCR variant, taking whichever variant is most confident. Measured over the four
+videos, that traded away exactly what the pipeline exists to protect:
+
+| | plates found | wrong plates | precision | recall | F1 |
+|---|---|---|---|---|---|
+| without the band | 25 of 28 | 0 | 1.000 | 0.893 | 0.943 |
+| with the band | 26 of 28 | 3 | 0.897 | 0.929 | 0.912 |
+
+One more car found, three cars misidentified: `694BPT03` for `694BPT05`,
+`116AEG19` for `776AEG19`, `136JDB04` for `136JDB02`. Each is one or two
+characters off a real plate in the same video. The band slices through a
+character, the clipped glyph reads as a different digit, and the result still
+has a plate's shape, so the pattern accepts it. Worse, the same slice repeats
+frame after frame, so the error is consistent and the voting confirms it:
+voting protects against occasional errors, not systematic ones. Selecting a
+variant by confidence alone cannot help here, because confidence says how sure
+OCR is of the characters it read, not whether they are the plate's.
+
+The measurement stands and the fix does not. A tight box is the detector's job,
+so this belongs with detector training rather than with a crop heuristic.
 
 A browser only grants a page access to the camera over HTTPS, so the server has
 to run with `--cert` and `--key` (see above) for this to work from a phone.
