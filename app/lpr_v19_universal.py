@@ -254,7 +254,20 @@ def main():
     duration = frames_total / fps if fps else 0.0
 
     VIDEO_OUT.parent.mkdir(parents=True, exist_ok=True)
-    out_w, out_h, out_fps = 1280, 720, 60.0
+    # The debug video keeps the source's shape. It was fixed at 1280x720, which
+    # squashed footage shot upright on a phone: every plate in it came out wider
+    # and flatter than it is. Recognition never saw that frame, it works on the
+    # original, but the picture is what a person judges the system by. Even
+    # numbers because odd ones break some encoders.
+    out_fps = 60.0
+    src_w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH) or 0)
+    src_h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT) or 0)
+    if src_w > 0 and src_h > 0:
+        k = 1280 / max(src_w, src_h)
+        out_w = max(2, int(round(src_w * k)) // 2 * 2)
+        out_h = max(2, int(round(src_h * k)) // 2 * 2)
+    else:
+        out_w, out_h = 1280, 720
     writer = cv2.VideoWriter(
         str(VIDEO_OUT),
         cv2.VideoWriter_fourcc(*"mp4v"),
