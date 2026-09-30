@@ -558,9 +558,13 @@ into something the browser opens:
     --out ~/demo_parking.mp4 --seconds 60 --width 720
 ```
 
-H.264 is tried first; this box has no H.264 encoder but does have VP9, so the
+H.264 is tried first; this box has no H.264 encoder but does have VP8, so the
 file usually comes out as `.webm` — the tool prints the name it actually wrote.
 Drag that file into a Chromium window to watch it.
+
+Encoding runs at roughly real time: a minute of 60 fps footage takes about a
+minute, and the tool prints how far it has got every few seconds. A 300 MB
+`result_*.mp4` comes out as a handful of megabytes.
 
 ## Known limitations
 
