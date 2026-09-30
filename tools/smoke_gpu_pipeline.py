@@ -2,7 +2,7 @@
 """
 Starts both workers for real, end to end, and times them. Needs the GPU.
 
-The wider companion to test_ocr_gpu_worker.py: this one runs detection and
+The wider companion to smoke_ocr_worker.py: this one runs detection and
 recognition together, the way the pipeline chains them, and reports the median,
 minimum and maximum time per frame plus the worker's exit code. Also a hand-run
 check rather than part of the suite.
@@ -12,7 +12,7 @@ what needs answering is whether the GPU path still works at all and at what
 speed.
 
 Usage:
-    .venv_gpu/bin/python test_yolo_ocr_gpu.py
+    .venv_gpu/bin/python tools/smoke_gpu_pipeline.py
 """
 
 import os

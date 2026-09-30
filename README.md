@@ -131,7 +131,8 @@ bench/
                          is corrected
 ```
 
-**Preparing training data.** Not part of running the service.
+**Preparing training data.** Not part of running the service, and the only
+thing here that needs Ultralytics.
 
 ```text
 tools/
@@ -140,26 +141,43 @@ tools/
   prepare_photos.py      the same for still photographs
 ```
 
-**Tests.** No GPU needed; the workers are replaced by stand-ins.
+**Tests.** The suite needs no GPU: the workers are replaced by stand-ins, so
+it runs anywhere, and `tools/preflight.py` and GitHub Actions both run it.
 
 ```text
-tests/                   the suite preflight.py runs
-compare_ab_offline.py    compares two offline runs (OCR mode A/B)
-test_ocr_gpu_worker.py   manual smoke checks that DO need the GPU, kept at
-test_yolo_ocr_gpu.py     the root because they are run by hand, not by the
-                         suite
+tests/                   the suite, run by preflight.py and by CI
+bench/compare_ab_offline.py   compares two offline runs (OCR mode A/B)
+tools/
+  smoke_ocr_worker.py    starts the real OCR worker and times it. Needs the
+  smoke_gpu_pipeline.py  GPU, run by hand, deliberately not named test_* so
+                         the suite does not try to collect it
 ```
+
+**Nothing lives in the repository root** except `README.md`, `.gitignore` and
+the two requirements files. A tool belongs to `tools/`, a measurement to
+`bench/`, a test to `tests/`.
 
 ## Environment
 
 One virtual environment in the project root, used by both workers:
 
-```text
-.venv_gpu/   Python 3.12, onnxruntime-gpu 1.26.0, paddlepaddle-gpu 3.3.1, paddlex 3.3.13
+```bash
+python3.12 -m venv .venv_gpu
+.venv_gpu/bin/pip install -r requirements.txt          # to run the service
+.venv_gpu/bin/pip install -r requirements-tools.txt    # to run the tests too
 ```
 
-Tested on an RTX 4090, driver 580.95.05. The environment is machine-specific
-and not stored in Git.
+Tested on an RTX 4090, driver 580.95.05, Python 3.12. The GPU builds expect
+CUDA on the machine. The environment itself is machine-specific and not stored
+in Git.
+
+The split between the two files is not tidiness. **Ultralytics is AGPL-3.0**,
+and it is in the second one: it trained the detector and it exports the model,
+but the service loads the exported `.onnx` through ONNX Runtime and never
+imports it. So a developer installing the tools and a bank deploying the
+service are two different licensing questions. `model/best_512.onnx` carries
+`license: AGPL-3.0` in its own metadata, which is the fact to take to a lawyer
+rather than an argument about whether a trained model is derivative.
 
 ## Offline pipeline
 
@@ -186,7 +204,7 @@ recorded in the result JSON (`ocr_variant_mode`).
 Compare two runs:
 
 ```bash
-python3 compare_ab_offline.py <A.json> <B.json>
+python3 bench/compare_ab_offline.py <A.json> <B.json>
 ```
 
 The script refuses to compare runs made in the same mode or runs in which OCR

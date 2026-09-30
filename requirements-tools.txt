@@ -1,0 +1,16 @@
+# Needed to run the tests and to prepare training data. Not needed to run the
+# service, which is the point of keeping this file separate.
+#
+#     .venv_gpu/bin/pip install -r requirements-tools.txt
+#
+# ULTRALYTICS IS AGPL-3.0. It is used by tools/prepare_frames.py and
+# tools/prepare_photos.py to pre-label collected frames, and it trained the
+# detector: model/best_512.onnx carries "license: AGPL-3.0" in its own
+# metadata, which is the fact a lawyer needs rather than an argument about
+# whether a trained model is derivative. The service itself never imports it.
+# Deploying the current detector is a licensing question; installing this file
+# on a developer's machine is not the same question, and keeping the two apart
+# is why they are two files.
+
+requests
+ultralytics

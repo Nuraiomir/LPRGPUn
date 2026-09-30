@@ -1,0 +1,20 @@
+# What the service needs to run: the HTTP server, both workers, the offline
+# pipeline and the benchmarks. Nothing here is AGPL.
+#
+# Ultralytics is deliberately absent. It trained the detector and it exports
+# the model, but the running service only loads the exported .onnx through
+# ONNX Runtime, so it is not a dependency of anything that runs in production.
+# See requirements-tools.txt, and "Known limitations" in the README.
+#
+# Install into the project's own environment:
+#     python3.12 -m venv .venv_gpu
+#     .venv_gpu/bin/pip install -r requirements.txt
+#
+# The GPU builds below expect CUDA on the machine. Tested on an RTX 4090,
+# driver 580.95.05, Python 3.12.
+
+onnxruntime-gpu==1.26.0
+paddlepaddle-gpu==3.3.1
+paddlex==3.3.13
+opencv-python
+numpy==2.5.3

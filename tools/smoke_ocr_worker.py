@@ -13,7 +13,7 @@ the GPU environment is intact after a change, whether paddle still loads,
 whether a worker that looked slow really is.
 
 Usage:
-    .venv_gpu/bin/python test_ocr_gpu_worker.py
+    .venv_gpu/bin/python tools/smoke_ocr_worker.py
 """
 
 import os

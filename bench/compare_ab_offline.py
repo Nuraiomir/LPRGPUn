@@ -10,7 +10,7 @@
 один режим лучше другого. Он только показывает, что изменилось.
 
 Запуск:
-    python3 compare_ab_offline.py A.json B.json
+    python3 bench/compare_ab_offline.py A.json B.json
 """
 
 import json
