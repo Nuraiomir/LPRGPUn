@@ -83,6 +83,12 @@ except Exception as e:
     raise
 
 def _ocr_once(image):
+    """One call to the recogniser: (text, confidence), never an exception.
+
+    Confidence is the recogniser's own, and it says how sure it is of the
+    characters it read, not whether they are a plate. Deciding that is the
+    caller's job, in lpr_recognizer.py.
+    """
     if image is None or image.size == 0:
         return "", 0.0
     if len(image.shape) == 2:
@@ -132,6 +138,14 @@ OCR_EARLY_EXIT_CONF = 0.92
 _VARIANT_LOG = []
 
 def run_ocr(crop):
+    """Reads a single-row crop, trying harder until the answer is good enough.
+
+    The same picture is offered to the recogniser several ways -- as it came,
+    upscaled, in grey, and finally with detailEnhance -- and the most confident
+    answer wins, ties going to whichever was tried first. The cascade stops as
+    soon as one variant reaches OCR_EARLY_EXIT_CONF, which is why the expensive
+    last variant runs only on crops that are genuinely hard.
+    """
     best_text, best_conf = "", 0.0
 
     def _try(image, variant_name, prep_ms):
@@ -181,6 +195,14 @@ def run_ocr(crop):
     return best_text, best_conf
 
 def square_ocr(crop):
+    """Reads a two-row (square) plate as two separate rows.
+
+    The border is trimmed, the crop is split just below the middle with a small
+    gap so neither row carries a sliver of the other, and each row goes through
+    run_ocr on its own. Returns (top text, top confidence, bottom text, bottom
+    confidence): the rows are kept apart all the way to the voting, which lets
+    a frame contribute a good top row even when its bottom row is unreadable.
+    """
     h, w = crop.shape[:2]
     py, px = max(2, int(h*.05)), max(2, int(w*.03))
     s = crop[py:h-py, px:w-px]

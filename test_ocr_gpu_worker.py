@@ -1,3 +1,21 @@
+#!/usr/bin/env python3
+"""
+Starts the OCR worker for real and times its round trips. Needs the GPU.
+
+A hand-run check, not part of the suite: tests/ replaces the workers with
+stand-ins so it can run anywhere, and this does the opposite. It spawns the
+actual subprocess, sends it crops over the same connection the pipeline uses,
+and prints the average, minimum and maximum time for an answer to come back,
+then the worker's exit code.
+
+Use it when the question is about the machine rather than the logic: whether
+the GPU environment is intact after a change, whether paddle still loads,
+whether a worker that looked slow really is.
+
+Usage:
+    .venv_gpu/bin/python test_ocr_gpu_worker.py
+"""
+
 import os
 import sys
 import time

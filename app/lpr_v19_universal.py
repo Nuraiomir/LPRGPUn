@@ -1,3 +1,44 @@
+#!/usr/bin/env python3
+"""
+Runs one video file through the whole pipeline, and writes down what happened.
+
+This is the measuring instrument of the project. The HTTP server answers a
+camera and is judged by how it feels; this answers a file and is judged by
+whether the same file gives the same answer twice, which is what a metric
+needs. Everything in "Measured results" below the README's headline numbers
+comes from here.
+
+The two entry points are deliberately not two implementations. Every rule that
+decides anything -- what counts as a plate, how readings are normalized, how
+votes accumulate, when a plate is confirmed, when the vehicle has changed --
+lives in lpr_recognizer.py and is imported by both. The same two GPU worker
+subprocesses are spawned the same way. What differs is only how frames arrive
+and what is done with the answer, and that difference is one flag:
+
+    LIVE_MODE = False   every sampled frame is processed, none dropped, so a
+                        run is repeatable and its numbers mean something
+    LIVE_MODE = True    only the newest frame is kept; latency beats
+                        completeness, which is what a camera needs
+
+FRAME_STEP decides which frames are sampled in the first place (every 6th at
+60 fps, so about 10 a second reach the detector).
+
+Written to runs/real_video_v18_<video name>/:
+
+    results_vehicle_switch_GPU.json     every reading, every vote, every
+                                        vehicle switch, and the timings.
+                                        bench/pipeline_metrics.py scores this
+                                        file against bench/labels.json
+    result_vehicle_switch_GPU.mp4       the same run drawn on the frames, for
+                                        looking at rather than counting
+
+Usage:
+    .venv_gpu/bin/python app/lpr_v19_universal.py videos/20260923_152319.mp4
+    .venv_gpu/bin/python app/lpr_v19_universal.py        # the reference video
+
+Needs the GPU environment (.venv_gpu) and model/best_512.onnx. A run over a
+20-second video takes about 25 seconds.
+"""
 
 import cv2
 import json

@@ -53,31 +53,102 @@ running: `ss -ltnp | grep 8765`.
 
 ## Project structure
 
+Every file in the repository, and what it is for.
+
+**The pipeline itself.**
+
 ```text
 app/
-  lpr_recognizer.py      recognition rules: normalization, voting, vehicle switching
-  lpr_v19_universal.py   offline pipeline: processes a video file
-  lpr_api_server.py      HTTP server: POST /frame, one recognizer per session
-  gpu_workers_client.py  starts and talks to the GPU worker processes
+  lpr_recognizer.py      the rules that decide anything: what counts as a
+                         plate, normalization, voting, vehicle switching.
+                         Both entry points import this one, so they cannot
+                         drift apart
+  lpr_api_server.py      HTTP server: POST /frame, one recognizer per
+                         session, and it serves the scanning page
+  lpr_v19_universal.py   offline pipeline: one video file in, a JSON of
+                         everything that happened out. The measuring
+                         instrument behind every number below
+  gpu_workers_client.py  starts the worker subprocesses, talks to them, and
+                         restarts one that dies
+  ocrm_stub.py           the invented vehicle lookup standing where OCRM
+                         will go
 workers/
-  yolo_gpu_worker.py     plate detection subprocess
-  ocr_gpu_worker.py      text recognition subprocess
-client/
-  camera_client.py       sends a video to the server frame by frame, like a camera
-  degradations.py        damages frames to imitate hard conditions (--degrade)
-bench/
-  hard_conditions.py     OCR mode benchmark on degraded video, scored against labels
-  labels.json            plates present in each test video
+  yolo_gpu_worker.py     plate detection, its own process
+  ocr_gpu_worker.py      text recognition, its own process
+web/
+  demo.html              the scanning page: camera, aiming guide, plate,
+                         vehicle card, field-visit button
 config/
-  gpu_env.example.py     paths for the HTTP server (copy to gpu_env.py)
-model/best_512.onnx
-videos/                  test videos
+  gpu_env.example.py     paths for the server (copy to gpu_env.py)
+  test_ocrm.json         invented vehicles for the lookup
+model/best_512.onnx      the detector
+videos/                  test footage
 runs/                    results and benchmark history
-tests/
-compare_ab_offline.py    compares two offline runs (OCR mode A/B)
 ```
 
-Both entry points use the same rules from `app/lpr_recognizer.py`.
+**Sending something to the service.**
+
+```text
+client/
+  camera_client.py       replays a video into the server frame by frame, as
+                         a camera would
+  degradations.py        damages frames on the way to imitate dusk, blur,
+                         distance and phone compression
+tools/
+  mock_lpr_server.py     answers the same API with no GPU and no
+                         dependencies, so integrators can build against it
+  preflight.py           one command that puts the whole scenario through a
+                         real instance and prints a line per check
+  make_demo_clip.py      prepares a clip to play or a file to feed Chromium
+                         instead of a camera, without ffmpeg
+  LPR_API.postman_collection.json
+```
+
+**Measuring.** Every number in this README was produced by one of these.
+
+```text
+bench/
+  labels.json            the plates actually present in each test video.
+                         Ground truth for everything else here
+  pipeline_metrics.py    the headline score: vehicles found, wrong plates,
+                         precision, recall, F1
+  hard_conditions.py     the same score over deliberately damaged frames
+  missed_plates.py       why one plate was never confirmed: the readings in
+                         its window, and which of them were it
+  box_shapes.py          the shape of the box each reading came from, which
+                         is what "Why a plate is lost" below is built on
+  crop_size.py           read rate against the share of the frame the plate
+                         fills; the aiming guide is sized from this
+  field_misses.py        sorts failed readings by what went wrong
+  ocr_dataset_eval.py    the recogniser alone, over a labelled dataset
+  letter_stats.py        which characters the recogniser confuses
+  letter_repair.py       the repair rule those statistics suggested, kept
+                         because the measurement said it does not pay
+  vote_margins.py        how close a confirmation came to not happening
+  confirm_delay_sim.py   how much sooner a lower threshold would confirm,
+                         and what it would cost
+  wrong_plate_time.py    how long a wrong plate stays on screen before it
+                         is corrected
+```
+
+**Preparing training data.** Not part of running the service.
+
+```text
+tools/
+  build_dataset.py       assembles a training set from collected frames
+  prepare_frames.py      pulls frames out of video and pre-labels them
+  prepare_photos.py      the same for still photographs
+```
+
+**Tests.** No GPU needed; the workers are replaced by stand-ins.
+
+```text
+tests/                   the suite preflight.py runs
+compare_ab_offline.py    compares two offline runs (OCR mode A/B)
+test_ocr_gpu_worker.py   manual smoke checks that DO need the GPU, kept at
+test_yolo_ocr_gpu.py     the root because they are run by hand, not by the
+                         suite
+```
 
 ## Environment
 

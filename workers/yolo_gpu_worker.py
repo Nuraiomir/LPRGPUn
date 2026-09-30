@@ -32,6 +32,13 @@ conn.send({"type": "ready", "providers": session.get_providers()})
 inp = session.get_inputs()[0].name
 
 def letterbox(im, size=512):
+    """Fits the frame into the model's square input without distorting it.
+
+    The frame is scaled to fit and centred on a grey canvas, so a plate keeps
+    its proportions whatever shape the camera sends. Returns the canvas plus
+    the scale and offsets, which detect() needs to put a box found on the
+    canvas back onto the original frame.
+    """
     h,w=im.shape[:2]
     scale=min(size/w,size/h)
     nw,nh=int(round(w*scale)),int(round(h*scale))
@@ -42,6 +49,14 @@ def letterbox(im, size=512):
     return canvas,scale,dx,dy
 
 def detect(im):
+    """The most confident plate box in the frame, or None.
+
+    Returns (x1, y1, x2, y2, confidence) in the original frame's pixels. One
+    box per frame: with the camera pointed at a plate, the nearest one is also
+    the most confident, and a second box would only raise the question of which
+    car the answer belongs to. The output layout differs between exported
+    models, so both orderings and both coordinate scales are accepted here.
+    """
     x,scale,dx,dy=letterbox(im)
     a=x[:,:,::-1].astype(np.float32)/255.0
     a=np.transpose(a,(2,0,1))[None]
