@@ -100,9 +100,14 @@ def looks_like_plate(width, height, frame_width, frame_height):
 
 # A Kazakh plate carries a printed "KZ" block, and OCR reads it as part of the
 # text: a plate 545BDR05 comes back as "KZ545BDR05". Matching the whole string
-# against the format threw every such reading away. Measured on 1001 labelled
-# crops (AUTO.RIA KZ): pulling the plate out of the string took correct readings
-# from 294 to 785 and introduced no wrong plate.
+# against the format threw every such reading away. Measured on the val split
+# (1001 labelled crops, AUTO.RIA KZ, 823 of them plates of the current format):
+# pulling the plate out of the string took correct readings from 294 to 785.
+#
+# The stray-digit rule in extract_plate was added later and gave 92 of those
+# back: the same measurement now reads 693, or 84.2% of the 823. That is the
+# price of never building another car's plate out of a misread digit, and it
+# was paid on purpose. Any quoted accuracy has to say which of the two it is.
 #
 # The lookahead finds overlapping matches, and a plate is taken only when the
 # string holds exactly one candidate: two candidates mean the crop caught two

@@ -383,6 +383,90 @@ With `no-enhanced`, YOLO becomes the largest cost: about 44 ms per frame in
 the pipeline against about 1.3 ms of pure model inference. Most of that time
 is spent outside the GPU.
 
+### The recogniser alone, on a labelled dataset
+
+`bench/ocr_dataset_eval.py` over AUTO.RIA KZ (`autoriaNumberplateOcrKz-2019-04-26`).
+Both splits, same code, same day. A plate of the old format (3 digits, 2
+letters, 2 digits) or of some other shape cannot pass the service's format
+check however well it is read, so the accuracy that means anything is counted
+over plates of the current format only, and both denominators are given.
+
+| | val | test |
+|---|---|---|
+| Crops | 1001 | 279 |
+| Of them, current format | 823 | 251 |
+| Read exactly | 443 (44.3%) | 140 (50.2%) |
+| Accepted before `extract_plate` | 294 | 114 |
+| **Correct after `extract_plate`** | **693 (84.2%)** | **197 (78.5%)** |
+| Wrong plate | 1 (0.1%) | 0 |
+| Character error rate | 11.5% | 9.7% |
+
+Two things this table settles.
+
+**`extract_plate` is what makes the recogniser usable.** 97% of its errors are
+"picked up extra": `001AP06` comes back as `KZ001AP06`. Pulling the plate out
+of the string more than doubles the result, 294 to 693 on val.
+
+**An older note quoted 95.4%, and that number is stale, not wrong.** It was
+785 of 823 on val, measured before `extract_plate` refused readings with a
+stray digit outside the plate. That rule costs 92 plates and buys never
+building a different car's plate out of a misread digit, which had already
+happened once on real footage. Quoting 95.4% today would be quoting the code
+as it was before that fix.
+
+The two splits differ by six points on the same code. Say which split a number
+comes from, every time.
+
+#### Four recognisers on the same 100 crops
+
+`bench/ocr_engine_compare.py` runs two engines over one sample under one set
+of rules, so the answer is about the engines and not about how each was
+graded. Both were given their own best model as well as their default one.
+Tesseract was given the conditions it does best in: a whitelist of Latin
+letters and digits, three page-segmentation modes, the same four image
+variants the service tries, and the same early exit at 0.92.
+
+| Engine and model | Correct | Format | **Wrong plate** | ms |
+|---|---|---|---|---|
+| PaddleOCR PP-OCRv5 **mobile** | **70** | 70 | **0** | **3** |
+| PaddleOCR PP-OCRv5 server | 71 | 72 | 1 | 4 |
+| Tesseract 5.3.4 `tessdata_fast` | 2 | 2 | 0 | 780 |
+| Tesseract 5.3.4 `tessdata_best` | 2 | 3 | 1 | 1097 |
+
+Tesseract's accurate model changed nothing: 2 of 100 either way, 1.4x slower,
+and it added a wrong plate. The gap is not the weights. Tesseract is trained
+on scanned documents; a plate is embossed metal at an angle, under glare,
+beside a printed KZ block. It is not that it reads plates badly, it is that it
+mostly does not read them at all, and what it does return is wrapped in the
+rest of the plate: `545BDR044WSE10YAANP` for `545BDR05`.
+
+That the two Tesseract runs used different models is not taken on trust. The
+per-crop rows differ on 39 of the 100 crops (`KZ306IHZ17` against `K2306IHZ17`
+and so on), and a repeat of the fast model reproduced itself to within 4 ms.
+Each run writes a file named after its engine and model, so two runs cannot
+overwrite each other and any pair can be diffed later.
+
+The useful column is the last-but-one. Of the four, **only PP-OCRv5 mobile
+produced no wrong plate**, and it is also the fastest and the smallest. Both
+larger models gained at most one plate and each added a wrong one: one case
+out of a hundred is far too little to call a pattern, but the direction is the
+expensive one for a bank, where a wrong plate opens another customer's
+collateral while a missed plate costs a second pass of the camera.
+
+#### Repairing a letter read as a digit
+
+`bench/letter_repair.py` turns `106B0A11` back into `106BOA11`. Measured on
+both splits, the rule splits cleanly in two:
+
+| | val | test |
+|---|---|---|
+| Unambiguous: correct / wrong | +1 / 0 | +3 / 0 |
+| Guess: correct / wrong | +25 / 9 | +13 / 2 |
+
+The guessing half adds a wrong plate for every three it fixes. On the bank's
+side of the trade a wrong plate opens another customer's collateral, so only
+the unambiguous half is worth having, and neither half is in the service yet.
+
 ### OCR A/B on `20260908_150904.mp4`
 
 Offline replay of `videos/20260908_150904.mp4` (18.19 s, 59.98 FPS, 1,091
@@ -661,8 +745,10 @@ and still carrying a key. One line per check, and a list of what failed.
    apart everywhere, down to the 200 rather than a 404.
 4. **Create the field visit.** It comes back with an id.
 5. **Show the numbers**, not a claim: 25 vehicles of 28 on our own footage with
-   no false plate, precision 1.000, recall 0.893, F1 0.943, and 95.4% on the
-   labelled dataset. Say the sample is 28 vehicles.
+   no false plate, precision 1.000, recall 0.893, F1 0.943. Say the sample is
+   28 vehicles. For the recogniser alone, 84.2% on the labelled dataset's val
+   split and 78.5% on its test split, both counted over plates of the current
+   format; name the split, because the two differ by six points.
 
 Two things to say before being asked: the vehicle data is invented, and this
 has not been tested from a phone over the network because the port is closed.
