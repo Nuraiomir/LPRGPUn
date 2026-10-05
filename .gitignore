@@ -79,9 +79,32 @@ runs/**
 !runs/*/
 !runs/ab_*.json
 !runs/http_*.json
+# One file per recogniser run, named after the engine and the model it used.
+# Each holds a row per crop: what was read, what was extracted, how long it
+# took. The README's table of four recognisers is these files summed up, and
+# without them the table is a claim rather than a measurement. Tens of
+# kilobytes each.
+!runs/ocr_*.json
 !runs/real_video_*/results_vehicle_switch_GPU.json
 !runs/real_video_*/results_A_full*.json
 !runs/real_video_*/results_B_no_enhanced*.json
+
+# ------------------------------------------------------------ secrets
+# Access keys, tokens and anything that looks like one. The gateway key for
+# the bank's OCR lives in an environment variable and nowhere else; these
+# patterns are the second line of defence, for the day someone saves it to a
+# file "just for a minute". A key committed once stays in the history even
+# after it is deleted from the files.
+*.key
+*.pem
+*.p12
+*.pfx
+.env
+.env.*
+**/api_keys.txt
+**/*secret*
+**/*token*
+**/*credentials*
 
 # --------------------------------------------- generated OCR report
 # bench/ocr_dataset_eval.py --report writes index.html plus a crops/ folder

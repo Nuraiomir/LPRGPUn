@@ -73,10 +73,28 @@ VIDEO_ARG = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_VIDEO_NAME
 VIDEO = (ROOT.parent / VIDEO_ARG) if not Path(VIDEO_ARG).is_absolute() else Path(VIDEO_ARG)
 VIDEO_STEM = VIDEO.stem
 
-ONNX_MODEL = ROOT.parent / "model" / "best_512.onnx"
-# Results/video output are namespaced by the input video's filename, so
-# running against a second video never overwrites the first run's results.
-RUN_DIR = ROOT.parent / "runs" / f"real_video_v18_{VIDEO_STEM}"
+# LPR_ONNX_MODEL swaps the detector without editing code, the same way
+# LPR_OCR_MODEL swaps the recogniser: it exists so a second detector can be
+# measured on this exact benchmark and a failed experiment is undone by
+# unsetting one variable. The worker letterboxes to 512, so an export made at
+# another size would be measured wrong rather than fail; export at 512.
+_MODEL_ENV = os.environ.get("LPR_ONNX_MODEL", "").strip()
+ONNX_MODEL = Path(_MODEL_ENV) if _MODEL_ENV else (ROOT.parent / "model" / "best_512.onnx")
+if not ONNX_MODEL.is_file():
+    raise SystemExit(f"нет файла модели: {ONNX_MODEL}")
+
+# Results are namespaced by the input video's filename, so running against a
+# second video never overwrites the first run's results. A non-default
+# detector adds its own suffix, so an experiment cannot overwrite the numbers
+# the baseline is judged by.
+_TAG = "" if ONNX_MODEL.name == "best_512.onnx" else f"__{ONNX_MODEL.stem}"
+# A non-default square threshold makes a different run of the same model, and
+# two runs that differ only by a threshold must not land in the same folder:
+# the second would overwrite the first and the pair could not be compared.
+from lpr_recognizer import SQUARE_ASPECT_MAX as _SQ  # noqa: E402
+if abs(_SQ - 1.80) > 1e-9:
+    _TAG += f"__sq{_SQ:g}"
+RUN_DIR = ROOT.parent / "runs" / f"real_video_v18_{VIDEO_STEM}{_TAG}"
 OUT = RUN_DIR / "results_vehicle_switch_GPU.json"
 VIDEO_OUT = RUN_DIR / "result_vehicle_switch_GPU.mp4"
 

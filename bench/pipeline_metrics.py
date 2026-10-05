@@ -30,6 +30,7 @@ the metric and do not read a difference of one plate as a difference in quality.
 Usage:
     python3 bench/pipeline_metrics.py
     python3 bench/pipeline_metrics.py --videos 20260923_152319
+    python3 bench/pipeline_metrics.py --detector best11n_512
 """
 
 import argparse
@@ -40,9 +41,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 
 
-def confirmations(stem):
-    """Plates the run confirmed, in order, or None when there is no run."""
-    path = ROOT / "runs" / f"real_video_v18_{stem}" / "results_vehicle_switch_GPU.json"
+def confirmations(stem, tag=""):
+    """Plates the run confirmed, in order, or None when there is no run.
+
+    tag names a run made with a non-default detector. app/lpr_v19_universal.py
+    writes those to their own folder, so a second detector is scored without
+    overwriting the numbers the baseline is judged by.
+    """
+    path = ROOT / "runs" / f"real_video_v18_{stem}{tag}" / "results_vehicle_switch_GPU.json"
     if not path.exists():
         return None
     try:
@@ -64,7 +70,11 @@ def main():
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--videos", nargs="*", help="video names; default is all in labels.json")
     ap.add_argument("--labels", type=Path, default=ROOT / "bench" / "labels.json")
+    ap.add_argument("--detector", default="",
+                    help="stem of a non-default detector, e.g. best11n_512; "
+                         "scores the runs made with LPR_ONNX_MODEL")
     args = ap.parse_args()
+    tag = f"__{args.detector}" if args.detector else ""
 
     labels = {k: v for k, v in
               json.loads(args.labels.read_text(encoding="utf-8")).items()
@@ -80,7 +90,7 @@ def main():
         if stem not in labels:
             print(f"пропущено: {stem} нет в labels.json")
             continue
-        got = confirmations(stem)
+        got = confirmations(stem, tag)
         if got is None:
             print(f"пропущено: {stem} без сохранённого прогона")
             continue

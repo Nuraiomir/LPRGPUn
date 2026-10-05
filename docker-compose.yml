@@ -1,0 +1,36 @@
+# One service, because that is what it is: the server and both GPU workers
+# live in one process family and talk over a local socket.
+#
+#     docker compose up --build
+#
+# The host needs the NVIDIA driver and nvidia-container-toolkit. Without them
+# the container starts and the workers fail to find CUDA, which shows up in
+# the startup banner as the device rather than as a crash.
+services:
+  lpr:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: lpr-service:latest
+    container_name: lpr
+    ports:
+      - "8765:8765"
+    environment:
+      # Access keys, comma separated. Left empty, the entrypoint generates one
+      # into ./certs/api_keys.txt and prints it once.
+      LPR_API_KEYS: "${LPR_API_KEYS:-}"
+      # The name the self-signed certificate is made for. A browser reached by
+      # IP wants the IP here, not localhost.
+      LPR_CERT_CN: "${LPR_CERT_CN:-localhost}"
+    volumes:
+      # Certificate and access key. NOT mounted over /app/config: that folder
+      # holds the test vehicles and gpu_env.py, and a mount would hide both.
+      - ./certs:/certs
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    restart: unless-stopped

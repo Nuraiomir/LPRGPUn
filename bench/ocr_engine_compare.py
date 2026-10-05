@@ -152,6 +152,127 @@ def run_tesseract(samples):
     return rows, times
 
 
+# Распознаватель, развёрнутый в кластере банка и отданный через AI Gateway.
+# Говорит на языке OpenAI chat/completions: картинка уходит внутри сообщения
+# как data URL, ответ приходит обычным текстом.
+#
+# Две вещи, которые отличают его от локальных движков и которые надо помнить:
+#
+#   уверенности нет. chat/completions её не возвращает. На ней у нас держатся
+#   голосование, ранний выход 0.92 и смена машины 0.95, поэтому в колонке
+#   "conf" здесь всегда 0, и сравнивать по ней нельзя
+#
+#   время включает сеть. Это не время модели, а время запроса: сеть, очередь
+#   на шлюзе, инференс. Для решения "годится ли как живой распознаватель"
+#   важно именно оно, потому что столько и будет ждать камера
+#
+# Запрос "Free OCR." выбран не наугад: на пробе он прочитал номер, а
+# инструкция на русском вернула пустую строку. Но проба это один вырез, и на
+# сотне картина может быть другой, поэтому формулировку можно выбрать флагом.
+GATEWAY_PROMPTS = {
+    "free": "Free OCR.",
+    "plate": "Read the license plate. Answer with the plate characters only.",
+    "plate_ru": ("Прочитай номерной знак на изображении. "
+                 "В ответе только символы номера, без пояснений."),
+}
+
+# ЧЕСТНОСТЬ СРАВНЕНИЯ. Первый прогон дал шлюзу то же, что PaddleOCR: плотный
+# вырез номера, примерно 300 на 60 точек. Для PaddleOCR это ровно его вход, он
+# на таких строках и обучался. Для модели документного OCR это вход далеко за
+# пределами того, что она видела: такие модели обучают на страницах, и
+# крошечная картинка из восьми символов для них нетипична.
+#
+# То есть низкие 44 из 100 могут быть не свойством модели, а свойством того,
+# что мы ей дали. Проверяется это двумя дешёвыми способами, и оба здесь
+# флагами: увеличить вырез до привычного модели размера и поменять
+# формулировку запроса. Пока это не проверено, вывод "шлюз читает хуже"
+# держится на одном варианте входа, а не на модели.
+def _prepare_for_gateway(path, upscale_to):
+    """(байты картинки, mime). При upscale_to вырез увеличивается по ширине."""
+    raw = path.read_bytes()
+    mime = "image/png" if path.suffix.lower() == ".png" else "image/jpeg"
+    if not upscale_to:
+        return raw, mime
+
+    import cv2
+    import numpy as np
+    image = cv2.imdecode(np.frombuffer(raw, np.uint8), cv2.IMREAD_COLOR)
+    if image is None:
+        return raw, mime
+    h, w = image.shape[:2]
+    if w >= upscale_to:
+        return raw, mime
+    scale = upscale_to / w
+    # INTER_CUBIC, а не NEAREST: увеличение должно выглядеть как фотография
+    # побольше, а не как пиксельная лестница.
+    bigger = cv2.resize(image, (upscale_to, max(1, int(round(h * scale)))),
+                        interpolation=cv2.INTER_CUBIC)
+    ok, buf = cv2.imencode(".jpg", bigger, [cv2.IMWRITE_JPEG_QUALITY, 95])
+    if not ok:
+        return raw, mime
+    return buf.tobytes(), "image/jpeg"
+
+
+def run_gateway(samples, prompt_key="free", upscale_to=0):
+    key = os.environ.get("LPR_GATEWAY_KEY", "").strip()
+    base = os.environ.get("LPR_GATEWAY_URL", "").strip()
+    model = os.environ.get("LPR_GATEWAY_MODEL", "deepseek-ocr-2/deepseek-ocr-2")
+    if not key or not base:
+        print("  нужны LPR_GATEWAY_KEY и LPR_GATEWAY_URL")
+        print("  ключ задавать так, чтобы он не попал в историю команд:")
+        print('    read -s -p "ключ: " LPR_GATEWAY_KEY; export LPR_GATEWAY_KEY; echo')
+        return None
+
+    import base64
+    import urllib.error
+    import urllib.request
+
+    prompt = GATEWAY_PROMPTS[prompt_key]
+    url = base.rstrip("/") + "/chat/completions"
+    print(f"  {model} через {url}")
+    print(f"  запрос: {prompt_key} ({prompt[:50]!r})")
+    print(f"  вход: {'вырез как есть' if not upscale_to else f'увеличен до {upscale_to} точек по ширине'}")
+    rows, times, failed = [], [], 0
+    for i, (path, label) in enumerate(samples, 1):
+        raw_bytes, mime = _prepare_for_gateway(path, upscale_to)
+        body = json.dumps({
+            "model": model,
+            "messages": [{"role": "user", "content": [
+                {"type": "text", "text": prompt},
+                {"type": "image_url", "image_url": {
+                    "url": f"data:{mime};base64," + base64.b64encode(raw_bytes).decode("ascii")}},
+            ]}],
+        }).encode("utf-8")
+        req = urllib.request.Request(url, data=body, method="POST")
+        req.add_header("Authorization", f"Bearer {key}")
+        req.add_header("Content-Type", "application/json")
+
+        t0 = time.perf_counter()
+        try:
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                answer = json.loads(resp.read().decode("utf-8", "replace"))
+            text = answer["choices"][0]["message"]["content"]
+        except Exception as e:
+            # Один упавший запрос не должен обрушить весь прогон: сеть моргает,
+            # а повторять час измерений из-за одного таймаута незачем. Падения
+            # считаются и печатаются в конце.
+            text = ""
+            failed += 1
+            if failed <= 3:
+                print(f"    запрос {i} не прошёл: {type(e).__name__}")
+        ms = (time.perf_counter() - t0) * 1000.0
+        times.append(ms)
+
+        row = grade(text, label)
+        row.update({"file": path.name, "label": label, "conf": 0.0, "ms": round(ms, 1)})
+        rows.append(row)
+        if i % 25 == 0:
+            print(f"    шлюз {i}/{len(samples)}", flush=True)
+    if failed:
+        print(f"  запросов не прошло: {failed} из {len(samples)}")
+    return rows, times
+
+
 def run_paddle(samples):
     try:
         import config.gpu_env as gpu_env
@@ -186,14 +307,22 @@ def run_paddle(samples):
     return rows, times
 
 
-def report(name, rows, times):
+def report(name, model, rows, times):
+    """name  ключ запуска (paddle, tesseract, gateway)
+    model  что на самом деле читало номер, это и попадает в таблицу.
+
+    Две разные вещи, и раньше в таблице стояла первая. «gateway» это способ
+    доступа, а не распознаватель: через шлюз может стоять любая модель, и
+    строка «gateway 44/100» через месяц ничего не говорит о том, что мерили.
+    В колонке теперь имя модели, а ключ остаётся в JSON для сверки запуска.
+    """
     n = len(rows) or 1
     correct = sum(r["correct"] for r in rows)
     fmt = sum(r["format_ok"] for r in rows)
     exact = sum(r["exact"] for r in rows)
     wrong_plate = sum(1 for r in rows if r["format_ok"] and not r["correct"])
     return {
-        "engine": name, "samples": len(rows),
+        "engine": name, "model": model, "samples": len(rows),
         "correct": correct, "correct_share": round(correct / n, 4),
         "format_ok": fmt, "wrong_plate": wrong_plate,
         "exact": exact, "exact_share": round(exact / n, 4),
@@ -209,6 +338,13 @@ def main():
     ap.add_argument("--limit", type=int, default=300,
                     help="0 = вся часть; тессеракт медленный, начни с 300")
     ap.add_argument("--engines", default="paddle,tesseract")
+    ap.add_argument("--gateway-prompt", default="free",
+                    choices=sorted(GATEWAY_PROMPTS),
+                    help="формулировка запроса к шлюзу")
+    ap.add_argument("--gateway-upscale", type=int, default=0,
+                    help="увеличить вырез до N точек по ширине перед отправкой "
+                         "на шлюз. 0 = как есть. Документный OCR обучался на "
+                         "страницах, и плотный вырез номера для него нетипичен")
     # No fixed default: one shared name let a later run quietly overwrite an
     # earlier run's per-crop rows, and the two could then no longer be
     # compared. The name is built from what actually varies between runs, so
@@ -233,11 +369,31 @@ def main():
     paddle_model = os.environ.get("LPR_OCR_MODEL", "en_PP-OCRv5_mobile_rec")
     tess_data = os.environ.get("TESSDATA_PREFIX", "")
     tess_tag = Path(tess_data.rstrip("/")).name or "system"
+    gw_model = os.environ.get("LPR_GATEWAY_MODEL",
+                              "deepseek-ocr-2/deepseek-ocr-2").split("/")[-1]
+    # Ключ запуска → что этим ключом на самом деле запускается.
+    gw_label = gw_model
+    if args.gateway_prompt != "free":
+        gw_label += f"/{args.gateway_prompt}"
+    if args.gateway_upscale:
+        gw_label += f"/x{args.gateway_upscale}"
+    model_of = {
+        "paddle": paddle_model,
+        "tesseract": f"tesseract/{tess_tag}",
+        "gateway": gw_label,
+    }
     tags = []
     if "paddle" in engines:
         tags.append(paddle_model)
     if "tesseract" in engines:
         tags.append(f"tess-{tess_tag}")
+    if "gateway" in engines:
+        tag = "gw-" + gw_model
+        if args.gateway_prompt != "free":
+            tag += f"-{args.gateway_prompt}"
+        if args.gateway_upscale:
+            tag += f"-up{args.gateway_upscale}"
+        tags.append(tag)
 
     if args.out is None:
         part = f"{args.split}{len(samples)}"
@@ -250,30 +406,44 @@ def main():
         print(f"модель paddle: {paddle_model}")
     if "tesseract" in engines:
         print(f"данные tesseract: {tess_data or '(системные)'}")
+    if "gateway" in engines:
+        print(f"модель через шлюз: {gw_model}")
+        print(f"шлюз: {os.environ.get('LPR_GATEWAY_URL', '(не задан)')}")
     print(f"результат будет записан в: {args.out}\n")
 
     results, details = [], {}
     for engine in engines:
         print(f"{engine}:")
-        got = run_paddle(samples) if engine == "paddle" else run_tesseract(samples)
+        runner = {"paddle": run_paddle,
+                  "tesseract": run_tesseract,
+                  "gateway": run_gateway}.get(engine)
+        if runner is None:
+            print(f"  неизвестный движок: {engine}")
+            continue
+        if engine == "gateway":
+            got = runner(samples, prompt_key=args.gateway_prompt,
+                         upscale_to=args.gateway_upscale)
+        else:
+            got = runner(samples)
         if not got:
             continue
         rows, times = got
-        results.append(report(engine, rows, times))
+        results.append(report(engine, model_of.get(engine, engine), rows, times))
         details[engine] = rows
         print()
 
     if not results:
         raise SystemExit("ни один движок не отработал")
 
-    print("=" * 74)
+    print("=" * 88)
     print("СРАВНЕНИЕ НА ОДНОЙ И ТОЙ ЖЕ ВЫБОРКЕ")
-    print("=" * 74)
-    head = f"{'движок':<12}{'правильно':>12}{'доля':>9}{'формат':>9}{'чужой':>8}{'мс':>8}"
+    print("=" * 88)
+    head = (f"{'модель':<26}{'правильно':>12}{'доля':>9}"
+            f"{'формат':>9}{'чужой':>8}{'мс':>8}")
     print(head)
-    print("-" * 74)
+    print("-" * 88)
     for r in results:
-        print(f"{r['engine']:<12}{r['correct']:>7}/{r['samples']:<4}"
+        print(f"{r['model']:<26}{r['correct']:>7}/{r['samples']:<4}"
               f"{r['correct_share']:>9.3f}{r['format_ok']:>9}"
               f"{r['wrong_plate']:>8}{r['median_ms']:>8.0f}")
 
@@ -288,10 +458,10 @@ def main():
         a, b = results
         d = (a["correct_share"] - b["correct_share"]) * 100
         print(f"\nРазница в чтении: {abs(d):.1f} пункта в пользу "
-              f"{a['engine'] if d > 0 else b['engine']}.")
+              f"{a['model'] if d > 0 else b['model']}.")
         if b["median_ms"] and a["median_ms"]:
             slower = max(a["median_ms"], b["median_ms"]) / min(a["median_ms"], b["median_ms"])
-            slow = a["engine"] if a["median_ms"] > b["median_ms"] else b["engine"]
+            slow = a["model"] if a["median_ms"] > b["median_ms"] else b["model"]
             print(f"По скорости {slow} медленнее в {slower:.0f} раз.")
 
     args.out.parent.mkdir(parents=True, exist_ok=True)

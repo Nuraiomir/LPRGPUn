@@ -23,6 +23,7 @@ sent to OCR. The value was tuned for a 60 fps offline loop. A live camera that
 sends far fewer frames per second may need a smaller value.
 """
 
+import os
 import re
 import time
 from collections import defaultdict
@@ -31,7 +32,22 @@ from contextlib import contextmanager
 
 # Detection and plate shape
 YOLO_CONF = 0.40
-SQUARE_ASPECT_MAX = 1.80      # wider than this -> single-row plate
+
+# Wider than this -> single-row plate, narrower -> the two-row path that cuts
+# the crop in half. The value is tied to ONE detector's idea of where a plate
+# ends: measured on four videos, three different detectors all sent 34-37% of
+# their boxes down the square path, and a fourth, retrained on the same data
+# with 150 frames removed, sent 65% and found 10 vehicles of 28 instead of 25.
+# Its own box metrics were perfect (recall 1.000): it finds plates fine, it
+# just draws them taller, and this threshold then routes single-row plates
+# into the two-row path, where they are cut through the characters.
+#
+# So this constant is not a property of Kazakh plates, it is a property of the
+# detector in model/. Any replacement detector has to be checked against it,
+# and LPR_SQUARE_ASPECT_MAX exists to find the right value without editing
+# code. A pipeline that routes on box shape has this coupling by construction;
+# removing it means routing on something the detector cannot shift.
+SQUARE_ASPECT_MAX = float(os.environ.get("LPR_SQUARE_ASPECT_MAX", "1.80"))
 MIN_SQUARE_W = 130            # smaller crops are treated as single-row
 MIN_SQUARE_H = 85
 OCR_EVERY_N_DETECTIONS = 3    # square detections: OCR every Nth one

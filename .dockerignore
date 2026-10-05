@@ -1,0 +1,39 @@
+# What the build does NOT need to see. Everything here is sent to the Docker
+# daemon before the first line of the Dockerfile runs, so a forgotten entry is
+# not untidiness, it is minutes of waiting: videos/ alone is 560 MB.
+.git
+.gitignore
+.github
+
+# Virtual environments: gigabytes, and the image builds its own.
+.venv*
+**/__pycache__
+*.pyc
+
+# Measurement, not service. The image serves; the host measures.
+bench/
+tests/
+runs/
+videos/
+real_all/
+results/
+datasets*/
+training/
+
+# Secrets and machine-specific settings. The certificate and the key are made
+# by the entrypoint into a volume; config/gpu_env.py is replaced by
+# docker/gpu_env.py. Neither may be copied in by accident.
+config/gpu_env.py
+config/api_keys.txt
+config/server.key
+config/server.pem
+
+# Media and documents that have nothing to do with running the service.
+*.mp4
+*.webm
+*.avi
+*.mov
+*.docx
+*.pdf
+/index.html
+/crops/

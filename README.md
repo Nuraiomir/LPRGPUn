@@ -151,11 +151,22 @@ tools/
   smoke_ocr_worker.py    starts the real OCR worker and times it. Needs the
   smoke_gpu_pipeline.py  GPU, run by hand, deliberately not named test_* so
                          the suite does not try to collect it
+
+docker/
+  Dockerfile             the service in one image: server, both workers, the
+                         page, the detector. Not the benchmarks and not the
+                         videos: those belong to the machine that measures
+  gpu_env.py             config/gpu_env.py for the container, where there is
+                         no virtual environment and one interpreter
+  entrypoint.sh          makes the certificate and the access key on first
+                         start, into the /certs volume, never into the image
 ```
 
-**Nothing lives in the repository root** except `README.md`, `.gitignore` and
-the two requirements files. A tool belongs to `tools/`, a measurement to
-`bench/`, a test to `tests/`.
+**Four files live in the repository root**: `README.md`, `.gitignore`,
+`.dockerignore` and `docker-compose.yml`, plus the two requirements files.
+`docker-compose.yml` is there because Compose looks for it there. Everything
+else has a folder: a tool belongs to `tools/`, a measurement to `bench/`, a
+test to `tests/`.
 
 ## Environment
 
@@ -794,6 +805,58 @@ Drag that file into a Chromium window to watch it.
 Encoding runs at roughly real time: a minute of 60 fps footage takes about a
 minute, and the tool prints how far it has got every few seconds. A 300 MB
 `result_*.mp4` comes out as a handful of megabytes.
+
+## Docker
+
+The service in one image: HTTP server, both GPU workers, the scanning page and
+the detector. The benchmarks, the tests, the videos and the offline pipeline
+are deliberately left out of it, because they belong to the machine that
+measures rather than the one that serves.
+
+```bash
+docker compose up --build          # first build pulls several GB of CUDA wheels
+```
+
+Then `https://<host>:8765/demo`, with the access key the container prints once
+on first start.
+
+**The host needs the NVIDIA driver and `nvidia-container-toolkit`.** Without
+them the container starts, the workers fail to find CUDA, and the startup
+banner says so: it reports the device it actually got. That is the first line
+to read when something is wrong.
+
+Three decisions worth knowing, because each one is a place this could have
+gone wrong quietly:
+
+**The base image is `python:3.12-slim`, not an `nvidia/cuda` one.** On the GPU
+host the CUDA libraries already arrive as pip packages: `config/gpu_env.py`
+builds the library path out of `nvidia-cublas`, `nvidia-cudnn` and the rest
+inside `.venv_gpu`. The image reproduces that, so it matches an arrangement
+that is known to work instead of introducing a second, untested way of getting
+CUDA into the process.
+
+**The certificate and the access key are made at first start, into `./certs`,
+never baked into the image.** A certificate inside an image is the same
+certificate on every machine that pulls it, and a key inside an image is not a
+key. `./certs` is a volume, so both survive restarts and rebuilds. Reached by
+IP rather than by name, the certificate wants that IP: set `LPR_CERT_CN` and
+delete `certs/server.*`.
+
+**`./certs` is mounted, `/app/config` is not.** `/app/config` holds the
+invented test vehicles and the container's own `gpu_env.py`; a volume mounted
+over it would hide both, and the failure would appear as a missing module at
+worker startup rather than as anything to do with volumes.
+
+The recogniser's weights are downloaded during the build so a container can
+start on a network that allows nothing. If that build step fails the image
+still works, and the download happens once at first start instead.
+
+### What this is not
+
+One image, one container, no orchestration, no reverse proxy, no secret store,
+no log shipping, and state only in `./certs`. It is the prototype packaged so
+it can be run somewhere other than one laptop. A production deployment is the
+architecture in the section above, and it is a different piece of work.
 
 ## Known limitations
 
