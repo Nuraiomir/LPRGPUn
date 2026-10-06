@@ -1,0 +1,73 @@
+# The suite on every push, so a change that breaks the recognition rules is
+# caught by the repository rather than by the next person to run a video.
+#
+# GitHub's runners have no GPU, which is exactly why this can exist: the tests
+# replace both workers with stand-ins and drive the real recognition logic,
+# the real HTTP server and the real voting. What they cannot cover is the GPU
+# path itself, and tools/preflight.py is what covers that, by hand, on the
+# machine that has one.
+#
+# Only the tests' own dependencies are installed. The GPU builds in
+# requirements.txt are large and would not be used here.
+
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  suite:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install what the tests import
+        run: |
+          python -m pip install --upgrade pip
+          # opencv-python-headless: the runner has no display, and the tests
+          # only ever encode and decode, never show a window.
+          pip install opencv-python-headless numpy requests
+
+      - name: Run the suite
+        run: |
+          failed=0
+          for t in tests/test_*.py; do
+            printf '%-44s' "$t"
+            if python "$t" > /tmp/out.txt 2>&1; then
+              echo "OK"
+            else
+              echo "FAILED"
+              tail -20 /tmp/out.txt
+              failed=1
+            fi
+          done
+          exit $failed
+
+      - name: Every file still parses
+        run: python -m compileall -q app bench client tools workers tests
+
+      - name: The README names files that exist
+        run: |
+          python - <<'PY'
+          import re, subprocess, sys
+          readme = open("README.md", encoding="utf-8").read()
+          tracked = set(subprocess.run(["git", "ls-files"],
+                                       capture_output=True, text=True).stdout.split())
+          # Placeholders in usage examples, and the file you create by copying
+          # the example, are named on purpose and do not exist in the tree.
+          allowed = {"A.json", "B.json", "gpu_env.py", "config/gpu_env.py"}
+          named = set(re.findall(r"(?:[\w-]+/)*[\w.-]+\.(?:py|html|json|onnx)\b", readme)) - allowed
+          missing = [n for n in sorted(named)
+                     if not any(t == n or t.endswith("/" + n) for t in tracked)]
+          if missing:
+              print("README names files that are not in the repository:")
+              for n in missing:
+                  print("   ", n)
+              sys.exit(1)
+          print(f"{len(named)} names checked, all present")
+          PY

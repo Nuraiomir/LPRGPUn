@@ -1,0 +1,4000 @@
+{
+  "benchmark": "real_video_yolo11_paddle_vs_deepseek",
+  "video": "/home/omirzakn/nurai_gpu/videos/20260909_171120.mp4",
+  "video_name": "20260909_171120.mp4",
+  "yolo_model": "/home/omirzakn/nurai_gpu/model/best11n_512.onnx",
+  "yolo_worker": "/home/omirzakn/nurai_gpu/workers/yolo_gpu_worker.py",
+  "frame_step": 6,
+  "video_fps": 60.0021483046296,
+  "video_total_frames": 931,
+  "processed_frames": 155,
+  "detected_frames": 129,
+  "elapsed_wall_sec": 51.49023734219372,
+  "ocr_backend": {
+    "paddle": {
+      "model": "en_PP-OCRv5_mobile_rec",
+      "device": "gpu:0"
+    },
+    "deepseek": {
+      "gateway": "https://test-mlops-ai-gateway.apps.prod.aida.bcc.kz/v1",
+      "model": "deepseek-ocr-2/deepseek-ocr-2"
+    }
+  },
+  "rows": [
+    {
+      "frame_id": 0,
+      "timestamp_sec": 0.0,
+      "det": {
+        "x1": 1047.0,
+        "y1": 413.0,
+        "x2": 2322.0,
+        "y2": 726.0,
+        "confidence": 0.9197888374328613
+      },
+      "crop_shape": [
+        1275,
+        313
+      ],
+      "yolo_ms": 25.34129796549678,
+      "yolo_roundtrip_ms": 69.25539998337626,
+      "paddle": {
+        "text": "545BDR05",
+        "confidence": 0.9693735241889954,
+        "latency_ms": 246.4376757852733,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 469.23031099140644,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 6,
+      "timestamp_sec": 0.09999641962047977,
+      "det": {
+        "x1": 1034.0,
+        "y1": 357.0,
+        "x2": 2347.0,
+        "y2": 695.0,
+        "confidence": 0.9201304912567139
+      },
+      "crop_shape": [
+        1313,
+        338
+      ],
+      "yolo_ms": 22.062984760850668,
+      "yolo_roundtrip_ms": 65.8863759599626,
+      "paddle": {
+        "text": "545BDR05",
+        "confidence": 0.9273166656494141,
+        "latency_ms": 3.8633719086647034,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 404.0639791637659,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 12,
+      "timestamp_sec": 0.19999283924095954,
+      "det": {
+        "x1": 1030.0,
+        "y1": 310.0,
+        "x2": 2374.0,
+        "y2": 627.0,
+        "confidence": 0.917372465133667
+      },
+      "crop_shape": [
+        1344,
+        317
+      ],
+      "yolo_ms": 19.324836786836386,
+      "yolo_roundtrip_ms": 50.19851494580507,
+      "paddle": {
+        "text": "545BDR05",
+        "confidence": 0.9595613479614258,
+        "latency_ms": 3.864305093884468,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 361.18624499067664,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 18,
+      "timestamp_sec": 0.2999892588614393,
+      "det": {
+        "x1": 1022.0,
+        "y1": 222.0,
+        "x2": 2409.0,
+        "y2": 580.0,
+        "confidence": 0.9126939177513123
+      },
+      "crop_shape": [
+        1387,
+        358
+      ],
+      "yolo_ms": 19.418573938310146,
+      "yolo_roundtrip_ms": 44.327398762106895,
+      "paddle": {
+        "text": "545BDR05",
+        "confidence": 0.9852194786071777,
+        "latency_ms": 4.052558448165655,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 399.2255129851401,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 24,
+      "timestamp_sec": 0.39998567848191907,
+      "det": {
+        "x1": 1014.0,
+        "y1": 127.0,
+        "x2": 2430.0,
+        "y2": 483.0,
+        "confidence": 0.923677921295166
+      },
+      "crop_shape": [
+        1416,
+        356
+      ],
+      "yolo_ms": 21.614252123981714,
+      "yolo_roundtrip_ms": 52.63805203139782,
+      "paddle": {
+        "text": "545BDR05",
+        "confidence": 0.9945831298828125,
+        "latency_ms": 3.8368329405784607,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 339.6370052359998,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 30,
+      "timestamp_sec": 0.49998209810239885,
+      "det": {
+        "x1": 1008.0,
+        "y1": 4.0,
+        "x2": 2460.0,
+        "y2": 369.0,
+        "confidence": 0.9301780462265015
+      },
+      "crop_shape": [
+        1452,
+        365
+      ],
+      "yolo_ms": 21.14286506548524,
+      "yolo_roundtrip_ms": 64.45257132872939,
+      "paddle": {
+        "text": "545BDR05",
+        "confidence": 0.9913160800933838,
+        "latency_ms": 5.018624011427164,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 341.2965349853039,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 36,
+      "timestamp_sec": 0.5999785177228786,
+      "det": {
+        "x1": 1023.0,
+        "y1": 0.0,
+        "x2": 2473.0,
+        "y2": 315.0,
+        "confidence": 0.8422154784202576
+      },
+      "crop_shape": [
+        1450,
+        315
+      ],
+      "yolo_ms": 21.066853310912848,
+      "yolo_roundtrip_ms": 64.91103302687407,
+      "paddle": {
+        "text": "K2545 BDR05",
+        "confidence": 0.8224595785140991,
+        "latency_ms": 4.843985196202993,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 368.63706167787313,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 42,
+      "timestamp_sec": 0.6999749373433584,
+      "det": {
+        "x1": 993.0,
+        "y1": 0.0,
+        "x2": 2483.0,
+        "y2": 342.0,
+        "confidence": 0.8508056402206421
+      },
+      "crop_shape": [
+        1490,
+        342
+      ],
+      "yolo_ms": 21.13601192831993,
+      "yolo_roundtrip_ms": 65.1111388579011,
+      "paddle": {
+        "text": "2545BDR05",
+        "confidence": 0.9319331049919128,
+        "latency_ms": 3.6264266818761826,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 339.1441898420453,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 48,
+      "timestamp_sec": 0.7999713569638381,
+      "det": {
+        "x1": 992.0,
+        "y1": 4.0,
+        "x2": 2487.0,
+        "y2": 377.0,
+        "confidence": 0.9194344282150269
+      },
+      "crop_shape": [
+        1495,
+        373
+      ],
+      "yolo_ms": 21.542156115174294,
+      "yolo_roundtrip_ms": 53.53931616991758,
+      "paddle": {
+        "text": "545BDR05",
+        "confidence": 0.992906391620636,
+        "latency_ms": 3.8657067343592644,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 354.3483498506248,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 54,
+      "timestamp_sec": 0.8999677765843179,
+      "det": {
+        "x1": 987.0,
+        "y1": 89.0,
+        "x2": 2492.0,
+        "y2": 462.0,
+        "confidence": 0.9136753082275391
+      },
+      "crop_shape": [
+        1505,
+        373
+      ],
+      "yolo_ms": 19.64418776333332,
+      "yolo_roundtrip_ms": 49.553151708096266,
+      "paddle": {
+        "text": "545BDR05",
+        "confidence": 0.9887374043464661,
+        "latency_ms": 3.9160619489848614,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 339.5965788513422,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 60,
+      "timestamp_sec": 0.9999641962047977,
+      "det": {
+        "x1": 962.0,
+        "y1": 192.0,
+        "x2": 2495.0,
+        "y2": 564.0,
+        "confidence": 0.8838392496109009
+      },
+      "crop_shape": [
+        1533,
+        372
+      ],
+      "yolo_ms": 19.544510636478662,
+      "yolo_roundtrip_ms": 48.406846821308136,
+      "paddle": {
+        "text": "Z545BDR05",
+        "confidence": 0.9123554229736328,
+        "latency_ms": 3.8530929014086723,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 330.3067455999553,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 66,
+      "timestamp_sec": 1.0999606158252775,
+      "det": {
+        "x1": 946.0,
+        "y1": 277.0,
+        "x2": 2495.0,
+        "y2": 659.0,
+        "confidence": 0.9094919562339783
+      },
+      "crop_shape": [
+        1549,
+        382
+      ],
+      "yolo_ms": 19.918182864785194,
+      "yolo_roundtrip_ms": 48.756333999335766,
+      "paddle": {
+        "text": "545BDR05",
+        "confidence": 0.9686272144317627,
+        "latency_ms": 3.9024963043630123,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 339.88854894414544,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 72,
+      "timestamp_sec": 1.1999570354457572,
+      "det": {
+        "x1": 927.0,
+        "y1": 373.0,
+        "x2": 2501.0,
+        "y2": 745.0,
+        "confidence": 0.9286462068557739
+      },
+      "crop_shape": [
+        1574,
+        372
+      ],
+      "yolo_ms": 18.764755222946405,
+      "yolo_roundtrip_ms": 42.56058810278773,
+      "paddle": {
+        "text": "545BDR05",
+        "confidence": 0.9889870285987854,
+        "latency_ms": 3.8325446657836437,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 346.4217302389443,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 78,
+      "timestamp_sec": 1.299953455066237,
+      "det": {
+        "x1": 911.0,
+        "y1": 457.0,
+        "x2": 2507.0,
+        "y2": 837.0,
+        "confidence": 0.9132529497146606
+      },
+      "crop_shape": [
+        1596,
+        380
+      ],
+      "yolo_ms": 20.17970383167267,
+      "yolo_roundtrip_ms": 71.41047110781074,
+      "paddle": {
+        "text": "Z545BDR05",
+        "confidence": 0.9153229594230652,
+        "latency_ms": 3.4317709505558014,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 350.4827041178942,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 84,
+      "timestamp_sec": 1.3999498746867167,
+      "det": {
+        "x1": 915.0,
+        "y1": 519.0,
+        "x2": 2521.0,
+        "y2": 902.0,
+        "confidence": 0.8946048617362976
+      },
+      "crop_shape": [
+        1606,
+        383
+      ],
+      "yolo_ms": 19.9583787471056,
+      "yolo_roundtrip_ms": 62.17670161277056,
+      "paddle": {
+        "text": "545BDR05",
+        "confidence": 0.9947510957717896,
+        "latency_ms": 3.3690128475427628,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 397.97351881861687,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 90,
+      "timestamp_sec": 1.4999462943071964,
+      "det": {
+        "x1": 903.0,
+        "y1": 578.0,
+        "x2": 2528.0,
+        "y2": 962.0,
+        "confidence": 0.9150036573410034
+      },
+      "crop_shape": [
+        1625,
+        384
+      ],
+      "yolo_ms": 21.373439114540815,
+      "yolo_roundtrip_ms": 63.45863314345479,
+      "paddle": {
+        "text": "545 BDR05",
+        "confidence": 0.9355785846710205,
+        "latency_ms": 3.4342361614108086,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 397.12820993736386,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 96,
+      "timestamp_sec": 1.5999427139276763,
+      "det": {
+        "x1": 906.0,
+        "y1": 634.0,
+        "x2": 2543.0,
+        "y2": 1005.0,
+        "confidence": 0.916029691696167
+      },
+      "crop_shape": [
+        1637,
+        371
+      ],
+      "yolo_ms": 21.048738155514002,
+      "yolo_roundtrip_ms": 56.2495207414031,
+      "paddle": {
+        "text": "545 BDR05",
+        "confidence": 0.9567417502403259,
+        "latency_ms": 3.8262628950178623,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 372.0094012096524,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 102,
+      "timestamp_sec": 1.699939133548156,
+      "det": {
+        "x1": 915.0,
+        "y1": 669.0,
+        "x2": 2562.0,
+        "y2": 1045.0,
+        "confidence": 0.9061720371246338
+      },
+      "crop_shape": [
+        1647,
+        376
+      ],
+      "yolo_ms": 20.972263999283314,
+      "yolo_roundtrip_ms": 67.23331799730659,
+      "paddle": {
+        "text": "K545BDR05",
+        "confidence": 0.9424852728843689,
+        "latency_ms": 3.4439540468156338,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 361.1691128462553,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 108,
+      "timestamp_sec": 1.7999355531686358,
+      "det": {
+        "x1": 910.0,
+        "y1": 699.0,
+        "x2": 2586.0,
+        "y2": 1085.0,
+        "confidence": 0.9271033406257629
+      },
+      "crop_shape": [
+        1676,
+        386
+      ],
+      "yolo_ms": 21.11275866627693,
+      "yolo_roundtrip_ms": 62.723079696297646,
+      "paddle": {
+        "text": "545BDR05",
+        "confidence": 0.9815349578857422,
+        "latency_ms": 3.4434632398188114,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 450.752736069262,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 114,
+      "timestamp_sec": 1.8999319727891155,
+      "det": {
+        "x1": 918.0,
+        "y1": 719.0,
+        "x2": 2598.0,
+        "y2": 1103.0,
+        "confidence": 0.9339069128036499
+      },
+      "crop_shape": [
+        1680,
+        384
+      ],
+      "yolo_ms": 21.431358065456152,
+      "yolo_roundtrip_ms": 64.40096395090222,
+      "paddle": {
+        "text": "545BDR05",
+        "confidence": 0.9891170859336853,
+        "latency_ms": 4.821393173187971,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 336.76552679389715,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 120,
+      "timestamp_sec": 1.9999283924095954,
+      "det": {
+        "x1": 923.0,
+        "y1": 729.0,
+        "x2": 2613.0,
+        "y2": 1099.0,
+        "confidence": 0.9287325739860535
+      },
+      "crop_shape": [
+        1690,
+        370
+      ],
+      "yolo_ms": 21.28263795748353,
+      "yolo_roundtrip_ms": 63.27345501631498,
+      "paddle": {
+        "text": "2545BDR05",
+        "confidence": 0.9158724546432495,
+        "latency_ms": 5.009287036955357,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 405.1376059651375,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 126,
+      "timestamp_sec": 2.099924812030075,
+      "det": {
+        "x1": 936.0,
+        "y1": 734.0,
+        "x2": 2622.0,
+        "y2": 1114.0,
+        "confidence": 0.9153589010238647
+      },
+      "crop_shape": [
+        1686,
+        380
+      ],
+      "yolo_ms": 20.9428402595222,
+      "yolo_roundtrip_ms": 63.438573852181435,
+      "paddle": {
+        "text": "545BDR05",
+        "confidence": 0.9878979921340942,
+        "latency_ms": 4.805092699825764,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 411.85025591403246,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 132,
+      "timestamp_sec": 2.199921231650555,
+      "det": {
+        "x1": 945.0,
+        "y1": 744.0,
+        "x2": 2634.0,
+        "y2": 1129.0,
+        "confidence": 0.8986697196960449
+      },
+      "crop_shape": [
+        1689,
+        385
+      ],
+      "yolo_ms": 21.075387950986624,
+      "yolo_roundtrip_ms": 61.43505917862058,
+      "paddle": {
+        "text": "545BDR05",
+        "confidence": 0.9883220195770264,
+        "latency_ms": 3.9177839644253254,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 348.1449792161584,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 138,
+      "timestamp_sec": 2.2999176512710346,
+      "det": {
+        "x1": 950.0,
+        "y1": 746.0,
+        "x2": 2643.0,
+        "y2": 1141.0,
+        "confidence": 0.8863977193832397
+      },
+      "crop_shape": [
+        1693,
+        395
+      ],
+      "yolo_ms": 21.01263962686062,
+      "yolo_roundtrip_ms": 66.42250390723348,
+      "paddle": {
+        "text": "545BDR05",
+        "confidence": 0.9915446639060974,
+        "latency_ms": 3.3892011269927025,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 359.74772088229656,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 144,
+      "timestamp_sec": 2.3999140708915143,
+      "det": {
+        "x1": 964.0,
+        "y1": 749.0,
+        "x2": 2646.0,
+        "y2": 1129.0,
+        "confidence": 0.9010530710220337
+      },
+      "crop_shape": [
+        1682,
+        380
+      ],
+      "yolo_ms": 21.77681727334857,
+      "yolo_roundtrip_ms": 45.860650949180126,
+      "paddle": {
+        "text": "K545BDR05",
+        "confidence": 0.9283373951911926,
+        "latency_ms": 3.90592310577631,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 335.6092139147222,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 150,
+      "timestamp_sec": 2.499910490511994,
+      "det": {
+        "x1": 973.0,
+        "y1": 755.0,
+        "x2": 2649.0,
+        "y2": 1152.0,
+        "confidence": 0.8768610954284668
+      },
+      "crop_shape": [
+        1676,
+        397
+      ],
+      "yolo_ms": 20.90810379013419,
+      "yolo_roundtrip_ms": 62.4951021745801,
+      "paddle": {
+        "text": "545BDR05",
+        "confidence": 0.9876197576522827,
+        "latency_ms": 4.95136808604002,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 344.09897308796644,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 156,
+      "timestamp_sec": 2.599906910132474,
+      "det": {
+        "x1": 998.0,
+        "y1": 760.0,
+        "x2": 2651.0,
+        "y2": 1149.0,
+        "confidence": 0.8997061848640442
+      },
+      "crop_shape": [
+        1653,
+        389
+      ],
+      "yolo_ms": 18.94618570804596,
+      "yolo_roundtrip_ms": 42.26148501038551,
+      "paddle": {
+        "text": "545BDR05",
+        "confidence": 0.9910198450088501,
+        "latency_ms": 3.858312964439392,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 356.47677164524794,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 162,
+      "timestamp_sec": 2.6999033297529538,
+      "det": {
+        "x1": 1015.0,
+        "y1": 774.0,
+        "x2": 2651.0,
+        "y2": 1146.0,
+        "confidence": 0.9101997017860413
+      },
+      "crop_shape": [
+        1636,
+        372
+      ],
+      "yolo_ms": 19.18891305103898,
+      "yolo_roundtrip_ms": 48.00048377364874,
+      "paddle": {
+        "text": "545BDR05",
+        "confidence": 0.988500714302063,
+        "latency_ms": 3.83348623290658,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 353.89793384820223,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 168,
+      "timestamp_sec": 2.7998997493734334,
+      "det": {
+        "x1": 1023.0,
+        "y1": 795.0,
+        "x2": 2633.0,
+        "y2": 1170.0,
+        "confidence": 0.8944293260574341
+      },
+      "crop_shape": [
+        1610,
+        375
+      ],
+      "yolo_ms": 20.531696267426014,
+      "yolo_roundtrip_ms": 52.26458003744483,
+      "paddle": {
+        "text": "545BDR05",
+        "confidence": 0.9812262058258057,
+        "latency_ms": 3.8179466500878334,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 383.3678928203881,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 174,
+      "timestamp_sec": 2.899896168993913,
+      "det": {
+        "x1": 1009.0,
+        "y1": 791.0,
+        "x2": 2586.0,
+        "y2": 1164.0,
+        "confidence": 0.8786023855209351
+      },
+      "crop_shape": [
+        1577,
+        373
+      ],
+      "yolo_ms": 19.43534566089511,
+      "yolo_roundtrip_ms": 47.3773218691349,
+      "paddle": {
+        "text": "545BDR05",
+        "confidence": 0.9808547496795654,
+        "latency_ms": 3.8536852225661278,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 339.9351560510695,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 180,
+      "timestamp_sec": 2.999892588614393,
+      "det": {
+        "x1": 930.0,
+        "y1": 792.0,
+        "x2": 2489.0,
+        "y2": 1174.0,
+        "confidence": 0.8889796137809753
+      },
+      "crop_shape": [
+        1559,
+        382
+      ],
+      "yolo_ms": 20.50383435562253,
+      "yolo_roundtrip_ms": 63.30903200432658,
+      "paddle": {
+        "text": "545BDR05",
+        "confidence": 0.9898722171783447,
+        "latency_ms": 3.8126371800899506,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 350.99795181304216,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 186,
+      "timestamp_sec": 3.099889008234873,
+      "det": {
+        "x1": 815.0,
+        "y1": 778.0,
+        "x2": 2362.0,
+        "y2": 1192.0,
+        "confidence": 0.8654047846794128
+      },
+      "crop_shape": [
+        1547,
+        414
+      ],
+      "yolo_ms": 19.130040891468525,
+      "yolo_roundtrip_ms": 62.72150715813041,
+      "paddle": {
+        "text": "545BDR05",
+        "confidence": 0.9833296537399292,
+        "latency_ms": 3.8616489619016647,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 367.72774206474423,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 192,
+      "timestamp_sec": 3.1998854278553526,
+      "det": {
+        "x1": 674.0,
+        "y1": 783.0,
+        "x2": 2208.0,
+        "y2": 1204.0,
+        "confidence": 0.8712065815925598
+      },
+      "crop_shape": [
+        1534,
+        421
+      ],
+      "yolo_ms": 18.888287246227264,
+      "yolo_roundtrip_ms": 59.364966582506895,
+      "paddle": {
+        "text": "545BDR05",
+        "confidence": 0.9770323038101196,
+        "latency_ms": 3.31659521907568,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 386.4733409136534,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 198,
+      "timestamp_sec": 3.2998818474758322,
+      "det": {
+        "x1": 485.0,
+        "y1": 779.0,
+        "x2": 1997.0,
+        "y2": 1239.0,
+        "confidence": 0.8613443374633789
+      },
+      "crop_shape": [
+        1512,
+        460
+      ],
+      "yolo_ms": 19.24492698162794,
+      "yolo_roundtrip_ms": 47.76599304750562,
+      "paddle": {
+        "text": "545BDR05",
+        "confidence": 0.982450544834137,
+        "latency_ms": 3.8639730773866177,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 350.75058694928885,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 204,
+      "timestamp_sec": 3.399878267096312,
+      "det": {
+        "x1": 217.0,
+        "y1": 789.0,
+        "x2": 1762.0,
+        "y2": 1292.0,
+        "confidence": 0.8225301504135132
+      },
+      "crop_shape": [
+        1545,
+        503
+      ],
+      "yolo_ms": 19.028760958462954,
+      "yolo_roundtrip_ms": 65.5637988820672,
+      "paddle": {
+        "text": "545BDR05",
+        "confidence": 0.9801684617996216,
+        "latency_ms": 3.3614691346883774,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 304.3976309709251,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 210,
+      "timestamp_sec": 3.4998746867167916,
+      "det": {
+        "x1": 0.0,
+        "y1": 828.0,
+        "x2": 1523.0,
+        "y2": 1359.0,
+        "confidence": 0.8005322217941284
+      },
+      "crop_shape": [
+        1523,
+        531
+      ],
+      "yolo_ms": 19.15480801835656,
+      "yolo_roundtrip_ms": 62.52747215330601,
+      "paddle": {
+        "text": "545BDR05",
+        "confidence": 0.9824541211128235,
+        "latency_ms": 3.4219427034258842,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 354.8967419192195,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 216,
+      "timestamp_sec": 3.5998711063372717,
+      "det": null,
+      "yolo_ms": 19.85494513064623,
+      "yolo_roundtrip_ms": 65.45470515266061,
+      "paddle": null,
+      "deepseek": null
+    },
+    {
+      "frame_id": 222,
+      "timestamp_sec": 3.6998675259577514,
+      "det": null,
+      "yolo_ms": 19.476962741464376,
+      "yolo_roundtrip_ms": 64.36577765271068,
+      "paddle": null,
+      "deepseek": null
+    },
+    {
+      "frame_id": 228,
+      "timestamp_sec": 3.799863945578231,
+      "det": null,
+      "yolo_ms": 18.91533797606826,
+      "yolo_roundtrip_ms": 62.384492717683315,
+      "paddle": null,
+      "deepseek": null
+    },
+    {
+      "frame_id": 234,
+      "timestamp_sec": 3.8998603651987107,
+      "det": null,
+      "yolo_ms": 19.422832410782576,
+      "yolo_roundtrip_ms": 69.02877427637577,
+      "paddle": null,
+      "deepseek": null
+    },
+    {
+      "frame_id": 240,
+      "timestamp_sec": 3.999856784819191,
+      "det": null,
+      "yolo_ms": 20.217314828187227,
+      "yolo_roundtrip_ms": 75.93303313478827,
+      "paddle": null,
+      "deepseek": null
+    },
+    {
+      "frame_id": 246,
+      "timestamp_sec": 4.09985320443967,
+      "det": null,
+      "yolo_ms": 18.903765827417374,
+      "yolo_roundtrip_ms": 63.28667886555195,
+      "paddle": null,
+      "deepseek": null
+    },
+    {
+      "frame_id": 252,
+      "timestamp_sec": 4.19984962406015,
+      "det": null,
+      "yolo_ms": 20.821901969611645,
+      "yolo_roundtrip_ms": 77.98959873616695,
+      "paddle": null,
+      "deepseek": null
+    },
+    {
+      "frame_id": 258,
+      "timestamp_sec": 4.29984604368063,
+      "det": {
+        "x1": 3045.0,
+        "y1": 0.0,
+        "x2": 3375.0,
+        "y2": 273.0,
+        "confidence": 0.5990089774131775
+      },
+      "crop_shape": [
+        330,
+        273
+      ],
+      "yolo_ms": 19.690806046128273,
+      "yolo_roundtrip_ms": 74.03105683624744,
+      "paddle": {
+        "text": "2BBT",
+        "confidence": 0.8279483318328857,
+        "latency_ms": 3.5466672852635384,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 149.1588749922812,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 264,
+      "timestamp_sec": 4.39984246330111,
+      "det": null,
+      "yolo_ms": 19.772137980908155,
+      "yolo_roundtrip_ms": 48.96724130958319,
+      "paddle": null,
+      "deepseek": null
+    },
+    {
+      "frame_id": 270,
+      "timestamp_sec": 4.49983888292159,
+      "det": null,
+      "yolo_ms": 19.912010990083218,
+      "yolo_roundtrip_ms": 69.45475516840816,
+      "paddle": null,
+      "deepseek": null
+    },
+    {
+      "frame_id": 276,
+      "timestamp_sec": 4.599835302542069,
+      "det": {
+        "x1": 2588.0,
+        "y1": 0.0,
+        "x2": 2935.0,
+        "y2": 360.0,
+        "confidence": 0.48027467727661133
+      },
+      "crop_shape": [
+        347,
+        360
+      ],
+      "yolo_ms": 19.208157900720835,
+      "yolo_roundtrip_ms": 71.38982228934765,
+      "paddle": {
+        "text": "2 BBT",
+        "confidence": 0.780799150466919,
+        "latency_ms": 4.764486104249954,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 149.26388300955296,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 282,
+      "timestamp_sec": 4.699831722162549,
+      "det": null,
+      "yolo_ms": 19.392183981835842,
+      "yolo_roundtrip_ms": 54.77706156671047,
+      "paddle": null,
+      "deepseek": null
+    },
+    {
+      "frame_id": 288,
+      "timestamp_sec": 4.799828141783029,
+      "det": {
+        "x1": 3688.0,
+        "y1": 8.0,
+        "x2": 3840.0,
+        "y2": 166.0,
+        "confidence": 0.8011561036109924
+      },
+      "crop_shape": [
+        152,
+        158
+      ],
+      "yolo_ms": 19.06317612156272,
+      "yolo_roundtrip_ms": 59.2870912514627,
+      "paddle": {
+        "text": "MITSU",
+        "confidence": 0.9913692474365234,
+        "latency_ms": 3.8479729555547237,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 140.44676907360554,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 294,
+      "timestamp_sec": 4.899824561403508,
+      "det": {
+        "x1": 3584.0,
+        "y1": 64.0,
+        "x2": 3840.0,
+        "y2": 237.0,
+        "confidence": 0.8563684225082397
+      },
+      "crop_shape": [
+        256,
+        173
+      ],
+      "yolo_ms": 20.548378117382526,
+      "yolo_roundtrip_ms": 52.31042578816414,
+      "paddle": {
+        "text": "MITSUBISH",
+        "confidence": 0.7831050157546997,
+        "latency_ms": 3.7806369364261627,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 136.15606306120753,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 300,
+      "timestamp_sec": 4.999820981023988,
+      "det": {
+        "x1": 3492.0,
+        "y1": 127.0,
+        "x2": 3773.0,
+        "y2": 316.0,
+        "confidence": 0.9355493783950806
+      },
+      "crop_shape": [
+        281,
+        189
+      ],
+      "yolo_ms": 19.640620797872543,
+      "yolo_roundtrip_ms": 68.15607333555818,
+      "paddle": {
+        "text": "MITSBISHI",
+        "confidence": 0.8454186916351318,
+        "latency_ms": 4.721275996416807,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 139.55753715708852,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 306,
+      "timestamp_sec": 5.099817400644468,
+      "det": {
+        "x1": 3413.0,
+        "y1": 193.0,
+        "x2": 3703.0,
+        "y2": 384.0,
+        "confidence": 0.9010193943977356
+      },
+      "crop_shape": [
+        290,
+        191
+      ],
+      "yolo_ms": 19.590476993471384,
+      "yolo_roundtrip_ms": 48.97921299561858,
+      "paddle": {
+        "text": "MITSUBISHI",
+        "confidence": 0.8181420564651489,
+        "latency_ms": 3.8333958946168423,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 147.0547909848392,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 312,
+      "timestamp_sec": 5.199813820264948,
+      "det": {
+        "x1": 3346.0,
+        "y1": 249.0,
+        "x2": 3651.0,
+        "y2": 446.0,
+        "confidence": 0.8927532434463501
+      },
+      "crop_shape": [
+        305,
+        197
+      ],
+      "yolo_ms": 21.66204061359167,
+      "yolo_roundtrip_ms": 87.60994300246239,
+      "paddle": {
+        "text": "MITSBISH!",
+        "confidence": 0.8636985421180725,
+        "latency_ms": 4.743877798318863,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 152.0581957884133,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 318,
+      "timestamp_sec": 5.299810239885428,
+      "det": {
+        "x1": 3286.0,
+        "y1": 288.0,
+        "x2": 3605.0,
+        "y2": 491.0,
+        "confidence": 0.8838356733322144
+      },
+      "crop_shape": [
+        319,
+        203
+      ],
+      "yolo_ms": 21.389609202742577,
+      "yolo_roundtrip_ms": 68.80797864869237,
+      "paddle": {
+        "text": "MITSUBISH!",
+        "confidence": 0.823436439037323,
+        "latency_ms": 3.3301101066172123,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 141.53891103342175,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 324,
+      "timestamp_sec": 5.3998066595059075,
+      "det": {
+        "x1": 3241.0,
+        "y1": 313.0,
+        "x2": 3582.0,
+        "y2": 528.0,
+        "confidence": 0.890677809715271
+      },
+      "crop_shape": [
+        341,
+        215
+      ],
+      "yolo_ms": 21.130753215402365,
+      "yolo_roundtrip_ms": 66.68879510834813,
+      "paddle": {
+        "text": "MITSUBISH!",
+        "confidence": 0.931182861328125,
+        "latency_ms": 4.781869240105152,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 144.38043301925063,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 330,
+      "timestamp_sec": 5.499803079126387,
+      "det": {
+        "x1": 3196.0,
+        "y1": 353.0,
+        "x2": 3554.0,
+        "y2": 573.0,
+        "confidence": 0.889421820640564
+      },
+      "crop_shape": [
+        358,
+        220
+      ],
+      "yolo_ms": 21.223175805062056,
+      "yolo_roundtrip_ms": 65.8258618786931,
+      "paddle": {
+        "text": "MITSUBISH",
+        "confidence": 0.8682587146759033,
+        "latency_ms": 3.4419111907482147,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 143.73009093105793,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 336,
+      "timestamp_sec": 5.599799498746867,
+      "det": {
+        "x1": 3157.0,
+        "y1": 399.0,
+        "x2": 3547.0,
+        "y2": 638.0,
+        "confidence": 0.8678988218307495
+      },
+      "crop_shape": [
+        390,
+        239
+      ],
+      "yolo_ms": 21.757951006293297,
+      "yolo_roundtrip_ms": 48.864788841456175,
+      "paddle": {
+        "text": "MITSUBISHI",
+        "confidence": 0.8765305280685425,
+        "latency_ms": 3.812375944107771,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 143.60784087330103,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 342,
+      "timestamp_sec": 5.699795918367347,
+      "det": {
+        "x1": 3137.0,
+        "y1": 452.0,
+        "x2": 3549.0,
+        "y2": 700.0,
+        "confidence": 0.8969995975494385
+      },
+      "crop_shape": [
+        412,
+        248
+      ],
+      "yolo_ms": 20.980841014534235,
+      "yolo_roundtrip_ms": 62.498817685991526,
+      "paddle": {
+        "text": "MITSUBISHI",
+        "confidence": 0.893048882484436,
+        "latency_ms": 3.87955317273736,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 125.69366488605738,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 348,
+      "timestamp_sec": 5.799792337987826,
+      "det": {
+        "x1": 3132.0,
+        "y1": 501.0,
+        "x2": 3563.0,
+        "y2": 761.0,
+        "confidence": 0.8471889495849609
+      },
+      "crop_shape": [
+        431,
+        260
+      ],
+      "yolo_ms": 20.899987779557705,
+      "yolo_roundtrip_ms": 52.821577060967684,
+      "paddle": {
+        "text": "MITSUISHI",
+        "confidence": 0.9054829478263855,
+        "latency_ms": 3.9321323856711388,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 144.81703424826264,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 354,
+      "timestamp_sec": 5.899788757608306,
+      "det": {
+        "x1": 3149.0,
+        "y1": 545.0,
+        "x2": 3612.0,
+        "y2": 815.0,
+        "confidence": 0.9016443490982056
+      },
+      "crop_shape": [
+        463,
+        270
+      ],
+      "yolo_ms": 21.133869420737028,
+      "yolo_roundtrip_ms": 53.043654188513756,
+      "paddle": {
+        "text": "MITSUISHI",
+        "confidence": 0.8749167323112488,
+        "latency_ms": 3.8357400335371494,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 143.12870986759663,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 360,
+      "timestamp_sec": 5.999785177228786,
+      "det": {
+        "x1": 3187.0,
+        "y1": 571.0,
+        "x2": 3679.0,
+        "y2": 847.0,
+        "confidence": 0.8823845386505127
+      },
+      "crop_shape": [
+        492,
+        276
+      ],
+      "yolo_ms": 22.670617792755365,
+      "yolo_roundtrip_ms": 55.61152100563049,
+      "paddle": {
+        "text": "MITSUBISSHI",
+        "confidence": 0.9110771417617798,
+        "latency_ms": 3.815742675215006,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 149.81599198654294,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 366,
+      "timestamp_sec": 6.099781596849265,
+      "det": {
+        "x1": 3256.0,
+        "y1": 593.0,
+        "x2": 3772.0,
+        "y2": 873.0,
+        "confidence": 0.9118709564208984
+      },
+      "crop_shape": [
+        516,
+        280
+      ],
+      "yolo_ms": 21.035462617874146,
+      "yolo_roundtrip_ms": 47.093227971345186,
+      "paddle": {
+        "text": "MITSUBISHI",
+        "confidence": 0.9367059469223022,
+        "latency_ms": 3.820782992988825,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 152.19424199312925,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 372,
+      "timestamp_sec": 6.199778016469746,
+      "det": {
+        "x1": 3336.0,
+        "y1": 632.0,
+        "x2": 3835.0,
+        "y2": 916.0,
+        "confidence": 0.8628230094909668
+      },
+      "crop_shape": [
+        499,
+        284
+      ],
+      "yolo_ms": 19.05759610235691,
+      "yolo_roundtrip_ms": 50.51566194742918,
+      "paddle": {
+        "text": "MITSUBISH",
+        "confidence": 0.8810311555862427,
+        "latency_ms": 3.815421834588051,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 152.6099438779056,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 378,
+      "timestamp_sec": 6.2997744360902255,
+      "det": {
+        "x1": 3417.0,
+        "y1": 718.0,
+        "x2": 3840.0,
+        "y2": 982.0,
+        "confidence": 0.8408108949661255
+      },
+      "crop_shape": [
+        423,
+        264
+      ],
+      "yolo_ms": 19.605544861406088,
+      "yolo_roundtrip_ms": 50.19229417666793,
+      "paddle": {
+        "text": "MITSUB",
+        "confidence": 0.9307201504707336,
+        "latency_ms": 3.7935711443424225,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 143.04390083998442,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 384,
+      "timestamp_sec": 6.399770855710705,
+      "det": {
+        "x1": 3514.0,
+        "y1": 775.0,
+        "x2": 3832.0,
+        "y2": 1028.0,
+        "confidence": 0.8842522501945496
+      },
+      "crop_shape": [
+        318,
+        253
+      ],
+      "yolo_ms": 21.84395305812359,
+      "yolo_roundtrip_ms": 65.55040460079908,
+      "paddle": {
+        "text": "MITSL",
+        "confidence": 0.8953954577445984,
+        "latency_ms": 3.301626071333885,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 145.5043856985867,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 390,
+      "timestamp_sec": 6.499767275331185,
+      "det": {
+        "x1": 3606.0,
+        "y1": 814.0,
+        "x2": 3840.0,
+        "y2": 1077.0,
+        "confidence": 0.6926555633544922
+      },
+      "crop_shape": [
+        234,
+        263
+      ],
+      "yolo_ms": 21.283188834786415,
+      "yolo_roundtrip_ms": 52.15239804238081,
+      "paddle": {
+        "text": "MIT",
+        "confidence": 0.969869077205658,
+        "latency_ms": 3.803449682891369,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 144.8227148503065,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 396,
+      "timestamp_sec": 6.5997636949516645,
+      "det": {
+        "x1": 3715.0,
+        "y1": 889.0,
+        "x2": 3839.0,
+        "y2": 1121.0,
+        "confidence": 0.8436195850372314
+      },
+      "crop_shape": [
+        124,
+        232
+      ],
+      "yolo_ms": 23.616015445441008,
+      "yolo_roundtrip_ms": 48.32812026143074,
+      "paddle": {
+        "text": "M",
+        "confidence": 0.9977947473526001,
+        "latency_ms": 3.8209217600524426,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 140.42314374819398,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 402,
+      "timestamp_sec": 6.699760114572144,
+      "det": null,
+      "yolo_ms": 21.357950288802385,
+      "yolo_roundtrip_ms": 49.90982310846448,
+      "paddle": null,
+      "deepseek": null
+    },
+    {
+      "frame_id": 408,
+      "timestamp_sec": 6.799756534192624,
+      "det": null,
+      "yolo_ms": 21.374389994889498,
+      "yolo_roundtrip_ms": 61.972860246896744,
+      "paddle": null,
+      "deepseek": null
+    },
+    {
+      "frame_id": 414,
+      "timestamp_sec": 6.8997529538131035,
+      "det": {
+        "x1": 3541.0,
+        "y1": 695.0,
+        "x2": 3840.0,
+        "y2": 835.0,
+        "confidence": 0.8856927156448364
+      },
+      "crop_shape": [
+        299,
+        140
+      ],
+      "yolo_ms": 21.108711138367653,
+      "yolo_roundtrip_ms": 46.704667154699564,
+      "paddle": {
+        "text": "FARED",
+        "confidence": 0.5830017924308777,
+        "latency_ms": 3.900031093508005,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 136.77714997902513,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 420,
+      "timestamp_sec": 6.999749373433583,
+      "det": {
+        "x1": 3571.0,
+        "y1": 714.0,
+        "x2": 3840.0,
+        "y2": 862.0,
+        "confidence": 0.8342838287353516
+      },
+      "crop_shape": [
+        269,
+        148
+      ],
+      "yolo_ms": 21.270434837788343,
+      "yolo_roundtrip_ms": 63.8597272336483,
+      "paddle": {
+        "text": "FBARSED",
+        "confidence": 0.7967740893363953,
+        "latency_ms": 4.715083632618189,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 140.69364313036203,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 426,
+      "timestamp_sec": 7.099745793054064,
+      "det": {
+        "x1": 1233.0,
+        "y1": 668.0,
+        "x2": 2158.0,
+        "y2": 1287.0,
+        "confidence": 0.7299158573150635
+      },
+      "crop_shape": [
+        925,
+        619
+      ],
+      "yolo_ms": 21.115793846547604,
+      "yolo_roundtrip_ms": 64.13548486307263,
+      "paddle": {
+        "text": "0 BT ",
+        "confidence": 0.6015986204147339,
+        "latency_ms": 3.3782199025154114,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 427.31731105595827,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 432,
+      "timestamp_sec": 7.199742212674543,
+      "det": {
+        "x1": 1241.0,
+        "y1": 664.0,
+        "x2": 2164.0,
+        "y2": 1283.0,
+        "confidence": 0.7855989933013916
+      },
+      "crop_shape": [
+        923,
+        619
+      ],
+      "yolo_ms": 21.406320855021477,
+      "yolo_roundtrip_ms": 65.75213372707367,
+      "paddle": {
+        "text": "026BT ",
+        "confidence": 0.5653024315834045,
+        "latency_ms": 4.766370169818401,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 439.1247280873358,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 438,
+      "timestamp_sec": 7.299738632295023,
+      "det": {
+        "x1": 1249.0,
+        "y1": 653.0,
+        "x2": 2162.0,
+        "y2": 1240.0,
+        "confidence": 0.6342410445213318
+      },
+      "crop_shape": [
+        913,
+        587
+      ],
+      "yolo_ms": 20.3456268645823,
+      "yolo_roundtrip_ms": 54.34153275564313,
+      "paddle": {
+        "text": "02 B ",
+        "confidence": 0.4769313931465149,
+        "latency_ms": 3.9753131568431854,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 419.0189610235393,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 444,
+      "timestamp_sec": 7.399735051915503,
+      "det": {
+        "x1": 3516.0,
+        "y1": 728.0,
+        "x2": 3826.0,
+        "y2": 859.0,
+        "confidence": 0.8533502221107483
+      },
+      "crop_shape": [
+        310,
+        131
+      ],
+      "yolo_ms": 20.094844978302717,
+      "yolo_roundtrip_ms": 51.86071014031768,
+      "paddle": {
+        "text": "BARSED",
+        "confidence": 0.6846449971199036,
+        "latency_ms": 4.003025125712156,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 144.69725918024778,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 450,
+      "timestamp_sec": 7.499731471535982,
+      "det": {
+        "x1": 1270.0,
+        "y1": 588.0,
+        "x2": 2166.0,
+        "y2": 1209.0,
+        "confidence": 0.786609411239624
+      },
+      "crop_shape": [
+        896,
+        621
+      ],
+      "yolo_ms": 45.025131199508905,
+      "yolo_roundtrip_ms": 89.01030570268631,
+      "paddle": {
+        "text": "026BT ",
+        "confidence": 0.44588443636894226,
+        "latency_ms": 3.951969090849161,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 419.8727570474148,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 456,
+      "timestamp_sec": 7.599727891156462,
+      "det": {
+        "x1": 1292.0,
+        "y1": 604.0,
+        "x2": 2169.0,
+        "y2": 1193.0,
+        "confidence": 0.7757502794265747
+      },
+      "crop_shape": [
+        877,
+        589
+      ],
+      "yolo_ms": 22.845065221190453,
+      "yolo_roundtrip_ms": 78.53074604645371,
+      "paddle": {
+        "text": "0 63 ",
+        "confidence": 0.58819180727005,
+        "latency_ms": 3.989879973232746,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 419.0223482437432,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 462,
+      "timestamp_sec": 7.699724310776942,
+      "det": {
+        "x1": 1297.0,
+        "y1": 592.0,
+        "x2": 2168.0,
+        "y2": 1187.0,
+        "confidence": 0.8054107427597046
+      },
+      "crop_shape": [
+        871,
+        595
+      ],
+      "yolo_ms": 32.64889493584633,
+      "yolo_roundtrip_ms": 66.4120139554143,
+      "paddle": {
+        "text": "026BT ",
+        "confidence": 0.5494077205657959,
+        "latency_ms": 3.949033096432686,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 431.6379530355334,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 468,
+      "timestamp_sec": 7.799720730397421,
+      "det": {
+        "x1": 1300.0,
+        "y1": 572.0,
+        "x2": 2170.0,
+        "y2": 1188.0,
+        "confidence": 0.838105320930481
+      },
+      "crop_shape": [
+        870,
+        616
+      ],
+      "yolo_ms": 20.165578927844763,
+      "yolo_roundtrip_ms": 72.31417996808887,
+      "paddle": {
+        "text": "026BT ",
+        "confidence": 0.4627731144428253,
+        "latency_ms": 4.98846685513854,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 415.7854332588613,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 474,
+      "timestamp_sec": 7.899717150017901,
+      "det": {
+        "x1": 1271.0,
+        "y1": 568.0,
+        "x2": 2153.0,
+        "y2": 1181.0,
+        "confidence": 0.7764830589294434
+      },
+      "crop_shape": [
+        882,
+        613
+      ],
+      "yolo_ms": 22.131723817437887,
+      "yolo_roundtrip_ms": 51.88060691580176,
+      "paddle": {
+        "text": "0263T",
+        "confidence": 0.4359377920627594,
+        "latency_ms": 4.022111184895039,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 453.54604721069336,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 480,
+      "timestamp_sec": 7.999713569638382,
+      "det": {
+        "x1": 3712.0,
+        "y1": 983.0,
+        "x2": 3840.0,
+        "y2": 1214.0,
+        "confidence": 0.8294456005096436
+      },
+      "crop_shape": [
+        128,
+        231
+      ],
+      "yolo_ms": 22.036755923181772,
+      "yolo_roundtrip_ms": 62.12526606395841,
+      "paddle": {
+        "text": "M",
+        "confidence": 0.9973369240760803,
+        "latency_ms": 3.9542438462376595,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 138.7152741663158,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 486,
+      "timestamp_sec": 8.09970998925886,
+      "det": {
+        "x1": 1051.0,
+        "y1": 588.0,
+        "x2": 1951.0,
+        "y2": 1212.0,
+        "confidence": 0.677471399307251
+      },
+      "crop_shape": [
+        900,
+        624
+      ],
+      "yolo_ms": 21.947608329355717,
+      "yolo_roundtrip_ms": 66.3071870803833,
+      "paddle": {
+        "text": "026B1",
+        "confidence": 0.49767738580703735,
+        "latency_ms": 4.03042696416378,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 418.9945957623422,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 492,
+      "timestamp_sec": 8.19970640887934,
+      "det": {
+        "x1": 3264.0,
+        "y1": 882.0,
+        "x2": 3836.0,
+        "y2": 1138.0,
+        "confidence": 0.5485647320747375
+      },
+      "crop_shape": [
+        572,
+        256
+      ],
+      "yolo_ms": 22.17871230095625,
+      "yolo_roundtrip_ms": 69.38667595386505,
+      "paddle": {
+        "text": "MITSUBI",
+        "confidence": 0.9185846447944641,
+        "latency_ms": 3.968840930610895,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 143.61163787543774,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 498,
+      "timestamp_sec": 8.29970282849982,
+      "det": {
+        "x1": 454.0,
+        "y1": 648.0,
+        "x2": 1457.0,
+        "y2": 1291.0,
+        "confidence": 0.4108456075191498
+      },
+      "crop_shape": [
+        1003,
+        643
+      ],
+      "yolo_ms": 22.19873107969761,
+      "yolo_roundtrip_ms": 60.10530795902014,
+      "paddle": {
+        "text": "0 BBT ",
+        "confidence": 0.5198879241943359,
+        "latency_ms": 4.05433215200901,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 424.19804679229856,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 504,
+      "timestamp_sec": 8.3996992481203,
+      "det": {
+        "x1": 2529.0,
+        "y1": 811.0,
+        "x2": 3224.0,
+        "y2": 1133.0,
+        "confidence": 0.8125436902046204
+      },
+      "crop_shape": [
+        695,
+        322
+      ],
+      "yolo_ms": 22.155288606882095,
+      "yolo_roundtrip_ms": 73.06136377155781,
+      "paddle": {
+        "text": "MITSUBISHI",
+        "confidence": 0.9503456950187683,
+        "latency_ms": 3.4650242887437344,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 150.5155060440302,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 510,
+      "timestamp_sec": 8.499695667740781,
+      "det": {
+        "x1": 2089.0,
+        "y1": 800.0,
+        "x2": 2782.0,
+        "y2": 1142.0,
+        "confidence": 0.8579351902008057
+      },
+      "crop_shape": [
+        693,
+        342
+      ],
+      "yolo_ms": 20.10122686624527,
+      "yolo_roundtrip_ms": 65.80529268831015,
+      "paddle": {
+        "text": "MITSUBISHI",
+        "confidence": 0.873434841632843,
+        "latency_ms": 4.905682057142258,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 146.9115810468793,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 516,
+      "timestamp_sec": 8.59969208736126,
+      "det": {
+        "x1": 1606.0,
+        "y1": 802.0,
+        "x2": 2326.0,
+        "y2": 1182.0,
+        "confidence": 0.9081264734268188
+      },
+      "crop_shape": [
+        720,
+        380
+      ],
+      "yolo_ms": 20.324156153947115,
+      "yolo_roundtrip_ms": 65.8788220025599,
+      "paddle": {
+        "text": "MUTSUBISH",
+        "confidence": 0.9139276146888733,
+        "latency_ms": 3.381917253136635,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 151.7255906946957,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 522,
+      "timestamp_sec": 8.69968850698174,
+      "det": {
+        "x1": 1043.0,
+        "y1": 823.0,
+        "x2": 1868.0,
+        "y2": 1235.0,
+        "confidence": 0.6920871138572693
+      },
+      "crop_shape": [
+        825,
+        412
+      ],
+      "yolo_ms": 19.181037321686745,
+      "yolo_roundtrip_ms": 59.4324441626668,
+      "paddle": {
+        "text": "NESIBSH",
+        "confidence": 0.5661488175392151,
+        "latency_ms": 4.7193109057843685,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 269.4493941962719,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 528,
+      "timestamp_sec": 8.79968492660222,
+      "det": {
+        "x1": 382.0,
+        "y1": 905.0,
+        "x2": 1348.0,
+        "y2": 1394.0,
+        "confidence": 0.8707534074783325
+      },
+      "crop_shape": [
+        966,
+        489
+      ],
+      "yolo_ms": 19.074087031185627,
+      "yolo_roundtrip_ms": 60.88057579472661,
+      "paddle": {
+        "text": "MESBSH",
+        "confidence": 0.5098720192909241,
+        "latency_ms": 4.887527786195278,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 292.9683057591319,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 534,
+      "timestamp_sec": 8.8996813462227,
+      "det": null,
+      "yolo_ms": 20.491902250796556,
+      "yolo_roundtrip_ms": 67.3233182169497,
+      "paddle": null,
+      "deepseek": null
+    },
+    {
+      "frame_id": 540,
+      "timestamp_sec": 8.99967776584318,
+      "det": null,
+      "yolo_ms": 19.89891706034541,
+      "yolo_roundtrip_ms": 71.28709880635142,
+      "paddle": null,
+      "deepseek": null
+    },
+    {
+      "frame_id": 546,
+      "timestamp_sec": 9.099674185463659,
+      "det": null,
+      "yolo_ms": 18.856337293982506,
+      "yolo_roundtrip_ms": 45.375869143754244,
+      "paddle": null,
+      "deepseek": null
+    },
+    {
+      "frame_id": 552,
+      "timestamp_sec": 9.199670605084139,
+      "det": {
+        "x1": 2416.0,
+        "y1": 12.0,
+        "x2": 2813.0,
+        "y2": 288.0,
+        "confidence": 0.514872670173645
+      },
+      "crop_shape": [
+        397,
+        276
+      ],
+      "yolo_ms": 18.69674725458026,
+      "yolo_roundtrip_ms": 47.948476392775774,
+      "paddle": {
+        "text": "ES45",
+        "confidence": 0.22582384943962097,
+        "latency_ms": 3.817726857960224,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 139.1513431444764,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 558,
+      "timestamp_sec": 9.299667024704618,
+      "det": {
+        "x1": 2177.0,
+        "y1": 17.0,
+        "x2": 2578.0,
+        "y2": 299.0,
+        "confidence": 0.8261673450469971
+      },
+      "crop_shape": [
+        401,
+        282
+      ],
+      "yolo_ms": 46.232850290834904,
+      "yolo_roundtrip_ms": 80.90418670326471,
+      "paddle": {
+        "text": "H6943E",
+        "confidence": 0.46694043278694153,
+        "latency_ms": 3.9605852216482162,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 162.17677714303136,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 564,
+      "timestamp_sec": 9.399663444325098,
+      "det": {
+        "x1": 1988.0,
+        "y1": 0.0,
+        "x2": 2444.0,
+        "y2": 300.0,
+        "confidence": 0.853239893913269
+      },
+      "crop_shape": [
+        456,
+        300
+      ],
+      "yolo_ms": 19.98417777940631,
+      "yolo_roundtrip_ms": 56.825964245945215,
+      "paddle": {
+        "text": "H694-83",
+        "confidence": 0.4530606269836426,
+        "latency_ms": 3.818567842245102,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 142.64480117708445,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 570,
+      "timestamp_sec": 9.499659863945578,
+      "det": {
+        "x1": 1831.0,
+        "y1": 0.0,
+        "x2": 2310.0,
+        "y2": 341.0,
+        "confidence": 0.7231485843658447
+      },
+      "crop_shape": [
+        479,
+        341
+      ],
+      "yolo_ms": 19.23889620229602,
+      "yolo_roundtrip_ms": 69.01065912097692,
+      "paddle": {
+        "text": "1694",
+        "confidence": 0.3672594428062439,
+        "latency_ms": 5.323777906596661,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 159.4595299102366,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 576,
+      "timestamp_sec": 9.599656283566057,
+      "det": {
+        "x1": 1693.0,
+        "y1": 22.0,
+        "x2": 2206.0,
+        "y2": 390.0,
+        "confidence": 0.8506283164024353
+      },
+      "crop_shape": [
+        513,
+        368
+      ],
+      "yolo_ms": 19.047707319259644,
+      "yolo_roundtrip_ms": 56.424830108881,
+      "paddle": {
+        "text": "16-6",
+        "confidence": 0.34867772459983826,
+        "latency_ms": 3.817735705524683,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 157.35486336052418,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 582,
+      "timestamp_sec": 9.699652703186537,
+      "det": {
+        "x1": 1578.0,
+        "y1": 71.0,
+        "x2": 2137.0,
+        "y2": 470.0,
+        "confidence": 0.909568190574646
+      },
+      "crop_shape": [
+        559,
+        399
+      ],
+      "yolo_ms": 19.127295818179846,
+      "yolo_roundtrip_ms": 46.317690052092075,
+      "paddle": {
+        "text": "M6949",
+        "confidence": 0.43515509366989136,
+        "latency_ms": 3.8028890267014503,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 154.57250317558646,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 588,
+      "timestamp_sec": 9.799649122807017,
+      "det": {
+        "x1": 1456.0,
+        "y1": 103.0,
+        "x2": 2046.0,
+        "y2": 535.0,
+        "confidence": 0.8531737327575684
+      },
+      "crop_shape": [
+        590,
+        432
+      ],
+      "yolo_ms": 19.133728928864002,
+      "yolo_roundtrip_ms": 47.37485805526376,
+      "paddle": {
+        "text": "1699",
+        "confidence": 0.5001582503318787,
+        "latency_ms": 20.927690900862217,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 169.38503831624985,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 594,
+      "timestamp_sec": 9.899645542427496,
+      "det": {
+        "x1": 1340.0,
+        "y1": 138.0,
+        "x2": 1964.0,
+        "y2": 592.0,
+        "confidence": 0.8900924921035767
+      },
+      "crop_shape": [
+        624,
+        454
+      ],
+      "yolo_ms": 19.572592806071043,
+      "yolo_roundtrip_ms": 54.23291027545929,
+      "paddle": {
+        "text": "16945",
+        "confidence": 0.438812255859375,
+        "latency_ms": 3.8347491063177586,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 164.64619897305965,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 600,
+      "timestamp_sec": 9.999641962047976,
+      "det": {
+        "x1": 1216.0,
+        "y1": 150.0,
+        "x2": 1898.0,
+        "y2": 621.0,
+        "confidence": 0.8869221210479736
+      },
+      "crop_shape": [
+        682,
+        471
+      ],
+      "yolo_ms": 19.652253948152065,
+      "yolo_roundtrip_ms": 61.03992601856589,
+      "paddle": {
+        "text": "169405",
+        "confidence": 0.47841718792915344,
+        "latency_ms": 3.7910472601652145,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 162.0801161043346,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 606,
+      "timestamp_sec": 10.099638381668456,
+      "det": {
+        "x1": 1097.0,
+        "y1": 162.0,
+        "x2": 1809.0,
+        "y2": 656.0,
+        "confidence": 0.9273349046707153
+      },
+      "crop_shape": [
+        712,
+        494
+      ],
+      "yolo_ms": 19.144419115036726,
+      "yolo_roundtrip_ms": 66.67393678799272,
+      "paddle": {
+        "text": "1-69405",
+        "confidence": 0.5281860828399658,
+        "latency_ms": 4.786727949976921,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 172.2575882449746,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 612,
+      "timestamp_sec": 10.199634801288935,
+      "det": {
+        "x1": 960.0,
+        "y1": 150.0,
+        "x2": 1736.0,
+        "y2": 693.0,
+        "confidence": 0.9242309927940369
+      },
+      "crop_shape": [
+        776,
+        543
+      ],
+      "yolo_ms": 19.24053905531764,
+      "yolo_roundtrip_ms": 46.84105422347784,
+      "paddle": {
+        "text": "1694",
+        "confidence": 0.5726875066757202,
+        "latency_ms": 3.8334662094712257,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 429.18685590848327,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 618,
+      "timestamp_sec": 10.299631220909415,
+      "det": {
+        "x1": 839.0,
+        "y1": 188.0,
+        "x2": 1700.0,
+        "y2": 729.0,
+        "confidence": 0.9096143841743469
+      },
+      "crop_shape": [
+        861,
+        541
+      ],
+      "yolo_ms": 18.90507899224758,
+      "yolo_roundtrip_ms": 63.20682913064957,
+      "paddle": {
+        "text": "1-694605",
+        "confidence": 0.5354201793670654,
+        "latency_ms": 3.8414308801293373,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 414.7204211913049,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 624,
+      "timestamp_sec": 10.399627640529896,
+      "det": {
+        "x1": 771.0,
+        "y1": 205.0,
+        "x2": 1689.0,
+        "y2": 783.0,
+        "confidence": 0.9099480509757996
+      },
+      "crop_shape": [
+        918,
+        578
+      ],
+      "yolo_ms": 19.74705094471574,
+      "yolo_roundtrip_ms": 49.37222274020314,
+      "paddle": {
+        "text": "16946PT",
+        "confidence": 0.5847533941268921,
+        "latency_ms": 3.999908920377493,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 410.51741037517786,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 630,
+      "timestamp_sec": 10.499624060150376,
+      "det": {
+        "x1": 741.0,
+        "y1": 215.0,
+        "x2": 1714.0,
+        "y2": 847.0,
+        "confidence": 0.939555287361145
+      },
+      "crop_shape": [
+        973,
+        632
+      ],
+      "yolo_ms": 22.466131951659918,
+      "yolo_roundtrip_ms": 76.10959419980645,
+      "paddle": {
+        "text": "1694803",
+        "confidence": 0.492451012134552,
+        "latency_ms": 5.321083124727011,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 431.7643013782799,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 636,
+      "timestamp_sec": 10.599620479770856,
+      "det": {
+        "x1": 750.0,
+        "y1": 252.0,
+        "x2": 1783.0,
+        "y2": 896.0,
+        "confidence": 0.9264882802963257
+      },
+      "crop_shape": [
+        1033,
+        644
+      ],
+      "yolo_ms": 21.730339154601097,
+      "yolo_roundtrip_ms": 56.342314928770065,
+      "paddle": {
+        "text": "1-694603",
+        "confidence": 0.5660839676856995,
+        "latency_ms": 3.99944931268692,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 419.4925222545862,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 642,
+      "timestamp_sec": 10.699616899391335,
+      "det": {
+        "x1": 770.0,
+        "y1": 278.0,
+        "x2": 1858.0,
+        "y2": 923.0,
+        "confidence": 0.9255357980728149
+      },
+      "crop_shape": [
+        1088,
+        645
+      ],
+      "yolo_ms": 20.07011929526925,
+      "yolo_roundtrip_ms": 71.77965482696891,
+      "paddle": {
+        "text": "M6948T05",
+        "confidence": 0.6361504793167114,
+        "latency_ms": 5.039885174483061,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 419.6708770468831,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 648,
+      "timestamp_sec": 10.799613319011815,
+      "det": {
+        "x1": 776.0,
+        "y1": 292.0,
+        "x2": 1940.0,
+        "y2": 948.0,
+        "confidence": 0.9269373416900635
+      },
+      "crop_shape": [
+        1164,
+        656
+      ],
+      "yolo_ms": 22.536876145750284,
+      "yolo_roundtrip_ms": 51.53073975816369,
+      "paddle": {
+        "text": "-694PT05",
+        "confidence": 0.6536939144134521,
+        "latency_ms": 3.9949999190866947,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 274.89786595106125,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 654,
+      "timestamp_sec": 10.899609738632295,
+      "det": {
+        "x1": 804.0,
+        "y1": 291.0,
+        "x2": 2029.0,
+        "y2": 961.0,
+        "confidence": 0.9377509355545044
+      },
+      "crop_shape": [
+        1225,
+        670
+      ],
+      "yolo_ms": 20.076059736311436,
+      "yolo_roundtrip_ms": 47.95757308602333,
+      "paddle": {
+        "text": "694P03",
+        "confidence": 0.750285804271698,
+        "latency_ms": 4.059690982103348,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 291.06907499954104,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 660,
+      "timestamp_sec": 10.999606158252774,
+      "det": {
+        "x1": 852.0,
+        "y1": 317.0,
+        "x2": 2112.0,
+        "y2": 976.0,
+        "confidence": 0.9353015422821045
+      },
+      "crop_shape": [
+        1260,
+        659
+      ],
+      "yolo_ms": 20.10803995653987,
+      "yolo_roundtrip_ms": 47.700018621981144,
+      "paddle": {
+        "text": "16943PT05",
+        "confidence": 0.5939825773239136,
+        "latency_ms": 4.055975005030632,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 289.89718295633793,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 666,
+      "timestamp_sec": 11.099602577873254,
+      "det": {
+        "x1": 890.0,
+        "y1": 334.0,
+        "x2": 2206.0,
+        "y2": 1003.0,
+        "confidence": 0.9416729211807251
+      },
+      "crop_shape": [
+        1316,
+        669
+      ],
+      "yolo_ms": 20.381954964250326,
+      "yolo_roundtrip_ms": 47.59413003921509,
+      "paddle": {
+        "text": "69468PT03",
+        "confidence": 0.713893711566925,
+        "latency_ms": 4.050172865390778,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 290.42666824534535,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 672,
+      "timestamp_sec": 11.199598997493734,
+      "det": {
+        "x1": 938.0,
+        "y1": 358.0,
+        "x2": 2283.0,
+        "y2": 1027.0,
+        "confidence": 0.9168477058410645
+      },
+      "crop_shape": [
+        1345,
+        669
+      ],
+      "yolo_ms": 20.7319431938231,
+      "yolo_roundtrip_ms": 62.311024870723486,
+      "paddle": {
+        "text": "6948PT03",
+        "confidence": 0.8456506729125977,
+        "latency_ms": 3.961165901273489,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 289.11179630085826,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 678,
+      "timestamp_sec": 11.299595417114213,
+      "det": {
+        "x1": 988.0,
+        "y1": 382.0,
+        "x2": 2376.0,
+        "y2": 1046.0,
+        "confidence": 0.9380124807357788
+      },
+      "crop_shape": [
+        1388,
+        664
+      ],
+      "yolo_ms": 22.361567243933678,
+      "yolo_roundtrip_ms": 77.84994598478079,
+      "paddle": {
+        "text": "6948PT.03",
+        "confidence": 0.8252912759780884,
+        "latency_ms": 5.234240088611841,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 295.9903567098081,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 684,
+      "timestamp_sec": 11.399591836734693,
+      "det": {
+        "x1": 1009.0,
+        "y1": 384.0,
+        "x2": 2436.0,
+        "y2": 1039.0,
+        "confidence": 0.9146994352340698
+      },
+      "crop_shape": [
+        1427,
+        655
+      ],
+      "yolo_ms": 32.927467953413725,
+      "yolo_roundtrip_ms": 61.938525177538395,
+      "paddle": {
+        "text": "694BPT05",
+        "confidence": 0.7726850509643555,
+        "latency_ms": 3.9609461091458797,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 289.732133038342,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 690,
+      "timestamp_sec": 11.499588256355173,
+      "det": {
+        "x1": 981.0,
+        "y1": 397.0,
+        "x2": 2438.0,
+        "y2": 1049.0,
+        "confidence": 0.9150692820549011
+      },
+      "crop_shape": [
+        1457,
+        652
+      ],
+      "yolo_ms": 20.550692919641733,
+      "yolo_roundtrip_ms": 61.26217404380441,
+      "paddle": {
+        "text": "694BPT.03",
+        "confidence": 0.8002145290374756,
+        "latency_ms": 3.9694420993328094,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 313.66988085210323,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 696,
+      "timestamp_sec": 11.599584675975652,
+      "det": {
+        "x1": 912.0,
+        "y1": 416.0,
+        "x2": 2456.0,
+        "y2": 1068.0,
+        "confidence": 0.8907853364944458
+      },
+      "crop_shape": [
+        1544,
+        652
+      ],
+      "yolo_ms": 19.945733714848757,
+      "yolo_roundtrip_ms": 53.22717921808362,
+      "paddle": {
+        "text": "6948PT105",
+        "confidence": 0.8509052991867065,
+        "latency_ms": 4.023362882435322,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 319.96599677950144,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 702,
+      "timestamp_sec": 11.699581095596132,
+      "det": {
+        "x1": 866.0,
+        "y1": 443.0,
+        "x2": 2456.0,
+        "y2": 1090.0,
+        "confidence": 0.8841915726661682
+      },
+      "crop_shape": [
+        1590,
+        647
+      ],
+      "yolo_ms": 20.00669902190566,
+      "yolo_roundtrip_ms": 72.31058226898313,
+      "paddle": {
+        "text": "694BPT05",
+        "confidence": 0.9203285574913025,
+        "latency_ms": 3.464403096586466,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 284.7191081382334,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 708,
+      "timestamp_sec": 11.799577515216612,
+      "det": {
+        "x1": 819.0,
+        "y1": 437.0,
+        "x2": 2482.0,
+        "y2": 1108.0,
+        "confidence": 0.8735643625259399
+      },
+      "crop_shape": [
+        1663,
+        671
+      ],
+      "yolo_ms": 20.221652928739786,
+      "yolo_roundtrip_ms": 72.62904196977615,
+      "paddle": {
+        "text": "694BPT105",
+        "confidence": 0.7818553447723389,
+        "latency_ms": 3.461817279458046,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 286.47167282179,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 714,
+      "timestamp_sec": 11.899573934837091,
+      "det": {
+        "x1": 791.0,
+        "y1": 526.0,
+        "x2": 2503.0,
+        "y2": 1145.0,
+        "confidence": 0.8502187728881836
+      },
+      "crop_shape": [
+        1712,
+        619
+      ],
+      "yolo_ms": 20.60410287231207,
+      "yolo_roundtrip_ms": 53.606702014803886,
+      "paddle": {
+        "text": "694BPT05",
+        "confidence": 0.9402937293052673,
+        "latency_ms": 4.017672035843134,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 340.95263900235295,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 720,
+      "timestamp_sec": 11.999570354457571,
+      "det": {
+        "x1": 782.0,
+        "y1": 550.0,
+        "x2": 2523.0,
+        "y2": 1188.0,
+        "confidence": 0.869861364364624
+      },
+      "crop_shape": [
+        1741,
+        638
+      ],
+      "yolo_ms": 20.787918008863926,
+      "yolo_roundtrip_ms": 56.657927576452494,
+      "paddle": {
+        "text": "694BPT05",
+        "confidence": 0.9235116839408875,
+        "latency_ms": 4.00471780449152,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 423.6732912249863,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 726,
+      "timestamp_sec": 12.09956677407805,
+      "det": {
+        "x1": 774.0,
+        "y1": 592.0,
+        "x2": 2544.0,
+        "y2": 1203.0,
+        "confidence": 0.8512333631515503
+      },
+      "crop_shape": [
+        1770,
+        611
+      ],
+      "yolo_ms": 22.238554898649454,
+      "yolo_roundtrip_ms": 74.01830283924937,
+      "paddle": {
+        "text": "694BPT/05",
+        "confidence": 0.8425475358963013,
+        "latency_ms": 3.6676041781902313,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 330.9925151988864,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 732,
+      "timestamp_sec": 12.19956319369853,
+      "det": {
+        "x1": 776.0,
+        "y1": 613.0,
+        "x2": 2561.0,
+        "y2": 1211.0,
+        "confidence": 0.8468140959739685
+      },
+      "crop_shape": [
+        1785,
+        598
+      ],
+      "yolo_ms": 22.18656660988927,
+      "yolo_roundtrip_ms": 51.720155868679285,
+      "paddle": {
+        "text": "694BPT05",
+        "confidence": 0.9182417988777161,
+        "latency_ms": 4.035545978695154,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 344.495318364352,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 738,
+      "timestamp_sec": 12.299559613319012,
+      "det": {
+        "x1": 790.0,
+        "y1": 626.0,
+        "x2": 2594.0,
+        "y2": 1240.0,
+        "confidence": 0.8377445936203003
+      },
+      "crop_shape": [
+        1804,
+        614
+      ],
+      "yolo_ms": 21.854203194379807,
+      "yolo_roundtrip_ms": 73.56125395745039,
+      "paddle": {
+        "text": "694BPT05",
+        "confidence": 0.8949065804481506,
+        "latency_ms": 4.988788161426783,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 363.1686712615192,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 744,
+      "timestamp_sec": 12.399556032939492,
+      "det": {
+        "x1": 785.0,
+        "y1": 624.0,
+        "x2": 2606.0,
+        "y2": 1231.0,
+        "confidence": 0.8304359912872314
+      },
+      "crop_shape": [
+        1821,
+        607
+      ],
+      "yolo_ms": 21.915948018431664,
+      "yolo_roundtrip_ms": 68.04572604596615,
+      "paddle": {
+        "text": "694BPT05",
+        "confidence": 0.972556471824646,
+        "latency_ms": 4.11257054656744,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 328.6418770439923,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 750,
+      "timestamp_sec": 12.499552452559971,
+      "det": {
+        "x1": 787.0,
+        "y1": 628.0,
+        "x2": 2610.0,
+        "y2": 1232.0,
+        "confidence": 0.8372522592544556
+      },
+      "crop_shape": [
+        1823,
+        604
+      ],
+      "yolo_ms": 21.99855400249362,
+      "yolo_roundtrip_ms": 73.36297119036317,
+      "paddle": {
+        "text": "694BPT05",
+        "confidence": 0.9757939577102661,
+        "latency_ms": 3.464824054390192,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 409.58075877279043,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 756,
+      "timestamp_sec": 12.599548872180451,
+      "det": {
+        "x1": 787.0,
+        "y1": 629.0,
+        "x2": 2613.0,
+        "y2": 1218.0,
+        "confidence": 0.83171147108078
+      },
+      "crop_shape": [
+        1826,
+        589
+      ],
+      "yolo_ms": 22.073294036090374,
+      "yolo_roundtrip_ms": 53.56652708724141,
+      "paddle": {
+        "text": "694BPT 05",
+        "confidence": 0.8971152901649475,
+        "latency_ms": 4.024484660476446,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 353.68107724934816,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 762,
+      "timestamp_sec": 12.69954529180093,
+      "det": {
+        "x1": 791.0,
+        "y1": 632.0,
+        "x2": 2615.0,
+        "y2": 1212.0,
+        "confidence": 0.836266279220581
+      },
+      "crop_shape": [
+        1824,
+        580
+      ],
+      "yolo_ms": 21.942066960036755,
+      "yolo_roundtrip_ms": 55.034365970641375,
+      "paddle": {
+        "text": "694BPT05",
+        "confidence": 0.9468585848808289,
+        "latency_ms": 4.055834840983152,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 332.564911339432,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 768,
+      "timestamp_sec": 12.79954171142141,
+      "det": {
+        "x1": 796.0,
+        "y1": 637.0,
+        "x2": 2619.0,
+        "y2": 1206.0,
+        "confidence": 0.8219321370124817
+      },
+      "crop_shape": [
+        1823,
+        569
+      ],
+      "yolo_ms": 22.05672301352024,
+      "yolo_roundtrip_ms": 74.18581796810031,
+      "paddle": {
+        "text": "694BPT05",
+        "confidence": 0.9490741491317749,
+        "latency_ms": 4.180489107966423,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 349.9398739077151,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 774,
+      "timestamp_sec": 12.89953813104189,
+      "det": {
+        "x1": 829.0,
+        "y1": 637.0,
+        "x2": 2629.0,
+        "y2": 1195.0,
+        "confidence": 0.8277062177658081
+      },
+      "crop_shape": [
+        1800,
+        558
+      ],
+      "yolo_ms": 22.37836830317974,
+      "yolo_roundtrip_ms": 69.98468143865466,
+      "paddle": {
+        "text": "694BPT05",
+        "confidence": 0.9309058785438538,
+        "latency_ms": 3.4958417527377605,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 353.42915216460824,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 780,
+      "timestamp_sec": 12.99953455066237,
+      "det": {
+        "x1": 858.0,
+        "y1": 628.0,
+        "x2": 2651.0,
+        "y2": 1165.0,
+        "confidence": 0.8170918226242065
+      },
+      "crop_shape": [
+        1793,
+        537
+      ],
+      "yolo_ms": 22.497450932860374,
+      "yolo_roundtrip_ms": 64.98316815122962,
+      "paddle": {
+        "text": "694BPT 05",
+        "confidence": 0.898054838180542,
+        "latency_ms": 4.030356183648109,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 320.9097911603749,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 786,
+      "timestamp_sec": 13.09953097028285,
+      "det": {
+        "x1": 880.0,
+        "y1": 626.0,
+        "x2": 2670.0,
+        "y2": 1150.0,
+        "confidence": 0.8766084313392639
+      },
+      "crop_shape": [
+        1790,
+        524
+      ],
+      "yolo_ms": 21.92898327484727,
+      "yolo_roundtrip_ms": 73.6751276999712,
+      "paddle": {
+        "text": "694BPT 05",
+        "confidence": 0.927734375,
+        "latency_ms": 3.5186847671866417,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 324.4131370447576,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 792,
+      "timestamp_sec": 13.199527389903329,
+      "det": {
+        "x1": 907.0,
+        "y1": 617.0,
+        "x2": 2661.0,
+        "y2": 1141.0,
+        "confidence": 0.8972225189208984
+      },
+      "crop_shape": [
+        1754,
+        524
+      ],
+      "yolo_ms": 21.884690038859844,
+      "yolo_roundtrip_ms": 69.34733269736171,
+      "paddle": {
+        "text": "694BPT 05",
+        "confidence": 0.8734343647956848,
+        "latency_ms": 3.4901811741292477,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 365.7342838123441,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 798,
+      "timestamp_sec": 13.299523809523809,
+      "det": {
+        "x1": 921.0,
+        "y1": 620.0,
+        "x2": 2683.0,
+        "y2": 1118.0,
+        "confidence": 0.8902167081832886
+      },
+      "crop_shape": [
+        1762,
+        498
+      ],
+      "yolo_ms": 22.555820643901825,
+      "yolo_roundtrip_ms": 70.71229768916965,
+      "paddle": {
+        "text": "694BPT 05",
+        "confidence": 0.93198561668396,
+        "latency_ms": 3.5284431651234627,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 391.15413976833224,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 804,
+      "timestamp_sec": 13.399520229144288,
+      "det": {
+        "x1": 929.0,
+        "y1": 618.0,
+        "x2": 2687.0,
+        "y2": 1135.0,
+        "confidence": 0.8890385627746582
+      },
+      "crop_shape": [
+        1758,
+        517
+      ],
+      "yolo_ms": 22.134989965707064,
+      "yolo_roundtrip_ms": 69.94292186573148,
+      "paddle": {
+        "text": "694BPT05",
+        "confidence": 0.9836808443069458,
+        "latency_ms": 4.933293908834457,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 332.1035639382899,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 810,
+      "timestamp_sec": 13.499516648764768,
+      "det": {
+        "x1": 935.0,
+        "y1": 625.0,
+        "x2": 2674.0,
+        "y2": 1133.0,
+        "confidence": 0.8700676560401917
+      },
+      "crop_shape": [
+        1739,
+        508
+      ],
+      "yolo_ms": 21.991771180182695,
+      "yolo_roundtrip_ms": 69.66393813490868,
+      "paddle": {
+        "text": "694BPT05",
+        "confidence": 0.9789561033248901,
+        "latency_ms": 4.95914276689291,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 325.8291590027511,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 816,
+      "timestamp_sec": 13.599513068385248,
+      "det": {
+        "x1": 901.0,
+        "y1": 634.0,
+        "x2": 2653.0,
+        "y2": 1150.0,
+        "confidence": 0.8874756693840027
+      },
+      "crop_shape": [
+        1752,
+        516
+      ],
+      "yolo_ms": 22.159256041049957,
+      "yolo_roundtrip_ms": 69.88733680918813,
+      "paddle": {
+        "text": "694BPT 05",
+        "confidence": 0.9006970524787903,
+        "latency_ms": 3.482457250356674,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 326.34510891512036,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 822,
+      "timestamp_sec": 13.699509488005727,
+      "det": {
+        "x1": 783.0,
+        "y1": 631.0,
+        "x2": 2540.0,
+        "y2": 1178.0,
+        "confidence": 0.8768525123596191
+      },
+      "crop_shape": [
+        1757,
+        547
+      ],
+      "yolo_ms": 21.737022791057825,
+      "yolo_roundtrip_ms": 68.7669413164258,
+      "paddle": {
+        "text": "694BPT05",
+        "confidence": 0.9660316705703735,
+        "latency_ms": 3.5727457143366337,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 329.93213180452585,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 828,
+      "timestamp_sec": 13.799505907626207,
+      "det": {
+        "x1": 648.0,
+        "y1": 606.0,
+        "x2": 2415.0,
+        "y2": 1186.0,
+        "confidence": 0.8837745785713196
+      },
+      "crop_shape": [
+        1767,
+        580
+      ],
+      "yolo_ms": 21.973115857690573,
+      "yolo_roundtrip_ms": 68.33400810137391,
+      "paddle": {
+        "text": "694BPT05",
+        "confidence": 0.8823727369308472,
+        "latency_ms": 5.06864907220006,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 332.4903408065438,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 834,
+      "timestamp_sec": 13.899502327246687,
+      "det": {
+        "x1": 409.0,
+        "y1": 600.0,
+        "x2": 2189.0,
+        "y2": 1187.0,
+        "confidence": 0.8589057922363281
+      },
+      "crop_shape": [
+        1780,
+        587
+      ],
+      "yolo_ms": 22.139488719403744,
+      "yolo_roundtrip_ms": 67.9716463200748,
+      "paddle": {
+        "text": "694BPT05",
+        "confidence": 0.9216736555099487,
+        "latency_ms": 3.518585115671158,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 346.9441416673362,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 840,
+      "timestamp_sec": 13.999498746867166,
+      "det": {
+        "x1": 17.0,
+        "y1": 603.0,
+        "x2": 1749.0,
+        "y2": 1290.0,
+        "confidence": 0.7318815588951111
+      },
+      "crop_shape": [
+        1732,
+        687
+      ],
+      "yolo_ms": 22.174264770001173,
+      "yolo_roundtrip_ms": 67.55920127034187,
+      "paddle": {
+        "text": "-6948PT05",
+        "confidence": 0.7981093525886536,
+        "latency_ms": 3.50166205316782,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 468.37548399344087,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 846,
+      "timestamp_sec": 14.099495166487648,
+      "det": null,
+      "yolo_ms": 21.859323140233755,
+      "yolo_roundtrip_ms": 67.47734686359763,
+      "paddle": null,
+      "deepseek": null
+    },
+    {
+      "frame_id": 852,
+      "timestamp_sec": 14.199491586108127,
+      "det": null,
+      "yolo_ms": 21.895620971918106,
+      "yolo_roundtrip_ms": 72.79966166242957,
+      "paddle": null,
+      "deepseek": null
+    },
+    {
+      "frame_id": 858,
+      "timestamp_sec": 14.299488005728607,
+      "det": null,
+      "yolo_ms": 21.9241539016366,
+      "yolo_roundtrip_ms": 49.17489131912589,
+      "paddle": null,
+      "deepseek": null
+    },
+    {
+      "frame_id": 864,
+      "timestamp_sec": 14.399484425349087,
+      "det": null,
+      "yolo_ms": 21.855223923921585,
+      "yolo_roundtrip_ms": 72.99009105190635,
+      "paddle": null,
+      "deepseek": null
+    },
+    {
+      "frame_id": 870,
+      "timestamp_sec": 14.499480844969566,
+      "det": null,
+      "yolo_ms": 21.112598944455385,
+      "yolo_roundtrip_ms": 64.42246492952108,
+      "paddle": null,
+      "deepseek": null
+    },
+    {
+      "frame_id": 876,
+      "timestamp_sec": 14.599477264590046,
+      "det": null,
+      "yolo_ms": 18.766327761113644,
+      "yolo_roundtrip_ms": 63.259928952902555,
+      "paddle": null,
+      "deepseek": null
+    },
+    {
+      "frame_id": 882,
+      "timestamp_sec": 14.699473684210526,
+      "det": null,
+      "yolo_ms": 19.22852685675025,
+      "yolo_roundtrip_ms": 66.98948983103037,
+      "paddle": null,
+      "deepseek": null
+    },
+    {
+      "frame_id": 888,
+      "timestamp_sec": 14.799470103831005,
+      "det": null,
+      "yolo_ms": 19.323264714330435,
+      "yolo_roundtrip_ms": 67.76385521516204,
+      "paddle": null,
+      "deepseek": null
+    },
+    {
+      "frame_id": 894,
+      "timestamp_sec": 14.899466523451485,
+      "det": null,
+      "yolo_ms": 19.531927071511745,
+      "yolo_roundtrip_ms": 64.6640881896019,
+      "paddle": null,
+      "deepseek": null
+    },
+    {
+      "frame_id": 900,
+      "timestamp_sec": 14.999462943071965,
+      "det": {
+        "x1": 2119.0,
+        "y1": 575.0,
+        "x2": 2578.0,
+        "y2": 886.0,
+        "confidence": 0.43818819522857666
+      },
+      "crop_shape": [
+        459,
+        311
+      ],
+      "yolo_ms": 64.70232084393501,
+      "yolo_roundtrip_ms": 110.844770912081,
+      "paddle": {
+        "text": "BEOAE",
+        "confidence": 0.27056655287742615,
+        "latency_ms": 3.4429016523063183,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 161.3957597874105,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 906,
+      "timestamp_sec": 15.099459362692444,
+      "det": null,
+      "yolo_ms": 19.968658220022917,
+      "yolo_roundtrip_ms": 52.86260321736336,
+      "paddle": null,
+      "deepseek": null
+    },
+    {
+      "frame_id": 912,
+      "timestamp_sec": 15.199455782312924,
+      "det": {
+        "x1": 1601.0,
+        "y1": 520.0,
+        "x2": 2076.0,
+        "y2": 876.0,
+        "confidence": 0.49490195512771606
+      },
+      "crop_shape": [
+        475,
+        356
+      ],
+      "yolo_ms": 19.776346627622843,
+      "yolo_roundtrip_ms": 51.73979327082634,
+      "paddle": {
+        "text": "RHLAC",
+        "confidence": 0.33116474747657776,
+        "latency_ms": 3.8184691220521927,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 148.1177587993443,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 918,
+      "timestamp_sec": 15.299452201933404,
+      "det": {
+        "x1": 1316.0,
+        "y1": 451.0,
+        "x2": 1866.0,
+        "y2": 905.0,
+        "confidence": 0.6080996990203857
+      },
+      "crop_shape": [
+        550,
+        454
+      ],
+      "yolo_ms": 19.230800680816174,
+      "yolo_roundtrip_ms": 46.972732059657574,
+      "paddle": {
+        "text": "PESIA",
+        "confidence": 0.20021334290504456,
+        "latency_ms": 3.8522016257047653,
+        "error": null
+      },
+      "deepseek": {
+        "text": "",
+        "latency_ms": 167.23587783053517,
+        "error": null,
+        "model": "deepseek-ocr-2"
+      }
+    },
+    {
+      "frame_id": 924,
+      "timestamp_sec": 15.399448621553883,
+      "det": null,
+      "yolo_ms": 19.0637968480587,
+      "yolo_roundtrip_ms": 44.66792894527316,
+      "paddle": null,
+      "deepseek": null
+    }
+  ]
+}

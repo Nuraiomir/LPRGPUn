@@ -1,0 +1,2806 @@
+{
+  "dataset": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26",
+  "split": "test",
+  "model": "deepseek-ocr-2/deepseek-ocr-2",
+  "prompt": "free_ocr",
+  "samples": 279,
+  "raw_exact": 2,
+  "normalized_exact": 8,
+  "extracted_exact": 15,
+  "valid_gt": 263,
+  "valid_gt_correct": 15,
+  "avg_latency_ms": 145.25,
+  "total_time_sec": 40.53,
+  "results": [
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12190610.jpg-0.png",
+      "expected": "249AS16",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 174.7
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12209128.jpg-1.png",
+      "expected": "392AD07",
+      "raw": "爆破销毁 Lance Protection 3982AD07",
+      "normalized": "LANCEPROTECTION3982AD07",
+      "extracted": "982AD07",
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 250.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12476702.jpg-0.png",
+      "expected": "553KKA01",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 128.3
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12478648.jpg-0.png",
+      "expected": "177ZFA11",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 132.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12479908.jpg-0.png",
+      "expected": "306IHZ17",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 121.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12480510.jpg-0.png",
+      "expected": "370BSB02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 150.3
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12480514.jpg-0.png",
+      "expected": "372OHA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 123.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12480734.jpg-0.png",
+      "expected": "075WWW04",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 128.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12484332.jpg-0.png",
+      "expected": "445CAA03",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 124.6
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12484443.jpg-0.png",
+      "expected": "795OTA02",
+      "raw": " A 7950TA02",
+      "normalized": "A7950TA02",
+      "extracted": "950TA02",
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 147.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12485420.jpg-0.png",
+      "expected": "002DMA04",
+      "raw": " محققون！！！！",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 138.3
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12485711.jpg-0.png",
+      "expected": "254LAM01",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 132.6
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12485978.jpg-0.png",
+      "expected": "214LMB05",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 128.3
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12487794.jpg-1.png",
+      "expected": "321VVA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 133.2
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12488056.jpg-0.png",
+      "expected": "687GRB02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 146.6
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12488355.jpg-0.png",
+      "expected": "545YCA11",
+      "raw": " The license plate is also used to priv lawn pools.",
+      "normalized": "THELICENSEPLATEISALSOUSEDTOPRIVLAWNPOOLS",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 170.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12489377.jpg-0.png",
+      "expected": "010AVA01",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 146.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12490170.jpg-0.png",
+      "expected": "343DAZ01",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 126.2
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12491175.jpg-0.png",
+      "expected": "412VAA01",
+      "raw": " 4",
+      "normalized": "4",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 131.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12491582.jpg-0.png",
+      "expected": "517VOA01",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 137.6
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12493210.jpg-0.png",
+      "expected": "888EEE04",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 141.0
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12496899.jpg-0.png",
+      "expected": "238ABZ11",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 135.4
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12498390.jpg-0.png",
+      "expected": "245SCA16",
+      "raw": " \\(22565\\)",
+      "normalized": "22565",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 135.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12498503.jpg-0.png",
+      "expected": "747CRA04",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 126.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12499171.jpg-0.png",
+      "expected": "201VCZ03",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 147.0
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12499821.jpg-0.png",
+      "expected": "968LBA10",
+      "raw": "672392102",
+      "normalized": "672392102",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 145.2
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12503376.jpg-0.png",
+      "expected": "128FHA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 145.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12503554.jpg-0.png",
+      "expected": "514CHB02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 128.7
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12503648.jpg-0.png",
+      "expected": "699SLA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 122.2
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12504001.jpg-0.png",
+      "expected": "181NCB05",
+      "raw": "NSNYC",
+      "normalized": "NSNYC",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 132.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12504022.jpg-0.png",
+      "expected": "308FTA05",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 141.7
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12505441.jpg-0.png",
+      "expected": "195LKA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 145.3
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12506580.jpg-0.png",
+      "expected": "464MJA14",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 124.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12508907.jpg-0.png",
+      "expected": "428YCA11",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 137.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12514569.jpg-0.png",
+      "expected": "885LQA10",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 124.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12515153.jpg-0.png",
+      "expected": "722FSA10",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 121.2
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12515244.jpg-0.png",
+      "expected": "749HAA10",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 120.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12518006.jpg-0.png",
+      "expected": "791YCA11",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 126.3
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12520272.jpg-0.png",
+      "expected": "242GNB02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 121.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12523001.jpg-0.png",
+      "expected": "551HMA01",
+      "raw": " The text shown is the only text in the image.NATIONAL CERTIFICATION. 12320",
+      "normalized": "THETEXTSHOWNISTHEONLYTEXTINTHEIMAGENATIONALCERTIFICATION12320",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 178.4
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12523052.jpg-0.png",
+      "expected": "559NBA01",
+      "raw": "This image is a logo.",
+      "normalized": "THISIMAGEISALOGO",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 140.7
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12523240.jpg-0.png",
+      "expected": "560UTA01",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 122.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12523936.jpg-0.png",
+      "expected": "647LGA10",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 144.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12525177.jpg-0.png",
+      "expected": "922NLA09",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 138.7
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12527217.jpg-0.png",
+      "expected": "590XMA13",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 120.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12529046.jpg-0.png",
+      "expected": "105AS15",
+      "raw": "895905105AS",
+      "normalized": "895905105AS",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 137.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12542889.jpg-0.png",
+      "expected": "205AE07",
+      "raw": " *205 AE07",
+      "normalized": "205AE07",
+      "extracted": "205AE07",
+      "correct": true,
+      "valid_gt_format": true,
+      "latency_ms": 137.7
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12546216.jpg-0.png",
+      "expected": "275BS02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 130.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12550607.jpg-0.png",
+      "expected": "A290DWO",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": false,
+      "latency_ms": 126.7
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12551140.jpg-0.png",
+      "expected": "A386TTO",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": false,
+      "latency_ms": 121.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12552319.jpg-0.png",
+      "expected": "101GGG04",
+      "raw": "12kg211GGG04",
+      "normalized": "12KG211GGG04",
+      "extracted": "211GGG04",
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 150.0
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12555962.jpg-0.png",
+      "expected": "T465VAM",
+      "raw": " The following table shows the required",
+      "normalized": "THEFOLLOWINGTABLESHOWSTHEREQUIRED",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": false,
+      "latency_ms": 132.7
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12557033.jpg-0.png",
+      "expected": "707ZRZ04",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 131.6
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12557817.jpg-0.png",
+      "expected": "T773MHM",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": false,
+      "latency_ms": 119.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12560535.jpg-0.png",
+      "expected": "040DOS04",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 124.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12561464.jpg-0.png",
+      "expected": "619BE01",
+      "raw": " Identification numbers",
+      "normalized": "IDENTIFICATIONNUMBERS",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 132.6
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12561798.jpg-0.png",
+      "expected": "827KFA04",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 123.0
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12562732.jpg-0.png",
+      "expected": "A125AA",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": false,
+      "latency_ms": 161.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12563113.jpg-0.png",
+      "expected": "225DUA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 322.6
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12564386.jpg-0.png",
+      "expected": "356BUA07",
+      "raw": "3536BAJ079",
+      "normalized": "3536BAJ079",
+      "extracted": "536BAJ07",
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 200.4
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12566480.jpg-0.png",
+      "expected": "586EZA02",
+      "raw": " Instead, focus on the facts, or the dates.",
+      "normalized": "INSTEADFOCUSONTHEFACTSORTHEDATES",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 165.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12568324.jpg-0.png",
+      "expected": "745HB02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 136.3
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12569747.jpg-0.png",
+      "expected": "D920WXM",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": false,
+      "latency_ms": 130.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12570389.jpg-0.png",
+      "expected": "590HMA10",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 125.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12570607.jpg-0.png",
+      "expected": "696CAA10",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 128.6
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12571608.jpg-1.png",
+      "expected": "143BEA04",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 124.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12571724.jpg-0.png",
+      "expected": "951LNA10",
+      "raw": " Do not force a product to be sold. Do not mix motor gasoline with motor fuel. When using high voltage batteries do not disassemble, expose to heat. Do not disassemble the license plate or do not short the frame or the positive and negative terminals in the positive or negative position. Do not ...",
+      "normalized": "DONOTFORCEAPRODUCTTOBESOLDDONOTMIXMOTORGASOLINEWITHMOTORFUELWHENUSINGHIGHVOLTAGEBATTERIESDONOTDISASSEMBLEEXPOSETOHEATDONOTDISASSEMBLETHELICENSEPLATEORDONOTSHORTTHEFRAMEORTHEPOSITIVEANDNEGATIVETERMINALSINTHEPOSITIVEORNEGATIVEPOSITIONDONOT",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 272.3
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12571864.jpg-0.png",
+      "expected": "805LQA10",
+      "raw": "9kg\n\n8",
+      "normalized": "9KG8",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 159.7
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12571994.jpg-0.png",
+      "expected": "107AU10",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 128.6
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12572056.jpg-0.png",
+      "expected": "235AA10",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 128.0
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12574722.jpg-0.png",
+      "expected": "968KNA10",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 121.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12575236.jpg-0.png",
+      "expected": "573LPA10",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 135.0
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12575349.jpg-0.png",
+      "expected": "777EEE04",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 123.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12581962.jpg-0.png",
+      "expected": "007RUU07",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 119.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12582878.jpg-0.png",
+      "expected": "444ARA04",
+      "raw": "年全国统一标准汉字表00",
+      "normalized": "00",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 134.4
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12583383.jpg-0.png",
+      "expected": "243MWA02",
+      "raw": " 243M请按此处填写表格.\n\nNote: This template is a generic placeholder for the license plate. Use actual text and lines as you fill it out.",
+      "normalized": "243MNOTETHISTEMPLATEISAGENERICPLACEHOLDERFORTHELICENSEPLATEUSEACTUALTEXTANDLINESASYOUFILLITOUT",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 197.0
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12586305.jpg-0.png",
+      "expected": "930ECA01",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 119.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12587014.jpg-0.png",
+      "expected": "077LCA10",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 130.6
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12587061.jpg-0.png",
+      "expected": "979UOA13",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 126.7
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12587103.jpg-1.png",
+      "expected": "327NAB13",
+      "raw": "if the perimeter of a real-world dome.",
+      "normalized": "IFTHEPERIMETEROFAREALWORLDDOME",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 142.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/12588560.jpg-0.png",
+      "expected": "051LZA01",
+      "raw": " depr",
+      "normalized": "DEPR",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 124.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/20717578-40-full.jpg-0.png",
+      "expected": "498VDZ08",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 128.0
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/22846661-5-full.jpg-0.png",
+      "expected": "546HNA01",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 125.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/30674446-1-full.jpg-0.png",
+      "expected": "075FKA01",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 124.4
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/31244487-1-full.jpg-0.png",
+      "expected": "410OFA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 124.2
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/31244487-4-full.jpg-0.png",
+      "expected": "410OFA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 129.6
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/32294184-9-full.jpg-0.png",
+      "expected": "841WPA02",
+      "raw": " Invoices belong at the address of the Impress. Subject of the invoice. 84.1QWPA 02",
+      "normalized": "INVOICESBELONGATTHEADDRESSOFTHEIMPRESSSUBJECTOFTHEINVOICE841QWPA02",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 195.4
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/32823761-76-full.jpg-0.png",
+      "expected": "051YFA01",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 128.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/44241559-1-full.jpg-0.png",
+      "expected": "F393KVN",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": false,
+      "latency_ms": 134.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/44241559-16-full.jpg-0.png",
+      "expected": "F393KVN",
+      "raw": " Note: higher-order dots are omitted.If the tire of the vehicle has markings for speeds over 90 km/h, this is",
+      "normalized": "NOTEHIGHERORDERDOTSAREOMITTEDIFTHETIREOFTHEVEHICLEHASMARKINGSFORSPEEDSOVER90KMHTHISIS",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": false,
+      "latency_ms": 213.2
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/44241559-3-full.jpg-0.png",
+      "expected": "F393KVN",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": false,
+      "latency_ms": 127.7
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/44990073-3-full.jpg-0.png",
+      "expected": "737THA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 119.3
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/44990073-5-full.jpg-0.png",
+      "expected": "737THA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 119.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/45045570-2-full.jpg-0.png",
+      "expected": "367PTA09",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 123.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/45168299-15-full.jpg-0.png",
+      "expected": "888DLA04",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 125.7
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/45812559-5-full.jpg-0.png",
+      "expected": "118NLA08",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 131.2
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/46079721-1-full.jpg-0.png",
+      "expected": "741APA10",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 133.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/46194641-11-full.jpg-0.png",
+      "expected": "575DVB02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 123.4
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/46395937-21-full.jpg-0.png",
+      "expected": "758WNA01",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 130.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/46831727-3-full.jpg-0.png",
+      "expected": "828NYA08",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 127.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/47152361-4-full.jpg-0.png",
+      "expected": "680WYA01",
+      "raw": " Return",
+      "normalized": "RETURN",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 130.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/86029831-3-full.jpg-0.png",
+      "expected": "394YPA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 141.2
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/86603142-3-full.jpg-0.png",
+      "expected": "T920PAM",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": false,
+      "latency_ms": 143.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/87142620-6-full.jpg-0.png",
+      "expected": "179VEZ14",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 127.0
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/87278630-3-full.jpg-0.png",
+      "expected": "X347HON",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": false,
+      "latency_ms": 146.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/87602685-34-full.jpg-0.png",
+      "expected": "040AVA10",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 122.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/87666561-155-full.jpg-0.png",
+      "expected": "231BJA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 132.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/87711149-11-full.jpg-0.png",
+      "expected": "810CCZ01",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 136.4
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/87751628-46-full.jpg-0.png",
+      "expected": "905EJA02",
+      "raw": "4309\n\nards.com",
+      "normalized": "4309ARDSCOM",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 148.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/87765927-1-full.jpg-0.png",
+      "expected": "835BQA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 134.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/87787793-1-full.jpg-0.png",
+      "expected": "351GCA09",
+      "raw": " Nr.",
+      "normalized": "NR",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 134.6
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/87875658-29-full.jpg-0.png",
+      "expected": "833VHA16",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 153.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/87891621-9-full.jpg-0.png",
+      "expected": "088AY09",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 133.2
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/87952721-64-full.jpg-0.png",
+      "expected": "772AJA09",
+      "raw": "Valid on June 30 and July 15,more.\"",
+      "normalized": "VALIDONJUNE30ANDJULY15MORE",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 160.0
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/88113245-1-full.jpg-0.png",
+      "expected": "338MEA16",
+      "raw": " Please post-adress",
+      "normalized": "PLEASEPOSTADRESS",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 134.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/88200524-4-full.jpg-0.png",
+      "expected": "155EYB02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 135.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/88496335-38-full.jpg-0.png",
+      "expected": "278KAA07",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 129.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/88500478-23-full.jpg-0.png",
+      "expected": "170TZA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 140.7
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/88500478-28-full.jpg-0.png",
+      "expected": "170TZA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 124.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/88553285-11-full.jpg-0.png",
+      "expected": "549GXZ05",
+      "raw": " The text is carved into the plate, so",
+      "normalized": "THETEXTISCARVEDINTOTHEPLATESO",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 149.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/88701357-63-full.jpg-0.png",
+      "expected": "892DOA10",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 138.3
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/88960107-13-full.jpg-0.png",
+      "expected": "101RRR06",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 138.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/88964405-10-full.jpg-0.png",
+      "expected": "A005NKN",
+      "raw": " All other symbols with numbers are not valid. The license plate is valid from",
+      "normalized": "ALLOTHERSYMBOLSWITHNUMBERSARENOTVALIDTHELICENSEPLATEISVALIDFROM",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": false,
+      "latency_ms": 177.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/89071881-5-full.jpg-0.png",
+      "expected": "272RTA01",
+      "raw": " R722RTA01",
+      "normalized": "R722RTA01",
+      "extracted": "722RTA01",
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 144.2
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/89551463-5-full.jpg-0.png",
+      "expected": "555FNB02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 137.6
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/89551463-55-full.jpg-0.png",
+      "expected": "555FNB02",
+      "raw": " Until the Japan Cooperation Program ends in September 2022.",
+      "normalized": "UNTILTHEJAPANCOOPERATIONPROGRAMENDSINSEPTEMBER2022",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 162.0
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/89551463-7-full.jpg-0.png",
+      "expected": "555FNB02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 135.3
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/89636018-9-full.jpg-0.png",
+      "expected": "949XOA01",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 137.4
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/89664914-21-full.jpg-0.png",
+      "expected": "091BAA07",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 206.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/89684872-5-full.jpg-0.png",
+      "expected": "862BAB02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 199.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/89806053-178-full.jpg-0.png",
+      "expected": "341VVA09",
+      "raw": "中之",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 195.6
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/89806053-198-full.jpg-0.png",
+      "expected": "341VVA09",
+      "raw": " No KZ identity plates.",
+      "normalized": "NOIDENTITYPLATES",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 207.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/89901195-27-full.jpg-0.png",
+      "expected": "040QOQ02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 131.7
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/89968314-5-full.jpg-0.png",
+      "expected": "555WHA02",
+      "raw": "555WHA02",
+      "normalized": "555WHA02",
+      "extracted": "555WHA02",
+      "correct": true,
+      "valid_gt_format": true,
+      "latency_ms": 147.0
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/89968314-8-full.jpg-0.png",
+      "expected": "555WHA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 133.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/89986443-3-full.jpg-0.png",
+      "expected": "925VCZ09",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 155.7
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90001279-21-full.jpg-0.png",
+      "expected": "707QQQ09",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 135.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90017879-11-full.jpg-0.png",
+      "expected": "888KZT01",
+      "raw": "zz282388073337",
+      "normalized": "ZZ282388073337",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 162.7
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90017879-37-full.jpg-0.png",
+      "expected": "888KZT01",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 232.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90034772-13-full.jpg-0.png",
+      "expected": "A677CNO",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": false,
+      "latency_ms": 129.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90068716-5-full.jpg-0.png",
+      "expected": "050ROF01",
+      "raw": " Remember to wear it when you ride.",
+      "normalized": "REMEMBERTOWEARITWHENYOURIDE",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 153.3
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90136486-49-full.jpg-0.png",
+      "expected": "484TAA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 124.2
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90145165-1-full.jpg-0.png",
+      "expected": "347VDZ14",
+      "raw": " B",
+      "normalized": "B",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 134.3
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90145165-8-full.jpg-0.png",
+      "expected": "347VDZ14",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 138.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90199878-57-full.jpg-0.png",
+      "expected": "336MEZ01",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 121.6
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90202191-2-full.jpg-0.png",
+      "expected": "936DPA10",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 128.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90345866-14-full.jpg-0.png",
+      "expected": "212ASB02",
+      "raw": " Please stay clear of this plate.And do not write or use the following signs.Know and be aware of this form of advertisement...",
+      "normalized": "PLEASESTAYCLEAROFTHISPLATEANDDONOTWRITEORUSETHEFOLLOWINGSIGNSKNOWANDBEAWAREOFTHISFORMOFADVERTISEMENT",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 209.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90424988-19-full.jpg-0.png",
+      "expected": "150VMA09",
+      "raw": "leave it. No hybridization.Without wille be deemed Documentary Collection by the Minister of the Interior of the Republic of Lithuania. It obliges the City of Vilnius to check the titles of all historical buildings and monuments within the city limits. Within the historic center (medieval fortifications), the City of Vilnius has the privilege of the wide mall permitted under City Law, by being allowed to preserve their companies management systems. Despite the city includes上市 located on the old terrace of Group Four, were in 1990 added under the new Monument Law. It is also the only city inhabitant which sets and respects wedding laws. The license plate has a black and white rectangular sign which is not imposed during the city registration. It features \" одного \" in a symbolic white square at the left-bottom corner. The short text on the upper side of the square reads \"kZ\" and the characters \"150VMAD09\". In the center of the square, it reads \"150VMAD09\" in black fonts, and is also the only one in black which will not fade on paper. The rest of the characters are in gray, and inside the square circle, it reads in black, the following:случаи of registration or home ownership.",
+      "normalized": "LEAVEITNOHYBRIDIZATIONWITHOUTWILLEBEDEEMEDDOCUMENTARYCOLLECTIONBYTHEMINISTEROFTHEINTERIOROFTHEREPUBLICOFLITHUANIAITOBLIGESTHECITYOFVILNIUSTOCHECKTHETITLESOFALLHISTORICALBUILDINGSANDMONUMENTSWITHINTHECITYLIMITSWITHINTHEHISTORICCENTERMEDIEVALFORTIFICATIONSTHECITYOFVILNIUSHASTHEPRIVILEGEOFTHEWIDEMALLPERMITTEDUNDERCITYLAWBYBEINGALLOWEDTOPRESERVETHEIRCOMPANIESMANAGEMENTSYSTEMSDESPITETHECITYINCLUDESLOCATEDONTHEOLDTERRACEOFGROUPFOURWEREIN1990ADDEDUNDERTHENEWMONUMENTLAWITISALSOTHEONLYCITYINHABITANTWHICHSETSANDRESPECTSWEDDINGLAWSTHELICENSEPLATEHASABLACKANDWHITERECTANGULARSIGNWHICHISNOTIMPOSEDDURINGTHECITYREGISTRATIONITFEATURESINASYMBOLICWHITESQUAREATTHELEFTBOTTOMCORNERTHESHORTTEXTONTHEUPPERSIDEOFTHESQUAREREADSANDTHECHARACTERS150VMAD09INTHECENTEROFTHESQUAREITREADS150VMAD09INBLACKFONTSANDISALSOTHEONLYONEINBLACKWHICHWILLNOTFADEONPAPERTHERESTOFTHECHARACTERSAREINGRAYANDINSIDETHESQUARECIRCLEITREADSINBLACKTHEFOLLOWINGOFREGISTRATIONORHOMEOWNERSHIP",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 720.0
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90432751-9-full.jpg-0.png",
+      "expected": "158NCA12",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 129.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90453068-4-full.jpg-0.png",
+      "expected": "247CWA08",
+      "raw": " 24 7cW A08",
+      "normalized": "247CWA08",
+      "extracted": "247CWA08",
+      "correct": true,
+      "valid_gt_format": true,
+      "latency_ms": 165.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90495393-4-full.jpg-0.png",
+      "expected": "707SLA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 138.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90515883-2-full.jpg-0.png",
+      "expected": "708FXA10",
+      "raw": " No sur",
+      "normalized": "NOSUR",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 140.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90546331-30-full.jpg-0.png",
+      "expected": "804FCA14",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 139.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90549504-3-full.jpg-0.png",
+      "expected": "994GBB02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 128.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90558483-2-full.jpg-0.png",
+      "expected": "757AFZ13",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 137.0
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90582444-51-full.jpg-0.png",
+      "expected": "033MXA03",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 136.3
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90582444-53-full.jpg-0.png",
+      "expected": "033MXA03",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 131.6
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90587962-12-full.jpg-0.png",
+      "expected": "755GPZ05",
+      "raw": "ecze",
+      "normalized": "ECZE",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 136.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90634636-11-full.jpg-0.png",
+      "expected": "139CEA10",
+      "raw": " It.",
+      "normalized": "IT",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 135.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90692723-3-full.jpg-0.png",
+      "expected": "872TAZ01",
+      "raw": " Aze",
+      "normalized": "AZE",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 143.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90702683-17-full.jpg-0.png",
+      "expected": "055OXA05",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 126.6
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90728668-4-full.jpg-0.png",
+      "expected": "999AXA16",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 127.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90728668-7-full.jpg-0.png",
+      "expected": "999AXA16",
+      "raw": "Only test results of China's PPTV Hellenic can be valid under this certificate, no cassette袋子例外.",
+      "normalized": "ONLYTESTRESULTSOFCHINASPPTVHELLENICCANBEVALIDUNDERTHISCERTIFICATENOCASSETTE",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 187.2
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90746321-1-full.jpg-0.png",
+      "expected": "620NUA08",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 124.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90747773-7-full.jpg-0.png",
+      "expected": "939MUA16",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 129.7
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90771715-12-full.jpg-0.png",
+      "expected": "485BL01",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 159.6
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90783148-2-full.jpg-0.png",
+      "expected": "666FFF06",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 122.6
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90786942-4-full.jpg-0.png",
+      "expected": "653GBZ05",
+      "raw": " KZ",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 143.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90807116-2-full.jpg-0.png",
+      "expected": "152NYB13",
+      "raw": " 152N.YB13",
+      "normalized": "152NYB13",
+      "extracted": "152NYB13",
+      "correct": true,
+      "valid_gt_format": true,
+      "latency_ms": 139.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90812896-2-full.jpg-0.png",
+      "expected": "565IVZ05",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 123.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90812896-21-full.jpg-0.png",
+      "expected": "565IVZ05",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 174.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90813790-1-full.jpg-0.png",
+      "expected": "012IEZ05",
+      "raw": " Viet Nam",
+      "normalized": "VIETNAM",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 128.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90815564-3-full.jpg-0.png",
+      "expected": "151TAZ13",
+      "raw": "ATBLE SOURCE",
+      "normalized": "ATBLESOURCE",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 149.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90815564-4-full.jpg-0.png",
+      "expected": "151TAZ13",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 120.2
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90870024-1-full.jpg-0.png",
+      "expected": "465DRA08",
+      "raw": " When writing the license plate number, PLEASE REMEMBER the following匣",
+      "normalized": "WHENWRITINGTHELICENSEPLATENUMBERPLEASEREMEMBERTHEFOLLOWING",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 148.6
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90879012-2-full.jpg-0.png",
+      "expected": "851IRZ05",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 126.4
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90881605-1-full.jpg-0.png",
+      "expected": "470KHA06",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 126.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90889734-1-full.jpg-0.png",
+      "expected": "462IGA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 142.3
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90889734-14-full.jpg-0.png",
+      "expected": "462IGA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 133.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90891216-10-full.jpg-0.png",
+      "expected": "462IGA02",
+      "raw": " 462iGA02",
+      "normalized": "462IGA02",
+      "extracted": "462IGA02",
+      "correct": true,
+      "valid_gt_format": true,
+      "latency_ms": 147.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90891216-14-full.jpg-0.png",
+      "expected": "462IGA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 122.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90907569-9-full.jpg-0.png",
+      "expected": "475AR10",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 127.4
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90932665-2-full.jpg-0.png",
+      "expected": "907SZA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 127.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90935559-11-full.jpg-0.png",
+      "expected": "676VBZ15",
+      "raw": " The license plate has been photographed in a",
+      "normalized": "THELICENSEPLATEHASBEENPHOTOGRAPHEDINA",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 150.2
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90946997-5-full.jpg-0.png",
+      "expected": "886ECA11",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 120.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90950591-4-full.jpg-0.png",
+      "expected": "020VAZ04",
+      "raw": " Invoic56601",
+      "normalized": "INVOIC56601",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 140.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90951618-2-full.jpg-0.png",
+      "expected": "814KRA10",
+      "raw": "8484841411101",
+      "normalized": "8484841411101",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 190.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90955706-32-full.jpg-0.png",
+      "expected": "H236602",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": false,
+      "latency_ms": 131.7
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90955706-38-full.jpg-0.png",
+      "expected": "911LIA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 119.0
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90976437-13-full.jpg-0.png",
+      "expected": "141GHB02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 117.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90978915-6-full.jpg-0.png",
+      "expected": "557EWA05",
+      "raw": " A UN1828 class I vehicle. Screen only for adhesive elsewhere. Please do not consider these as proof of registration,##,,#.55 7EWA 05#.",
+      "normalized": "AUN1828CLASSIVEHICLESCREENONLYFORADHESIVEELSEWHEREPLEASEDONOTCONSIDERTHESEASPROOFOFREGISTRATION557EWA05",
+      "extracted": "557EWA05",
+      "correct": true,
+      "valid_gt_format": true,
+      "latency_ms": 200.3
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90986062-6-full.jpg-0.png",
+      "expected": "595SAA01",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 128.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90996609-27-full.jpg-0.png",
+      "expected": "225CQA02",
+      "raw": "。\n\n225CQA02",
+      "normalized": "225CQA02",
+      "extracted": "225CQA02",
+      "correct": true,
+      "valid_gt_format": true,
+      "latency_ms": 144.3
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90996609-28-full.jpg-0.png",
+      "expected": "225CQA02",
+      "raw": "220225CQAI02",
+      "normalized": "220225CQAI02",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 149.0
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/90999739-9-full.jpg-0.png",
+      "expected": "456LLB13",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 132.7
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91001079-14-full.jpg-0.png",
+      "expected": "593DAZ13",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 124.7
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91005320-94-full.jpg-0.png",
+      "expected": "535EIA09",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 128.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91026738-4-full.jpg-0.png",
+      "expected": "755GPZ05",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 132.2
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91027096-4-full.jpg-0.png",
+      "expected": "787WBA01",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 134.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91039463-2-full.jpg-0.png",
+      "expected": "906FOA06",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 125.6
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91039463-5-full.jpg-0.png",
+      "expected": "906FOA06",
+      "raw": "拒绝添加解释。",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 136.2
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91041887-2-full.jpg-0.png",
+      "expected": "517KAA07",
+      "raw": " KLA1853102 517 KA A 07",
+      "normalized": "KLA1853102517KAA07",
+      "extracted": "517KAA07",
+      "correct": true,
+      "valid_gt_format": true,
+      "latency_ms": 226.3
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91046315-12-full.jpg-0.png",
+      "expected": "070CLB13",
+      "raw": "070CLB13",
+      "normalized": "070CLB13",
+      "extracted": "070CLB13",
+      "correct": true,
+      "valid_gt_format": true,
+      "latency_ms": 144.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91046315-34-full.jpg-0.png",
+      "expected": "070CLB13",
+      "raw": "holder is ID printed only. Managemen\n\nK2\n\n070CLB13C1",
+      "normalized": "HOLDERISIDPRINTEDONLYMANAGEMENK2070CLB13C1",
+      "extracted": "070CLB13",
+      "correct": true,
+      "valid_gt_format": true,
+      "latency_ms": 240.0
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91046315-36-full.jpg-0.png",
+      "expected": "070CLB13",
+      "raw": "明明动\n\n070CLB13",
+      "normalized": "070CLB13",
+      "extracted": "070CLB13",
+      "correct": true,
+      "valid_gt_format": true,
+      "latency_ms": 147.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91062705-5-full.jpg-0.png",
+      "expected": "757NLA03",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 131.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91062821-6-full.jpg-0.png",
+      "expected": "691BRB02",
+      "raw": " RZ691BRB02",
+      "normalized": "RZ691BRB02",
+      "extracted": "691BRB02",
+      "correct": true,
+      "valid_gt_format": true,
+      "latency_ms": 144.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91067294-2-full.jpg-0.png",
+      "expected": "657MTA08",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 122.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91068489-15-full.jpg-0.png",
+      "expected": "984SEA09",
+      "raw": " Use",
+      "normalized": "USE",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 134.3
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91070048-5-full.jpg-0.png",
+      "expected": "549HDA10",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 134.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91081568-1-full.jpg-0.png",
+      "expected": "833NRA04",
+      "raw": " 8373NRA 04",
+      "normalized": "8373NRA04",
+      "extracted": "373NRA04",
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 149.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91090673-3-full.jpg-0.png",
+      "expected": "462KFA01",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 125.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91097049-1-full.jpg-0.png",
+      "expected": "409EGA09",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 134.3
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91098517-4-full.jpg-0.png",
+      "expected": "638LUA10",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 135.6
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91100095-3-full.jpg-0.png",
+      "expected": "707NAM02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 208.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91100095-4-full.jpg-0.png",
+      "expected": "707NAM02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 176.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91102305-24-full.jpg-0.png",
+      "expected": "158KRG09",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 127.4
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91103303-3-full.jpg-0.png",
+      "expected": "808ASA16",
+      "raw": "湖北\n\n(08\n\n808ASA",
+      "normalized": "08808ASA",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 147.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91111853-2-full.jpg-0.png",
+      "expected": "421OHA16",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 133.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91117871-9-full.jpg-0.png",
+      "expected": "400OOO10",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 123.3
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91121474-2-full.jpg-0.png",
+      "expected": "964VVA09",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 196.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91123179-4-full.jpg-0.png",
+      "expected": "694DCB02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 126.7
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91131873-89-full.jpg-0.png",
+      "expected": "757VAZ02",
+      "raw": " K2 757V 4Z 02",
+      "normalized": "K2757V4Z02",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 147.7
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91137405-7-full.jpg-0.png",
+      "expected": "777ZNA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 124.2
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91147748-25-full.jpg-0.png",
+      "expected": "123PDA03",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 122.6
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91147748-27-full.jpg-0.png",
+      "expected": "123PDA03",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 122.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91147748-35-full.jpg-0.png",
+      "expected": "123PDA03",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 132.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91148239-33-full.jpg-0.png",
+      "expected": "123PDA03",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 117.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91148239-6-full.jpg-0.png",
+      "expected": "123PDA03",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 123.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91148578-490-full.jpg-0.png",
+      "expected": "123PDA03",
+      "raw": " To emit \"KG E 123PD A 03\" variant fac",
+      "normalized": "TOEMITKGE123PDA03VARIANTFAC",
+      "extracted": "123PDA03",
+      "correct": true,
+      "valid_gt_format": true,
+      "latency_ms": 163.4
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91150520-16-full.jpg-0.png",
+      "expected": "016ASZ13",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 121.2
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91150974-54-full.jpg-0.png",
+      "expected": "896SXA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 117.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91151845-14-full.jpg-0.png",
+      "expected": "253VUZ03",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 122.4
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91154679-23-full.jpg-0.png",
+      "expected": "060ESA15",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 121.3
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91155506-1-full.jpg-0.png",
+      "expected": "070DAZ02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 126.4
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91156716-3-full.jpg-0.png",
+      "expected": "191MEZ01",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 125.3
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91156716-5-full.jpg-0.png",
+      "expected": "191MEZ01",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 129.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91157976-12-full.jpg-0.png",
+      "expected": "317WDA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 123.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91158088-1-full.jpg-0.png",
+      "expected": "105UVA01",
+      "raw": "欠發标准字號105UVa0",
+      "normalized": "105UVA0",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 145.4
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91167977-1-full.jpg-0.png",
+      "expected": "046BAA08",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 125.3
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91167977-3-full.jpg-0.png",
+      "expected": "046BAA08",
+      "raw": " KZ046BAA08",
+      "normalized": "KZ046BAA08",
+      "extracted": "046BAA08",
+      "correct": true,
+      "valid_gt_format": true,
+      "latency_ms": 157.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91173662-26-full.jpg-0.png",
+      "expected": "678UDA09",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 114.4
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91173662-7-full.jpg-0.png",
+      "expected": "678UDA09",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 130.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91173871-6-full.jpg-0.png",
+      "expected": "796WMA01",
+      "raw": "لودوی (24)",
+      "normalized": "24",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 125.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91188016-1-full.jpg-0.png",
+      "expected": "751CWB02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 126.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91188115-45-full.jpg-0.png",
+      "expected": "774MGA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 126.6
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91194516-6-full.jpg-0.png",
+      "expected": "292EVA03",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 123.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91196966-11-full.jpg-0.png",
+      "expected": "288WTA01",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 146.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91199836-1-full.jpg-0.png",
+      "expected": "565LZA04",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 123.3
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91200483-14-full.jpg-0.png",
+      "expected": "348NCB05",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 130.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91204455-3-full.jpg-0.png",
+      "expected": "488MLB13",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 135.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91205017-20-full.jpg-0.png",
+      "expected": "077NBA16",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 131.2
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91217038-3-full.jpg-0.png",
+      "expected": "608EAA01",
+      "raw": "12/1",
+      "normalized": "121",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 136.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91217089-20-full.jpg-0.png",
+      "expected": "069VIP09",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 134.2
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91217089-22-full.jpg-0.png",
+      "expected": "069VIP09",
+      "raw": " License plate obtained from public collection. Please remember the best. Photo.",
+      "normalized": "LICENSEPLATEOBTAINEDFROMPUBLICCOLLECTIONPLEASEREMEMBERTHEBESTPHOTO",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 161.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91217089-4-full.jpg-0.png",
+      "expected": "069VIP09",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 119.0
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91218500-1-full.jpg-0.png",
+      "expected": "077OAA16",
+      "raw": " Sub. 0ZZOY9\n\nZZ9-12/16.收拾人：张某.",
+      "normalized": "SUB0ZZOY9ZZ91216",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 168.0
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91218500-6-full.jpg-0.png",
+      "expected": "077OAA16",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 157.7
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91222172-5-full.jpg-0.png",
+      "expected": "160ISZ05",
+      "raw": "1%9$EZ 160 1SZ05",
+      "normalized": "19EZ1601SZ05",
+      "extracted": "601SZ05",
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 152.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91235026-6-full.jpg-0.png",
+      "expected": "717KCA12",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 130.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91237604-2-full.jpg-0.png",
+      "expected": "748AEZ09",
+      "raw": " To report a violation left unblacklisted, Google will Google return the license plate only 3 or 4 times. With three attempts, each plate must be returned to the manufacturer. On other occasions, Google will be allowed to return a plate if there is at least one victim right or left, make evidence of violation (any of the previous numbers), name of千万不要保持安静！",
+      "normalized": "TOREPORTAVIOLATIONLEFTUNBLACKLISTEDGOOGLEWILLGOOGLERETURNTHELICENSEPLATEONLY3OR4TIMESWITHTHREEATTEMPTSEACHPLATEMUSTBERETURNEDTOTHEMANUFACTURERONOTHEROCCASIONSGOOGLEWILLBEALLOWEDTORETURNAPLATEIFTHEREISATLEASTONEVICTIMRIGHTORLEFTMAKEEVIDENCEOFVIOLATIONANYOFTHEPREVIOUSNUMBERSNAMEOF",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 318.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91241333-2-full.jpg-0.png",
+      "expected": "812FPA07",
+      "raw": " A并使 Official Seal to the license plate is班rah a, and SO DEVERSED in POint, CA hence the text pledge read 812FPA07",
+      "normalized": "AOFFICIALSEALTOTHELICENSEPLATEISRAHAANDSODEVERSEDINPOINTCAHENCETHETEXTPLEDGEREAD812FPA07",
+      "extracted": "812FPA07",
+      "correct": true,
+      "valid_gt_format": true,
+      "latency_ms": 212.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91241333-9-full.jpg-0.png",
+      "expected": "812FPA07",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 128.2
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91250768-25-full.jpg-0.png",
+      "expected": "828VWZ03",
+      "raw": " The only sufficient",
+      "normalized": "THEONLYSUFFICIENT",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 136.7
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91250768-37-full.jpg-0.png",
+      "expected": "828VWZ03",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 132.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91253286-2-full.jpg-0.png",
+      "expected": "707ZLA13",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 140.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91268588-4-full.jpg-0.png",
+      "expected": "869BZB02",
+      "raw": " Have乘坐 vehicle again.",
+      "normalized": "HAVEVEHICLEAGAIN",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 151.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91274515-8-full.jpg-0.png",
+      "expected": "445JGA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 127.1
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91285267-1-full.jpg-0.png",
+      "expected": "248HUA10",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 133.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91285267-2-full.jpg-0.png",
+      "expected": "248HUA10",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 175.6
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91292437-3-full.jpg-0.png",
+      "expected": "070MEA03",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 120.2
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91301670-6-full.jpg-0.png",
+      "expected": "484VEZ14",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 218.8
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91301707-8-full.jpg-0.png",
+      "expected": "424LJA02",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 310.0
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91309424-6-full.jpg-0.png",
+      "expected": "A315VBO",
+      "raw": " Try stating the above text or tags.",
+      "normalized": "TRYSTATINGTHEABOVETEXTORTAGS",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": false,
+      "latency_ms": 162.2
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91309424-8-full.jpg-0.png",
+      "expected": "A315VBO",
+      "raw": " 321511122008351070888883945639",
+      "normalized": "321511122008351070888883945639",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": false,
+      "latency_ms": 161.9
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91318821-3-full.jpg-0.png",
+      "expected": "801FAZ02",
+      "raw": "8001FAZ|02",
+      "normalized": "8001FAZ02",
+      "extracted": "001FAZ02",
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 146.5
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91322381-33-full.jpg-0.png",
+      "expected": "646VEZ14",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 143.6
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91323933-1-full.jpg-0.png",
+      "expected": "370YMA01",
+      "raw": " B1SGZE370YMA",
+      "normalized": "B1SGZE370YMA",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 151.2
+    },
+    {
+      "image": "/home/omirzakn/datasets_ocr_kz/autoriaNumberplateOcrKz-2019-04-26/test/img/91323933-4-full.jpg-0.png",
+      "expected": "370YMA01",
+      "raw": "",
+      "normalized": "",
+      "extracted": null,
+      "correct": false,
+      "valid_gt_format": true,
+      "latency_ms": 133.3
+    }
+  ]
+}
